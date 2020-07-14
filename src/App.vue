@@ -1,16 +1,10 @@
 <template>
   <div
-    v-bind:style="{ 'background-image': 'url('  + ')', 'background-repeat': 'no-repeat', 'width': '100%', 'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
-    <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme">
-      <ul>
-        <li>Работа с расчетами
-          <ul>
-            <li v-on:click="addListWindow">Список расчетов</li>
-            <li v-on:click="addListWindow">Новый расчет</li>
-            <li v-on:click="addListWindow">Последний открытый расчет</li>
-          </ul>
-        <li v-on:click="addListWindow">Загрузить шахматку</li>
-      </ul>
+    v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%', 'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
+    <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}">
+      <div align="left" v-if="!isOpenMainWin" v-on:click="addListWindow" :style="{'display': 'inline-block', 'height': '25px', 'position': 'absolute',
+       'left':'0px', 'marginLeft':'10px', 'marginTop':'5px', 'cursor':'pointer', 'text-align':'right'}"
+      >Загрузить шахматку</div>
     </JqxMenu>
     <div ref="main" v-bind:style="{'height': mainDivSize + 'px'}" id="main-page">
       <component v-for="window in windows" v-bind:is="window.type" :title="window.title" :id="window.id"
@@ -40,6 +34,7 @@
     },
     data() {
       return {
+        isOpenMainWin: false,
         backgroundUrl: backgroundUrl,
         theme: appConfig.menuTheme,
         mainDivSize: document.documentElement.clientHeight - 75,
@@ -72,6 +67,7 @@
     },
     methods: {
       removeWindow(id) {
+        this.isOpenMainWin = false;
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
         this.id = {};
@@ -81,6 +77,7 @@
         this.mainDivSize = document.documentElement.clientHeight - 75;
       },
       addListWindow: function () {
+        this.isOpenMainWin = true;
         let id = "win" + JQXLite.generateID(), vue = this;
         let option = {
           id: id,

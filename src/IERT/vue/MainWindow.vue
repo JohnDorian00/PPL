@@ -43,7 +43,12 @@
         theme: appConfig.windowsTheme,
       }
     },
-    methods: {}
+    methods: {},
+
+    mounted() {
+
+    }
+
   }
 </script>
 
