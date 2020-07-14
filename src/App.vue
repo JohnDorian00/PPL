@@ -6,9 +6,11 @@
        'left':'0px', 'marginLeft':'10px', 'marginTop':'5px', 'cursor':'pointer', 'text-align':'right'}"
       >Загрузить шахматку</div>
     </JqxMenu>
-    <div ref="main" v-bind:style="{'height': mainDivSize + 'px'}" id="main-page">
-      <component v-for="window in windows" v-bind:is="window.type" :title="window.title" :id="window.id"
+    <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
+        <component v-for="window in windows" v-bind:is="window.type" :title="window.title" :id="window.id"
                  v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"/>
+<!--      <component v-for="window in windows" v-bind:is="window.type" :title="window.title" :id="window.id"-->
+<!--                 v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"/>-->
     </div>
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
@@ -85,7 +87,7 @@
           title: 'Прогресс ' + ++this.count,
           state: true,
           close: () => vue.removeWindow(id),
-          changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state
+          changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state,
         }
         this.id[id] = this.windows.length;
         this.windows.push(option);
@@ -97,6 +99,8 @@
     },
   }
 </script>
+
+<!--505 ширина окна миниммум-->
 
 <style>
 

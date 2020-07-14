@@ -16,9 +16,26 @@
         to conveniently develop databases for various applications by database administrators
         (DBAs) and other specialists. A database is an integrated collection of data records,
         files, and other database objects...
-        <JqxButton ref="myTextImageButton" :width="120" :height="40"
-                   :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                   :theme="theme"
+      </div>
+      <div class="btn-group">
+        <JqxButton  ref="myTextImageButton" :width="120" :height="40"
+                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                    :theme="theme" :style="{'display': 'inline-block'}"
+        >
+        </JqxButton>
+        <JqxButton  ref="myTextImageButton" :width="120" :height="40"
+                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                    :theme="theme" :style="{'display': 'inline-block'}"
+        >
+        </JqxButton>
+        <JqxButton  ref="myTextImageButton" :width="120" :height="40"
+                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                    :theme="theme" :style="{'display': 'inline-block'}"
+        >
+        </JqxButton>
+        <JqxButton  ref="myTextImageButton" :width="120" :height="40"
+                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                    :theme="theme" :style="{'display': 'inline-block'}"
         >
         </JqxButton>
       </div>
@@ -46,12 +63,15 @@
     methods: {},
 
     mounted() {
+    },
 
-    }
 
   }
 </script>
 
 <style scoped>
+  .btn-group {
+
+  }
 
 </style>
