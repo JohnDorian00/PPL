@@ -2,7 +2,7 @@
   <div
     v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%', 'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
     <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}">
-      <div align="left" v-if="!isOpenMainWin" v-on:click="addListWindow" :style="{'display': 'inline-block', 'height': '25px', 'position': 'absolute',
+      <div align="left" v-if="!isOpenMainWin" v-on:click="addListWindow({type: 'MainWindow'})" :style="{'display': 'inline-block', 'height': '25px', 'position': 'absolute',
        'left':'0px', 'marginLeft':'10px', 'marginTop':'5px', 'cursor':'pointer', 'text-align':'right'}"
       >Загрузить шахматку</div>
     </JqxMenu>
@@ -34,6 +34,7 @@
       MainWindow,
       JqxButtons
     },
+
     data() {
       return {
         isOpenMainWin: false,
@@ -42,9 +43,10 @@
         mainDivSize: document.documentElement.clientHeight - 75,
         windows: [],
         id: {},
-        count: 0
+        count: 0,
       }
     },
+
     mounted() {
       this.$refs.Menu.setOptions({
         width: "100%",
@@ -64,10 +66,23 @@
       });
       window.addEventListener('resize', this.updateSizeApp)
     },
+
     destroyed() {
       window.removeEventListener('resize', this.updateSizeApp)
     },
+
     methods: {
+      updateWindowCreateOptions(old_options,added_options) {
+        if (added_options && added_options !== 0) {
+          for (let key in old_options) {
+            if (added_options[key] !== undefined) {
+              old_options[key] = added_options[key];
+            }
+          }
+        }
+        return old_options
+      },
+
       removeWindow(id) {
         this.isOpenMainWin = false;
         this.$refs.TollBar.destroyTool(this.id[id]);
@@ -75,10 +90,12 @@
         this.id = {};
         this.windows.forEach((value, index) => this.id[value.id] = index)
       },
+
       updateSizeApp: function () {
         this.mainDivSize = document.documentElement.clientHeight - 75;
       },
-      addListWindow: function () {
+
+      addListWindow: function (added_options) {
         this.isOpenMainWin = true;
         let id = "win" + JQXLite.generateID(), vue = this;
         let option = {
@@ -89,6 +106,7 @@
           close: () => vue.removeWindow(id),
           changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state,
         }
+        option = this.updateWindowCreateOptions(option, added_options);
         this.id[id] = this.windows.length;
         this.windows.push(option);
         this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {

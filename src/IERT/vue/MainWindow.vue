@@ -3,6 +3,8 @@
              :height="'auto'"
              :max-height="190000"
              :max-width="190000"
+             :min-width="505"
+             :min-height="211"
              :position="{ x: 150, y: 220 }"
              :title="title"
              :id="id"
@@ -71,7 +73,8 @@
 
 <style scoped>
   .btn-group {
-
+    position: absolute;
+    bottom: 0px;
   }
 
 </style>
