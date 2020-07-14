@@ -6,50 +6,34 @@
              :min-width="563"
              :min-height="211"
              :position="{ x: 150, y: 220 }"
+             :title="title"
              :id="id"
              :theme="theme"
-             :closeButtonSize="0"
              @close="closeWindows">
     <!--             :title="title"-->
-    <div ref="header">
+    <div ref="header" style="height: 55px">
 
-      {{title}}
-
-      <div class="collapse-button">
-        <img class="collapse-button" src="@/style/images/minus.png">
+      <div>
+        {{title}}
+        <img src="@/style/images/icon_collapse.png">
       </div>
-
-      <div class="expand-button">
-        <img class="expand-button" src="@/style/images/full-screen.png">
-      </div>
-
-      <div class="close-button">
-        <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">
-      </div>
-
 
 
 
     </div>
     <div>
       <div>
-        content
+        A database management system (DBMS) is a software package with computer programs
+        that control the creation, maintenance, and the use of a database. It allows organizations
+        to conveniently develop databases for various applications by database administrators
+        (DBAs) and other specialists. A database is an integrated collection of data records,
+        files, and other database objects...
       </div>
       <div class="btn-group">
         <JqxButton  ref="myTextImageButton1" @click="createWindowNewVariant" :width="120" :height="40"
                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                     :theme="theme" :style="{'display': 'inline-block'}"
         >Создать новый вариант
-        </JqxButton>
-        <JqxButton  ref="myTextImageButton2" :width="120" :height="40"
-                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                    :theme="theme" :style="{'display': 'inline-block'}"
-        >
-        </JqxButton>
-        <JqxButton  ref="myTextImageButton3" :width="120" :height="40"
-                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                    :theme="theme" :style="{'display': 'inline-block'}"
-        >
         </JqxButton>
         <JqxButton  ref="closeButton" @click="closeWindows" :width="120" :height="40"
                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
@@ -90,40 +74,15 @@
 
 <style scoped>
   .btn-group {
-    background-color: #545454;
     position: absolute;
-    left: 0px;
     bottom: 0px;
     width: 100%;
   }
-
-  .collapse-button {
-    display: inline;
-    cursor: pointer;
-    width: 12px;
-    height: 12px;
-    margin-top: 4px;
-    margin-right: 1px;
-    margin-left: 1px;
+  .collapse-expand-buttons-group {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin-right: 25px;
   }
-
-  .expand-button {
-    display: inline;
-    cursor: pointer;
-    width: 12px;
-    height: 12px;
-    margin-right: 1px;
-    margin-left: 1px;
-  }
-
-  .close-button {
-    display: inline;
-    cursor: pointer;
-    width: 12px;
-    height: 12px;
-    margin-right: 1px;
-    margin-left: 1px;
-  }
-
 
 </style>
