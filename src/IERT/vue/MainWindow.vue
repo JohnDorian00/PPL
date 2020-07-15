@@ -11,23 +11,23 @@
              :closeButtonSize="0"
              @close="closeWindows">
     <!--             :title="title"-->
-    <div ref="header">
+    <div ref="header" style="position: relative;">
 
-      {{title}}
+      <div style="display: inline;">{{title}}</div>
 
-      <div class="collapse-button">
-        <img class="collapse-button" src="@/style/images/minus.png">
+      <div style="display: inline; position: absolute; top:0; right: 0;
+                  margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
+      >
+        <div  class="collapse-button" >
+          <img class="collapse-button" src="@/style/images/minus.png">
+        </div>
+        <div class="expand-button" >
+          <img class="expand-button" src="@/style/images/full-screen.png">
+        </div>
+        <div id="exit-button" class="close-button" @click="closeWindows">
+          <img class="close-button"  src="@/style/images/closing.png" @click="closeWindows">
+        </div>
       </div>
-
-      <div class="expand-button">
-        <img class="expand-button" src="@/style/images/full-screen.png">
-      </div>
-
-      <div class="close-button">
-        <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">
-      </div>
-
-
 
 
     </div>
@@ -36,7 +36,7 @@
         content
       </div>
       <div class="btn-group">
-        <JqxButton  ref="myTextImageButton1" @click="createWindowNewVariant" :width="120" :height="40"
+        <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :width="120" :height="40"
                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                     :theme="theme" :style="{'display': 'inline-block'}"
         >Создать новый вариант
@@ -73,7 +73,7 @@
       JqxButton
     },
     name: "MainWindow",
-    props: ["id", "title", "closeWindows", "state", "createWindowNewVariant"],
+    props: ["id", "title", "closeWindows", "state"],
     data() {
       return {
         theme: appConfig.windowsTheme,
@@ -92,8 +92,8 @@
   .btn-group {
     background-color: #545454;
     position: absolute;
-    left: 0px;
-    bottom: 0px;
+    left: 0;
+    bottom: 0;
     width: 100%;
   }
 

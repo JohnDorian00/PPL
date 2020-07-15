@@ -3,16 +3,18 @@
     v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%',
      'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
     <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}">
-      <div v-if="!isOpenedMainWin" v-on:click="addListWindow({type: 'MainWindow',
-      title: 'Перечень вариантов расчета перспективной потребности локомотивов'})" :style="{
-        'display': 'inline-block', 'height': '25px', 'position': 'absolute',
-       'left':'0px', 'marginLeft':'10px', 'marginTop':'5px', 'cursor':'pointer', 'text-align':'right'}"
-      >Загрузить шахматку</div>
+      <ul>
+
+        <li v-on:click="addListWindow({type: 'MainWindow',
+            title: 'Перечень вариантов расчета перспективной потребности локомотивов'})" :style="{
+              'display': 'inline-block', 'height': '25px', 'left':'0px', 'cursor':'pointer', 'text-align':'left'}"
+            > Загрузить шахматку
+        </li>
+      </ul>
     </JqxMenu>
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
         <component v-for="window in windows" v-bind:is="window.type" :title="window.title" :id="window.id"
-                 v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
-                  :createWindowNewVariant="() => createWindowNewVariant()"/>
+                 v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"/>
     </div>
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
@@ -41,7 +43,6 @@
 
     data() {
       return {
-        isOpenedMainWin: false,
         backgroundUrl: backgroundUrl,
         theme: appConfig.menuTheme,
         mainDivSize: document.documentElement.clientHeight - 75,
@@ -82,8 +83,8 @@
 
       updateWindowCreateOptions(old_options,added_options) {
         if (added_options && added_options !== 0) {
-          for (let key in old_options) {
-            if (added_options[key] !== undefined) {
+          for (let key in added_options) {
+            if (old_options.hasOwnProperty(key)) {
               old_options[key] = added_options[key];
             }
           }
@@ -92,7 +93,6 @@
       },
 
       removeWindow(id) {
-        this.isOpenedMainWin = false;
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
         this.id = {};
@@ -104,7 +104,6 @@
       },
 
       addListWindow: function (added_options) {
-        this.isOpenedMainWin = true;
         let id = "win" + JQXLite.generateID(), vue = this;
         let option = {
           id: id,

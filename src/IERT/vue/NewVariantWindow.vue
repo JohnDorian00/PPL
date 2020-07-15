@@ -30,7 +30,7 @@
         files, and other database objects...
       </div>
       <div class="btn-group">
-        <JqxButton  ref="myTextImageButton1" @click="createWindowNewVariant" :width="120" :height="40"
+        <JqxButton  ref="myTextImageButton1" @click="" :width="120" :height="40"
                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                     :theme="theme" :style="{'display': 'inline-block'}"
         >Создать новый вариант
@@ -75,13 +75,13 @@
 <style scoped>
   .btn-group {
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     width: 100%;
   }
   .collapse-expand-buttons-group {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
     margin-right: 25px;
   }
 
