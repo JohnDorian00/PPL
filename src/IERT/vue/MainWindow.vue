@@ -33,8 +33,13 @@
     </div>
     <div>
       <div>
-        content
+        <JqxGrid :width="'100%'" :source="dataAdapter" :columns="columns"
+                 :pageable="true" :autoheight="true" :sortable="true"
+                 :altrows="true" :enabletooltip="true" :editable="true"
+                 :selectionmode="'multiplecellsadvanced'">
+        </JqxGrid>
       </div>
+
       <div class="btn-group">
         <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :width="120" :height="40"
                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
@@ -66,20 +71,44 @@
   import JqxWindow from "@/jqwidgets/jqwidgets-vue/vue_jqxwindow";
   import JqxButton from '@/jqwidgets/jqwidgets-vue/vue_jqxbuttons.vue';
   import appConfig from "@/IERT/js/appConfig";
+  import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
 
   export default {
     components: {
       JqxWindow,
-      JqxButton
+      JqxButton,
+      JqxGrid
     },
     name: "MainWindow",
     props: ["id", "title", "closeWindows", "state"],
     data() {
       return {
         theme: appConfig.windowsTheme,
+        dataAdapter: new jqx.dataAdapter(this.source),
+        columns: [
+          { text: 'id', datafield: 'VarId', width: 250 },
+          { text: 'year',  datafield: 'VarYear', cellsalign: 'right', align: 'right' },
+        ],
       }
     },
-    methods: {},
+
+    methods: {
+    },
+
+    beforeCreate: function () {
+      this.source = {
+        datatype: 'xml',
+        datafields: [
+          { name: 'VarId' },
+          { name: 'VarYear' },
+        ],
+        root: 'Products',
+        record: 'Product',
+        id: 'id',
+        url: 'test.xml'
+      };
+      console.log(this.source)
+    },
 
     mounted() {
     },
