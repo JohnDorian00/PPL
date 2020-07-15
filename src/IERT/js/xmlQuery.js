@@ -1,4 +1,7 @@
 'use strict';
+
+import $ from "@/vendor/jquery-3.4.1.min"
+
 const XmlQuery =  (function () {
   let latId = 0, activeQuery = new Map();
   let lastKey = [];
@@ -87,8 +90,7 @@ const XmlQuery =  (function () {
       if (ajax) {
         return false;
       }
-      let query = '<QuerySet refid="' + querySet + '" >' + this.getUrl() + '</QuerySet>';
-      console.log(query);
+      let query = '<QuerySet refid="' + querySet + '">' + this.getUrl() + '<RefID ID="ResultType">JSON_Q</RefID></QuerySet>';
       ajax = $.ajax({
         url: url,
         dataType: type,
