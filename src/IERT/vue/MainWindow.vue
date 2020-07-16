@@ -85,59 +85,49 @@
     data() {
       return {
         theme: appConfig.windowsTheme,
-        dataAdapter: null,
+        dataAdapter: new jqx.dataAdapter(this.source),
         columns: [
-          { text: 'id', datafield: 'var_id', width: 250 },
-          { text: 'year',  datafield: 'var_year', cellsalign: 'right', align: 'right' },
+          { text: 'id', datafield: 'var_id'},
+          { text: 'Год',  datafield: 'var_year'},
+          { text: 'Номер', datafield: 'var_gs_var_id'},
+          { text: 'Название',  datafield: 'var_name'},
+          { text: 'фывфывыфвфыв', datafield: 'gs_name'},
+          { text: 'фывыфвыфвфыв',  datafield: 'var_desc'},
         ],
       }
     },
 
     methods: {
+      updateGridFromURL() {
+        let t = this;
+
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs",
+          querySet: 'GET_VARS'
+        });
+
+        xmlQuery.query('json', successQuery, function (ER) {
+          console.log(ER);
+          xmlQuery.destroy();
+        })
+
+        function successQuery(json) {
+          t.source.datafields = json.metaData.fields;
+          t.source.localdata = json.rows;
+          t.$refs.myGrid.updatebounddata();
+          xmlQuery.destroy();
+        }
+      }
     },
 
     beforeCreate: function () {
-      let t = this;
-
-      let xmlQuery = new XmlQuery({
-        url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs",
-        querySet: 'GET_VARS'
-      });
-
-      xmlQuery.query('json', successQuery, function (ER) {
-        console.log(ER);
-        xmlQuery.destroy();
-      })
-
-      function successQuery(data) {
-        debugger
-        let source = {
-                        datatype: 'json',
-                        datafields: [
-                                      { name: 'var_id' },
-                                      { name: 'var_year' },
-                                    ],
-                        localdata: {var_id: 0, var_year: 0},
-                      };
-
-        // TODO Разобраться с обновлением грида
-        let dataAdapter = new $.jqx.dataAdapter(source);
-        t.$refs.myGrid.refresh();
-      }
-
-      // this.source = {
-      //               datatype: 'json',
-      //               datafields: [
-      //                             { name: 'var_id' },
-      //                             { name: 'var_year' },
-      //                           ],
-      //               localdata: {var_id: 0, var_year: 0},
-      //             };
-
+      this.source = {
+        datatype: 'json',
+      };
     },
 
     created() {
-
+      this.updateGridFromURL();
     },
 
     mounted() {
