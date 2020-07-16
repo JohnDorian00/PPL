@@ -1,10 +1,10 @@
 <template>
   <JqxWindow :width="300"
              :height="'auto'"
-             :max-height="190000"
+             :max-height="472"
              :max-width="190000"
-             :min-width="924"
-             :min-height="300"
+             :min-width="930"
+             :min-height="472"
              :position="{ x: 150, y: 220 }"
              :id="id"
              :theme="theme"
@@ -28,49 +28,50 @@
       </div>
     </div>
 
-    <div ref="content" style=" top: 0px; width: 100%; background-color: rgb(0,0,255); ">
+    <div ref="content" style=" top: 0px; width: 100%; background-color: rgba(0,0,255,0); ">
 
-      <div style="background-color: rgb(255,0,0); width: 100%; position: absolute; top: 0px; margin-top: 31px; margin-right: 60px" :style="{bottom: button_height+'px'}">
+<!--            FLEXBOX-->
+<!--        <rows ref="Rows" :rowsProps="rows"></rows>-->
 
-<!--        <div style="height: 31px; width: 100%; position:relative; top: 0px"></div>-->
-        <JqxGrid style="position:relative; height: 100%" ref="myGrid" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
+
+
+
+      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0px; margin-right: 60px" :style="{bottom: button_height+'px'}">
+
+        <!--    TODO Привязать таблицу к окну (по высоте)-->
+        <JqxGrid style="position:relative; height: 100%" ref="myGrid" :width="'100%'" :source="dataAdapter" :columnsmenu="true"
                  :columns="columns" :pageable="false" :autoheight="false"
                  :sortable="true" :altrows="true" :enabletooltip="true"
-                 :editable="false" :selectionmode="'singlerow'" >
+                 :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
-
-
       </div>
-
       <div class="btn-group" >
-<!--        :style="{ bottom: button_height+'px' }"-->
-          <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :width="120" :height="button_height"
+          <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
                       :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{'display': 'inline-block'}"
-          >Создать новый вариант
+                      :theme="theme" :style="{'display': 'inline-block'} "
+          ><span class="test">Создать новый вариант &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
-          <JqxButton  ref="myTextImageButton2" :width="120" :height="button_height+'px'"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{'display': 'inline-block'}"
-          >
-          </JqxButton>
-          <JqxButton  ref="myTextImageButton3" :width="120" :height="button_height+'px'"
+          <JqxButton class="button"  ref="myTextImageButton2" :width="120" :height="button_height+'px'"
                       :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                       :theme="theme" :style="{'display': 'inline-block'}"
           >
           </JqxButton>
-          <JqxButton  @click="updateGridFromURL" ref="refreshTable" :width="120" :height="button_height+'px'"
+          <JqxButton class="button"   ref="myTextImageButton3" :width="120" :height="button_height+'px'"
+                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                      :theme="theme" :style="{'display': 'inline-block'}"
+          >
+          </JqxButton>
+          <JqxButton class="button"  @click="updateGridFromURL" ref="refreshTable" :width="120" :height="button_height+'px'"
                       :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                       :theme="theme" :style="{'display': 'inline-block'}"
           >Обновить
           </JqxButton>
-          <JqxButton  ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+          <JqxButton class="button"   ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
                       :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                       :theme="theme" :style="{ 'display': 'inline-block'}"
           >Закрыть
           </JqxButton>
       </div>
-
   </div>
   </JqxWindow>
 </template>
@@ -81,12 +82,14 @@
   import appConfig from "@/IERT/js/appConfig";
   import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
   import XmlQuery from "@/IERT/js/xmlQuery";
+  import Rows from "@/IERT/vue/tabel/flex-row";
 
   export default {
     components: {
       JqxWindow,
       JqxButton,
-      JqxGrid
+      JqxGrid,
+      Rows
     },
     name: "MainWindow",
     props: ["id", "title", "closeWindows", "state"],
@@ -103,6 +106,18 @@
           { text: 'Вариант ГС', datafield: 'gs_name', minwidth: '100'},
           { text: 'Комментарий',  datafield: 'var_desc', minwidth: '100'},
         ],
+        rows: [{
+          id: 1,
+          flex: true,
+          flexSize: 1,
+          data: "<div style='width: 100%; height: 100%; border: 1px solid black;'>  </div>"
+        }, {
+          id: 2,
+          static: true,
+          height: 30,
+          data: "<div style='width: 100%; height: 100%; border: 1px solid black;'></div>"
+        }],
+
       }
     },
 
@@ -149,6 +164,8 @@
     },
 
     mounted() {
+      // FLEXBOX
+      // this.$refs.Rows.updateHeight();
     },
 
 
@@ -156,13 +173,25 @@
 </script>
 
 <style scoped>
+
+  .test {
+    white-space: nowrap;
+  }
+
+  .button {
+    display: inline-block;
+    margin-right: 10px;
+    margin-left: 10px;
+
+  }
+
   .btn-group {
     /*background-color: #545454;*/
-    background-color: green;
+
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 80%;
+    width: 100%;
   }
 
   .collapse-button {

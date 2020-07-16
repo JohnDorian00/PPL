@@ -401,7 +401,7 @@
 }
 .jqx-widget-ext .jqx-grid-cell-sort-ext, .jqx-widget-ext .jqx-grid-cell-filter-ext, .jqx-widget-ext .jqx-grid-cell-pinned-ext, .jqx-grid-cell-sort-ext, .jqx-grid-cell-filter-ext, .jqx-grid-cell-pinned-ext
 {
-  background-color: #aaaaaa;
+  background-color: #99BCE8;
   color: #000000;
   text-shadow: none;
 }
@@ -802,7 +802,8 @@
   color: #04408C;
   text-shadow: none;
   border-color: #99BCE8;
-  background-color: #CBDDF3;
+  padding-left: 4px;
+  background-color: white;
 }
 .jqx-combobox-input-ext
 {
