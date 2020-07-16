@@ -3,8 +3,8 @@
              :height="'auto'"
              :max-height="190000"
              :max-width="190000"
-             :min-width="563"
-             :min-height="211"
+             :min-width="924"
+             :min-height="300"
              :position="{ x: 150, y: 220 }"
              :id="id"
              :theme="theme"
@@ -33,6 +33,7 @@
     </div>
     <div>
       <div>
+<!--        TODO разобраться с высотой таблицы (прикрепить к div с нижними кнопками)-->
         <JqxGrid ref="myGrid" :width="'100%'" :source="dataAdapter"
                  :columns="columns" :pageable="true" :autoheight="true"
                  :sortable="true" :altrows="true" :enabletooltip="true"
@@ -55,6 +56,11 @@
                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                     :theme="theme" :style="{'display': 'inline-block'}"
         >
+        </JqxButton>
+        <JqxButton  @click="updateGridFromURL" ref="refreshTable" :width="120" :height="40"
+                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                    :theme="theme" :style="{'display': 'inline-block'}"
+        >Обновить
         </JqxButton>
         <JqxButton  ref="closeButton" @click="closeWindows" :width="120" :height="40"
                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
@@ -87,12 +93,12 @@
         theme: appConfig.windowsTheme,
         dataAdapter: new jqx.dataAdapter(this.source),
         columns: [
-          { text: 'id', datafield: 'var_id'},
-          { text: 'Год',  datafield: 'var_year'},
-          { text: 'Номер', datafield: 'var_gs_var_id'},
-          { text: 'Название',  datafield: 'var_name'},
-          { text: 'фывфывыфвфыв', datafield: 'gs_name'},
-          { text: 'фывыфвыфвфыв',  datafield: 'var_desc'},
+          { text: 'id', datafield: 'var_id', width: '44'},
+          { text: 'Год',  datafield: 'var_year', width: '44'},
+          { text: 'Номер ГС', datafield: 'var_gs_var_id', minwidth: '143'},
+          { text: 'Название варианта',  datafield: 'var_name'},
+          { text: 'Вариант ГС', datafield: 'gs_name', minwidth: '100'},
+          { text: 'Комментарий',  datafield: 'var_desc', minwidth: '100'},
         ],
       }
     },
@@ -107,8 +113,9 @@
         });
 
         xmlQuery.query('json', successQuery, function (ER) {
-          console.log(ER);
           xmlQuery.destroy();
+          console.log("Error update data");
+          console.log(ER);
         })
 
         function successQuery(json) {
@@ -116,6 +123,7 @@
           t.source.localdata = json.rows;
           t.$refs.myGrid.updatebounddata();
           xmlQuery.destroy();
+          console.log("Success update data");
         }
       }
     },
