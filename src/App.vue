@@ -8,7 +8,7 @@
         <li v-on:click="addListWindow({type: 'MainWindow',
             title: 'Перечень вариантов расчета перспективной потребности локомотивов'})" :style="{
               'display': 'inline-block', 'height': '25px', 'left':'0px', 'cursor':'pointer', 'text-align':'left'}"
-            > Загрузить шахматку
+            > Варианты расчетов перспективной потребности
         </li>
       </ul>
     </JqxMenu>

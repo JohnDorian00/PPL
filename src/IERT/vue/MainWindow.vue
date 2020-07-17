@@ -3,7 +3,7 @@
              :height="'auto'"
              :max-height="1999999"
              :max-width="190000"
-             :min-width="785"
+             :min-width="937"
              :min-height="510"
              :position="{ x: 150, y: 220 }"
              :id="id"
@@ -35,13 +35,15 @@
 <!--            FLEXBOX-->
 <!--        <rows ref="Rows" :rowsProps="rows"></rows>-->
 
+
       <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0px; margin-right: 60px" :style="{bottom: button_height+'px'}">
-        <JqxGrid style="position:relative; height: 100%" ref="myGrid" :width="'100%'" :source="dataAdapter" :columnsmenu="true"
+        <JqxGrid style="position:relative; height: 100%" ref="myGrid" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
                  :columns="columns" :pageable="false" :autoheight="false"
                  :sortable="true" :altrows="true" :enabletooltip="true"
                  :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
       </div>
+
       <ul class="btn-group" :height="button_height">
         <li>
           <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
@@ -145,7 +147,15 @@
         })
 
         function successQuery(json) {
-          t.source.datafields = json.metaData.fields;
+          // t.source.datafields = json.metaData.fields;
+          t.source.datafields = [
+              { name: 'var_id', type: 'string' },
+              { name: 'var_year', type: 'string' },
+              { name: 'var_gs_var_id', type: 'string' },
+              { name: 'var_name', type: 'string' },
+              { name: 'gs_name', type: 'string' },
+              { name: 'var_desc', type: 'string' },
+          ]
           t.source.localdata = json.rows;
           t.$refs.myGrid.updatebounddata();
           xmlQuery.destroy();
