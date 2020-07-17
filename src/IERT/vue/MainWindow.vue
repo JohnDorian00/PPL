@@ -1,7 +1,5 @@
 <template>
-  <JqxWindow :width="300"
-             :height="'auto'"
-             :max-height="1999999"
+  <JqxWindow :max-height="1999999"
              :max-width="190000"
              :min-width="937"
              :min-height="510"
@@ -10,9 +8,8 @@
              :theme="theme"
              :closeButtonSize="0"
              @close="closeWindows">
-    <!--             :title="title"
-                 :min-width="930"
-             :min-height="472" / max = 472-->
+
+<!--    Верхний бар-->
     <div ref="header" style="position: relative;">
       <div style="display: inline;">{{title}}</div>
       <div style="display: inline; position: absolute; top:0; right: 0;
@@ -30,20 +27,26 @@
       </div>
     </div>
 
+<!--      Контент-->
     <div ref="content" style=" top: 0px; width: 100%; background-color: rgba(0,0,255,0); ">
 
 <!--            FLEXBOX-->
 <!--        <rows ref="Rows" :rowsProps="rows"></rows>-->
 
+<!--      Таблица-->
+      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0px; margin-right: 60px; height: calc(100% - 76px)">
 
-      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0px; margin-right: 60px" :style="{bottom: button_height+'px'}">
-        <JqxGrid style="position:relative; height: 100%" ref="myGrid" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
+        <Preloader v-if="!isLoad"></Preloader>
+
+        <JqxGrid v-show="isLoad" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
                  :columns="columns" :pageable="false" :autoheight="false"
                  :sortable="true" :altrows="true" :enabletooltip="true"
                  :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
+
       </div>
 
+<!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
           <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
@@ -93,12 +96,14 @@
   import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
   import XmlQuery from "@/IERT/js/xmlQuery";
   import Rows from "@/IERT/vue/tabel/flex-row";
+  import Preloader from "@/IERT/vue/Preloader";
 
   export default {
     components: {
       JqxWindow,
       JqxButton,
       JqxGrid,
+      Preloader,
       Rows
     },
     name: "MainWindow",
@@ -106,6 +111,7 @@
     data() {
       return {
         theme: appConfig.windowsTheme,
+        isLoad: true,
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
         columns: [
@@ -132,6 +138,7 @@
     },
 
     methods: {
+      // Загрузка данных с url
       updateGridFromURL() {
         let t = this;
 
@@ -178,6 +185,7 @@
     },
 
     created() {
+      // Обновление таблицы
       this.updateGridFromURL();
     },
 

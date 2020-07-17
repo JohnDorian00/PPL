@@ -1,16 +1,9 @@
 <template>
-  <div style="width: 100%; height: 100%; position: absolute;">
-    <div id="app-content" style="width: 100%; height: 100%; position: fixed; z-index: 1; left: 0; top: 0;"></div>
-    <div id="app-loader"
-         style="width: 100%; height: 100%; position: fixed; z-index: 9999; left: 0; top: 0; background-color: #3272ca">
-      <div style="height: 35%"></div>
-      <div
-        style="position: absolute; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%); width: 416px; height: 416px;">
-        <p style="text-align: center; position: relative;">
-          <img style="position: absolute; top:-50%; left:0;" width="416" height="416"
-               src="src/public/img/icon_earth.png" class="logo-css-animation" alt="ИЭРТ"/>
-        </p>
-      </div>
+  <div style="width: 100%; height: 100%; position: absolute">
+    <div class='cssload-loader'>
+      <div class='cssload-inner cssload-one'></div>
+      <div class='cssload-inner cssload-two'></div>
+      <div class='cssload-inner cssload-three'></div>
     </div>
   </div>
 </template>
@@ -22,16 +15,115 @@
 </script>
 
 <style scoped>
-  .logo-css-animation {
-    animation: rotate-animate 3s infinite ease-in-out;
+  .cssload-loader {
+    position: relative;
+    left: calc(50% - 31px);
+    width: 100px;
+    height: 100px;
+    margin: 130px 0;
+    -webkit-perspective: 780px;
+    perspective: 780px;
   }
 
-  @keyframes rotate-animate {
+  .cssload-inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border-radius: 50%;
+    -o-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+  }
+  .cssload-inner.cssload-one {
+    left: 0%;
+    top: 0%;
+    animation: cssload-rotate-one 1.15s linear infinite;
+    -o-animation: cssload-rotate-one 1.15s linear infinite;
+    -ms-animation: cssload-rotate-one 1.15s linear infinite;
+    -webkit-animation: cssload-rotate-one 1.15s linear infinite;
+    -moz-animation: cssload-rotate-one 1.15s linear infinite;
+    border-bottom: 3px solid #5C5EDC;
+  }
+  .cssload-inner.cssload-two {
+    right: 0%;
+    top: 0%;
+    animation: cssload-rotate-two 1.15s linear infinite;
+    -o-animation: cssload-rotate-two 1.15s linear infinite;
+    -ms-animation: cssload-rotate-two 1.15s linear infinite;
+    -webkit-animation: cssload-rotate-two 1.15s linear infinite;
+    -moz-animation: cssload-rotate-two 1.15s linear infinite;
+    border-right: 3px solid rgba(76, 70, 101, 0.99);
+  }
+  .cssload-inner.cssload-three {
+    right: 0%;
+    bottom: 0%;
+    animation: cssload-rotate-three 1.15s linear infinite;
+    -o-animation: cssload-rotate-three 1.15s linear infinite;
+    -ms-animation: cssload-rotate-three 1.15s linear infinite;
+    -webkit-animation: cssload-rotate-three 1.15s linear infinite;
+    -moz-animation: cssload-rotate-three 1.15s linear infinite;
+    border-top: 3px solid #e9908a;
+  }
+
+  @keyframes cssload-rotate-one {
     0% {
-      transform: rotate(0deg)
+      -webkit-transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+      transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
     }
-    to {
-      transform: rotate(360deg)
+    100% {
+      -webkit-transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+      transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
     }
   }
+  @-webkit-keyframes cssload-rotate-one {
+    0% {
+      -webkit-transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+    }
+    100% {
+      -webkit-transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+    }
+  }
+  @keyframes cssload-rotate-two {
+    0% {
+      -webkit-transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+      transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+    }
+    100% {
+      -webkit-transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+      transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+    }
+  }
+  @-webkit-keyframes cssload-rotate-two {
+    0% {
+      -webkit-transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+    }
+    100% {
+      -webkit-transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+    }
+  }
+  @keyframes cssload-rotate-three {
+    0% {
+      -webkit-transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+      transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+    }
+    100% {
+      -webkit-transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+      transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+    }
+  }
+  @-webkit-keyframes cssload-rotate-three {
+    0% {
+      -webkit-transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+    }
+    100% {
+      -webkit-transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+    }
+  }
+
 </style>
