@@ -1,16 +1,18 @@
 <template>
   <JqxWindow :width="300"
              :height="'auto'"
-             :max-height="472"
+             :max-height="1999999"
              :max-width="190000"
-             :min-width="930"
-             :min-height="472"
+             :min-width="785"
+             :min-height="510"
              :position="{ x: 150, y: 220 }"
              :id="id"
              :theme="theme"
              :closeButtonSize="0"
              @close="closeWindows">
-    <!--             :title="title"-->
+    <!--             :title="title"
+                 :min-width="930"
+             :min-height="472" / max = 472-->
     <div ref="header" style="position: relative;">
       <div style="display: inline;">{{title}}</div>
       <div style="display: inline; position: absolute; top:0; right: 0;
@@ -33,45 +35,51 @@
 <!--            FLEXBOX-->
 <!--        <rows ref="Rows" :rowsProps="rows"></rows>-->
 
-
-
-
       <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0px; margin-right: 60px" :style="{bottom: button_height+'px'}">
-
-        <!--    TODO Привязать таблицу к окну (по высоте)-->
         <JqxGrid style="position:relative; height: 100%" ref="myGrid" :width="'100%'" :source="dataAdapter" :columnsmenu="true"
                  :columns="columns" :pageable="false" :autoheight="false"
                  :sortable="true" :altrows="true" :enabletooltip="true"
                  :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
       </div>
-      <div class="btn-group" >
+      <ul class="btn-group" :height="button_height">
+        <li>
           <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{'display': 'inline-block'} "
-          ><span class="test">Создать новый вариант &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                 :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                 :theme="theme" :style="{'display': 'inline-block'} "
+          ><span class="nobr">Создать новый вариант &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
+        </li>
+        <li>
           <JqxButton class="button"  ref="myTextImageButton2" :width="120" :height="button_height+'px'"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{'display': 'inline-block'}"
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                     :theme="theme" :style="{'display': 'inline-block'}"
           >
           </JqxButton>
+        </li>
+        <li>
           <JqxButton class="button"   ref="myTextImageButton3" :width="120" :height="button_height+'px'"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{'display': 'inline-block'}"
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                     :theme="theme" :style="{'display': 'inline-block'}"
           >
           </JqxButton>
+        </li>
+        <li>
           <JqxButton class="button"  @click="updateGridFromURL" ref="refreshTable" :width="120" :height="button_height+'px'"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{'display': 'inline-block'}"
-          >Обновить
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                     :theme="theme" :style="{'display': 'inline-block'}"
+          ><span class="nobr">Обновить &nbsp;&nbsp;</span>
           </JqxButton>
+        </li>
+        <li class="last">
           <JqxButton class="button"   ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{ 'display': 'inline-block'}"
-          >Закрыть
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                     :theme="theme" :style="{ 'display': 'inline-block'}"
+          ><span class="nobr">Закрыть &nbsp;&nbsp;</span>
           </JqxButton>
-      </div>
+        </li>
+        <li class="helper"></li>
+      </ul>
   </div>
   </JqxWindow>
 </template>
@@ -110,7 +118,7 @@
           id: 1,
           flex: true,
           flexSize: 1,
-          data: "<div style='width: 100%; height: 100%; border: 1px solid black;'>  </div>"
+          data: "<div style='width: 100%; height: 100%; border: 1px solid black;'></div>",
         }, {
           id: 2,
           static: true,
@@ -174,7 +182,27 @@
 
 <style scoped>
 
-  .test {
+  ul {
+    text-align: justify;
+    /* Лекарство для IE6-7*/
+    text-justify: newspaper;
+  }
+
+  ul li  {
+    display: inline-block;
+    text-align: left;
+    /* эмуляция inline-block для IE6-7*/
+    //display : inline;
+    //zoom : 1;
+  }
+  ul li.helper {
+    width: 100%;
+    height: 0;
+    visibility: hidden;
+  }
+  .last {margin-right: 100px}
+
+  .nobr {
     white-space: nowrap;
   }
 
@@ -186,8 +214,6 @@
   }
 
   .btn-group {
-    /*background-color: #545454;*/
-
     position: absolute;
     left: 0;
     bottom: 0;
