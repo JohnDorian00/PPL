@@ -28,28 +28,25 @@
     </div>
 
 <!--      Контент-->
-    <div ref="content" style=" top: 0px; width: 100%; background-color: rgba(0,0,255,0); ">
+    <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
 <!--            FLEXBOX-->
 <!--        <rows ref="Rows" :rowsProps="rows"></rows>-->
 
 <!--      Таблица-->
-      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0px; margin-right: 60px; height: calc(100% - 76px)">
-
-
+      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
         <Preloader v-if="!isLoad"></Preloader>
         <JqxGrid v-show="isLoad" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
                  :columns="columns" :pageable="false" :autoheight="false"
                  :sortable="true" :altrows="true" :enabletooltip="true"
                  :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
-
       </div>
 
 <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
-          <JqxButton  ref="myTextImageButton1" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
+          <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
                                  :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                  :theme="theme" :style="{'display': 'inline-block'} "
           ><span class="nobr">Создать новый вариант &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -166,7 +163,7 @@
           t.source.localdata = json.rows;
           t.$refs.myGrid.updatebounddata();
           xmlQuery.destroy();
-          // t.isLoad = true;
+          t.isLoad = true;
           console.log("Success update data");
 
           // adding data for test
