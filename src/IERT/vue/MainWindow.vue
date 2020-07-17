@@ -36,8 +36,8 @@
 <!--      Таблица-->
       <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0px; margin-right: 60px; height: calc(100% - 76px)">
 
-        <Preloader v-if="!isLoad"></Preloader>
 
+        <Preloader v-if="!isLoad"></Preloader>
         <JqxGrid v-show="isLoad" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
                  :columns="columns" :pageable="false" :autoheight="false"
                  :sortable="true" :altrows="true" :enabletooltip="true"
@@ -111,7 +111,7 @@
     data() {
       return {
         theme: appConfig.windowsTheme,
-        isLoad: true,
+        isLoad: false,
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
         columns: [
@@ -166,6 +166,7 @@
           t.source.localdata = json.rows;
           t.$refs.myGrid.updatebounddata();
           xmlQuery.destroy();
+          // t.isLoad = true;
           console.log("Success update data");
 
           // adding data for test
