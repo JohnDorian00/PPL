@@ -32,46 +32,47 @@
     <!--      Контент-->
     <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
+      <!--      Верхняя часть окна-->
       <div style="border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;  background-color: rgba(255,0,0,0); width: 100%;">
-        <div style="text-align: right; margin: 10px">Название нового варианта расчета &nbsp;&nbsp;
+        <div style="text-align: center; margin: 10px">Название нового варианта расчета &nbsp;&nbsp;
           <JqxInput :theme="theme"
                     :minLength="1"
-                    :placeHolder="'Enter a Country'">
+                    :placeHolder="''">
           </JqxInput>
         </div>
 
-
-
-
-        <div style="text-align: right; margin: 10px">Комментарий &nbsp;&nbsp;
+        <div style="text-align: center; margin: 10px">Комментарий &nbsp;&nbsp;
           <JqxInput :theme="theme"
                     :minLength="1"
-                    :placeHolder="'Enter a Country2'">
+                    :placeHolder="''">
           </JqxInput>
         </div>
 
       </div>
 
+      <!--      Нижняя часть окна-->
       <div style="display: inline-block; border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;
-      background-color: rgba(255,0,0,0); width: 200px;"
+       background-color: rgba(255,0,0,0); width: calc(100%); height: calc(100% - 250px); right: 0; position: relative; margin: 10px"
       >
-        <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
-                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                    :theme="theme" :style="{'display': 'block', 'margin': 'auto'} "
+
+
+        <div style="margin: auto; width: 100%; position: relative; display: inline-block; ">
+        <JqxButton  ref="buttonGenscheme" @click="toggleButton($event)" :height="button_height"
+                    :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"
+                    :theme="theme" :style="{'display': 'inline-block', 'margin': 'auto'} "
         ><span class="nobr">На основе варианта генсхемы &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
         </JqxButton>
-        <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
-                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                    :theme="theme" :style="{'display': 'block', 'margin': 'auto'} "
+        <JqxButton  ref="buttonPP" @click="toggleButton($event)" :height="button_height"
+                    :textImageRelation="'imageBeforeText'" :textPosition="'right'"
+                    :theme="theme" style="right: 0; position:absolute;" :style="{'display': 'inline-block', 'margin': 'auto'} "
         ><span class="nobr">На основе варианта расчета п.п. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
         </JqxButton>
-      </div>
+        </div>
 
-      <div style="display: inline-block; border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;
-       background-color: rgba(255,0,0,0); width: calc(50% - 4px); height: calc(100% - 200px); right: 0; margin-right: 3px; position: absolute"
-      >
-        <JqxListBox :theme="theme" :height="'100%'" :width="'100%'"
-                    :source="listBoxSource" :selectedIndex="3" :style="{'display': 'block', 'margin': 'auto'}">
+
+
+        <JqxListBox ref="listBox" :theme="theme" :height="'100%'" :width="'100%'"
+                    :source="listBoxSourceGenscheme" :selectedIndex="3" :style="{'display': 'block', 'margin': 'auto'}">
         </JqxListBox>
       </div>
       <!--      Разница нижних дивов = 117 - 76 = 41px -->
@@ -133,110 +134,106 @@
       JqxListBox,
       JqxInput
     },
+
     name: "MainWindow",
+
     props: ["id", "title", "closeWindows", "state"],
+
     data() {
       return {
         theme: appConfig.windowsTheme,
         isLoad: false,
         button_height: 30,
-        dataAdapter: new jqx.dataAdapter(this.source),
-        columns: [
-          { text: 'id', datafield: 'var_id', width: '44'},
-          { text: 'Год',  datafield: 'var_year', width: '44'},
-          { text: 'Номер ГС', datafield: 'var_gs_var_id', minwidth: '143'},
-          { text: 'Название варианта',  datafield: 'var_name'},
-          { text: 'Вариант ГС', datafield: 'gs_name', minwidth: '100'},
-          { text: 'Комментарий',  datafield: 'var_desc', minwidth: '100'},
+
+        listBoxSourceGenscheme: [
         ],
-        listBoxSource: [
-        "Affogato",
-        "Americano",
-        "Bicerin",
-        "Breve",
-        "Café Bombón",
-        "Café au lait",
-        "Caffé Corretto",
-        "Café Crema",
-        "Caffé Latte",
-        "Caffé macchiato",
-        "Café mélange",
-        "Coffee milk",
-        "Cafe mocha",
-        "Cappuccino",
-        "Carajillo",
-        "Cortado",
-        "Cuban espresso",
-        "Espresso",
-        "Eiskaffee",
-        "The Flat White",
-        "Frappuccino",
-        "Galao",
-        "Greek frappé coffee",
-        "Iced Coffee﻿",
-        "Indian filter coffee",
-        "Instant coffee",
-        "Irish coffee",
-        "Liqueur coffee"
-      ]
+
+        listBoxSourcePP: [
+        ]
 
       }
     },
 
     methods: {
       // Загрузка данных с url
-      updateGridFromURL() {
-        let t = this;
+      loadListBoxData(name) {
+        let t = this, query;
+        t.isLoad = false;
+
+        if (name === "GS") {
+          query = "GET_GS_VARS_GS";
+        } else if (name === "PP") {
+          query = "GET_GS_VARS_VARIANT";
+        }
 
         let xmlQuery = new XmlQuery({
-          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs",
-          querySet: 'GET_VARS'
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
+          querySet: query
         });
 
-        xmlQuery.query('json', successQuery, function (ER) {
-          xmlQuery.destroy();
-          console.log("Error update data");
-          console.log(ER);
-        })
+        xmlQuery.query('json',
 
-        function successQuery(json) {
-          // t.source.datafields = json.metaData.fields;
-          t.source.datafields = [
-            { name: 'var_id', type: 'string' },
-            { name: 'var_year', type: 'string' },
-            { name: 'var_gs_var_id', type: 'string' },
-            { name: 'var_name', type: 'string' },
-            { name: 'gs_name', type: 'string' },
-            { name: 'var_desc', type: 'string' },
-          ]
-          t.source.localdata = json.rows;
-          t.$refs.myGrid.updatebounddata();
-          xmlQuery.destroy();
-          t.isLoad = true;
-          console.log("Success update data");
+                      function(json) {
+                        if (name === "GS") {
+                          t.listBoxSourceGenscheme = [];
+                          for (let key in json.rows) {
+                            t.listBoxSourceGenscheme.push(json.rows[key].name);
+                          }
+                          t.$refs.listBox.source = t.listBoxSourceGenscheme;
 
-          // adding data for test
-          for (let i=0; i<15; i++) {
-            t.$refs.myGrid.addrow(1,[
-              {var_id: i, var_year: "asd", var_gs_var_id: "asd", var_name: "asd", gs_name:"asd", var_desc: "asd"},
-            ]);
-          }
+                        } else if (name === "PP") {
+                          t.listBoxSourcePP = [];
+                          for (let key in json.rows) {
+                            t.listBoxSourcePP.push(json.rows[key].var_name);
+                          }
+                          t.$refs.listBox.source = t.listBoxSourcePP;
+                        }
+                        xmlQuery.destroy();
+                        t.isLoad = true;
+                        console.log("Success update data");
+                        },
+
+                      function (ER) {
+                        xmlQuery.destroy();
+                        console.log("Error update data");
+                        console.log(ER);
+                        }
+        );
+      },
+
+      toggleButton(pressed_button) {
+        pressed_button = pressed_button.currentTarget;
+        let button;
+
+        // Обнуление
+        this.$refs.buttonGenscheme.disabled = false;
+        this.$refs.buttonPP.disabled = false;
+
+        // Кнопка 1
+        if ($(this.$refs.buttonGenscheme.componentSelector)[0] === pressed_button) {
+          button = this.$refs.buttonGenscheme;
+          button.disabled = true;
+          this.loadListBoxData("GS");
+          // Кнопка 2
+        } else if (($(this.$refs.buttonPP.componentSelector)[0] === pressed_button)) {
+          button = this.$refs.buttonPP;
+          button.disabled = true;
+          this.loadListBoxData("PP");
+        } else {
+          console.error("Кнопка не найдена");
         }
-      }
+      },
     },
 
     beforeCreate: function () {
-      this.source = {
-        datatype: 'json',
-      };
     },
 
     created() {
-      // Обновление таблицы
-      // this.updateGridFromURL();
     },
 
     mounted() {
+      this.loadListBoxData("GS");
+      console.log(this.listBoxSourceGenscheme);
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
     },

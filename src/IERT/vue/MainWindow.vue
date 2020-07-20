@@ -138,9 +138,10 @@
       // Загрузка данных с url
       updateGridFromURL() {
         let t = this;
+        t.isLoad = false;
 
         let xmlQuery = new XmlQuery({
-          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs",
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
           querySet: 'GET_VARS'
         });
 
