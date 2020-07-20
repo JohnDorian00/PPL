@@ -35,12 +35,10 @@
       <!--      Верхняя часть окна-->
       <div style="border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;  background-color: rgba(255,0,0,0); width: 100%;">
         <div style="text-align: center; margin: 10px">Название нового варианта расчета &nbsp;&nbsp;
-          <JqxInput :theme="theme"
-                    :minLength="1"
+          <JqxInput :theme="theme" :minLength="1" v-model="nameGS"
                     :placeHolder="''">
           </JqxInput>
         </div>
-
         <div style="text-align: center; margin: 10px">Комментарий &nbsp;&nbsp;
           <JqxInput :theme="theme"
                     :minLength="1"
@@ -52,7 +50,7 @@
 
       <!--      Нижняя часть окна-->
       <div style="display: inline-block; border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;
-       background-color: rgba(255,0,0,0); width: calc(100%); height: calc(100% - 250px); right: 0; position: relative; margin: 10px"
+       background-color: rgba(255,0,0,0); width: calc(100%); height: calc(100% - 200px); right: 0; position: relative; margin: 10px"
       >
 
 
@@ -70,41 +68,29 @@
         </div>
 
 
-
-        <JqxListBox ref="listBox" :theme="theme" :height="'100%'" :width="'100%'"
-                    :source="listBoxSourceGenscheme" :selectedIndex="3" :style="{'display': 'block', 'margin': 'auto'}">
+        <div style="margin-right: 25px; height: 100%">
+        <JqxListBox ref="listBox" :theme="theme" :height="'100%'" :width="'100%'" @select="onListBoxSelect"
+                    :source="listBoxSourceGenscheme" :selectedIndex="3" :style="{'display': 'block'}">
         </JqxListBox>
+        </div>
+
       </div>
-      <!--      Разница нижних дивов = 117 - 76 = 41px -->
-
-
-      <!--      Таблица-->
-<!--      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">-->
-
-
-<!--        <Preloader v-if="!isLoad"></Preloader>-->
-<!--        <JqxGrid v-show="isLoad" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"-->
-<!--                 :columns="columns" :pageable="false" :autoheight="false"-->
-<!--                 :sortable="true" :altrows="true" :enabletooltip="true"-->
-<!--                 :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">-->
-<!--        </JqxGrid>-->
-
-<!--      </div>-->
 
       <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
           <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                      v-bind:disabled="buttonFlag" :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                       :theme="theme" :style="{'display': 'inline-block'} "
-          ><span class="nobr">Создать новый вариант &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          ><span class="nobr">Создать&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
+
         </li>
         <li class="last">
-          <JqxButton class="button"   ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{ 'display': 'inline-block'}"
-          ><span class="nobr">Закрыть &nbsp;&nbsp;</span>
+          ><span class="nobr">Закрыть&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li class="helper"></li>
@@ -123,6 +109,7 @@
   import Preloader from "@/IERT/vue/Preloader";
   import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
   import JqxInput from "@/jqwidgets/jqwidgets-vue/vue_jqxinput";
+  import JqxForm from "@/jqwidgets/jqwidgets-vue/vue_jqxform";
 
   export default {
     components: {
@@ -132,7 +119,8 @@
       Preloader,
       Rows,
       JqxListBox,
-      JqxInput
+      JqxInput,
+      JqxForm
     },
 
     name: "MainWindow",
@@ -144,14 +132,36 @@
         theme: appConfig.windowsTheme,
         isLoad: false,
         button_height: 30,
+        listBoxSelected: false,
+        filledInputName: false,
+
+        nameGS: null,
 
         listBoxSourceGenscheme: [
         ],
 
         listBoxSourcePP: [
         ]
-
       }
+    },
+
+    // Слушатели переменных
+    watch: {
+      // При изменении флага меняется disable окна
+      buttonFlag: function () {
+        this.$refs.createWindowNewVariant.disabled = this.buttonFlag;
+      }
+
+    },
+
+    // Перевычисляемые переменные
+    computed: {
+      // Проверка поля "имя нового варианта" на пустоту, проверка на выбор элемента из списка
+      // При соблюдении условий включается кнопка "создать"
+      buttonFlag: function () {
+          let nameGS = this.nameGS ? this.nameGS.replace(/\s+/g, ' ').trim() : this.nameGS;
+          return !(this.listBoxSelected && (nameGS !== null && nameGS !== ""))
+        },
     },
 
     methods: {
@@ -179,6 +189,7 @@
                           for (let key in json.rows) {
                             t.listBoxSourceGenscheme.push(json.rows[key].name);
                           }
+                          t.listBoxSourceGenscheme.push("abc");
                           t.$refs.listBox.source = t.listBoxSourceGenscheme;
 
                         } else if (name === "PP") {
@@ -201,6 +212,7 @@
         );
       },
 
+      // Включение/отключения кнопок формата списка (кнопки генсхема/п.п. над списком)
       toggleButton(pressed_button) {
         pressed_button = pressed_button.currentTarget;
         let button;
@@ -208,6 +220,7 @@
         // Обнуление
         this.$refs.buttonGenscheme.disabled = false;
         this.$refs.buttonPP.disabled = false;
+        this.listBoxSelected = false;
 
         // Кнопка 1
         if ($(this.$refs.buttonGenscheme.componentSelector)[0] === pressed_button) {
@@ -223,24 +236,33 @@
           console.error("Кнопка не найдена");
         }
       },
+
+      onListBoxSelect() {
+        this.listBoxSelected = true;
+      },
+
     },
 
     beforeCreate: function () {
     },
 
     created() {
+
     },
 
     mounted() {
       this.loadListBoxData("GS");
-      console.log(this.listBoxSourceGenscheme);
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
     },
 
 
   }
+
+  // http://192.168.10.3:8090/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs&xmlQuery=<QuerySet%20refid="CREATE_VAR"><TextParam%20ID="GS_VAR_ID">1904040416293170</TextParam><TextParam%20ID="GS_YEAR">2019</TextParam><TextParam%20ID="GS_NAME">TEST</TextParam></QuerySet>
 </script>
+
+
 
 <style scoped>
 

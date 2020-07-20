@@ -168,11 +168,11 @@
           console.log("Success update data");
 
           // adding data for test
-          for (let i=0; i<15; i++) {
-            t.$refs.myGrid.addrow(1,[
-              {var_id: i, var_year: "asd", var_gs_var_id: "asd", var_name: "asd", gs_name:"asd", var_desc: "asd"},
-            ]);
-          }
+          // for (let i=0; i<15; i++) {
+          //   t.$refs.myGrid.addrow(1,[
+          //     {var_id: i, var_year: "asd", var_gs_var_id: "asd", var_name: "asd", gs_name:"asd", var_desc: "asd"},
+          //   ]);
+          // }
         }
       }
     },
