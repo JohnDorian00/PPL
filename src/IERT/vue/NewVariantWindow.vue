@@ -55,23 +55,24 @@
 
 
         <div style="margin: auto; width: 100%; position: relative; display: inline-block; ">
-        <JqxButton  ref="buttonGenscheme" @click="toggleButton($event)" :height="button_height"
-                    :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"
-                    :theme="theme" :style="{'display': 'inline-block', 'margin': 'auto'} "
-        ><span class="nobr">На основе варианта генсхемы &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        </JqxButton>
-        <JqxButton  ref="buttonPP" @click="toggleButton($event)" :height="button_height"
-                    :textImageRelation="'imageBeforeText'" :textPosition="'right'"
-                    :theme="theme" style="right: 0; position:absolute;" :style="{'display': 'inline-block', 'margin': 'auto'} "
-        ><span class="nobr">На основе варианта расчета п.п. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        </JqxButton>
+          <JqxButton  ref="buttonGenscheme" @click="toggleButton($event)" :height="button_height"
+                      :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"
+                      :theme="theme" :style="{'display': 'inline-block', 'margin': 'auto'} "
+          ><span class="nobr">На основе варианта генсхемы &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          </JqxButton>
+          <JqxButton  ref="buttonPP" @click="toggleButton($event)" :height="button_height"
+                      :textImageRelation="'imageBeforeText'" :textPosition="'right'"
+                      :theme="theme" style="right: 0; position:absolute;" :style="{'display': 'inline-block', 'margin': 'auto'} "
+          ><span class="nobr">На основе варианта расчета п.п. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          </JqxButton>
         </div>
 
 
         <div style="margin-right: 25px; height: 100%">
-        <JqxListBox ref="listBox" :theme="theme" :height="'100%'" :width="'100%'" @select="onListBoxSelect"
-                    :source="listBoxSourceGenscheme" :selectedIndex="3" :style="{'display': 'block'}">
-        </JqxListBox>
+          <Preloader v-if="!isLoad" />
+          <JqxListBox v-show="isLoad" ref="listBox" :theme="theme" :height="'100%'" :width="'100%'" @select="onListBoxSelect"
+                      :source="listBoxSourceGenscheme" :selectedIndex="3" :style="{'display': 'block'}">
+          </JqxListBox>
         </div>
 
       </div>
@@ -133,8 +134,6 @@
         isLoad: false,
         button_height: 30,
         listBoxSelected: false,
-        filledInputName: false,
-
         nameGS: null,
 
         listBoxSourceGenscheme: [
@@ -165,7 +164,7 @@
     },
 
     methods: {
-      // Загрузка данных с url
+      // Загрузка данных с бд
       loadListBoxData(name) {
         let t = this, query;
         t.isLoad = false;
@@ -189,7 +188,6 @@
                           for (let key in json.rows) {
                             t.listBoxSourceGenscheme.push(json.rows[key].name);
                           }
-                          t.listBoxSourceGenscheme.push("abc");
                           t.$refs.listBox.source = t.listBoxSourceGenscheme;
 
                         } else if (name === "PP") {
@@ -209,6 +207,35 @@
                         console.log("Error update data");
                         console.log(ER);
                         }
+        )
+      },
+
+      // Загрузка данных в бд (создание нового варианта)
+      uploadNewVar() {
+        let t = this
+        t.isLoad = false;
+
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
+          querySet: "CREATE_VAR"
+        });
+
+        xmlQuery.setFilter()
+
+        xmlQuery.query('json',
+
+          function(json) {
+
+            xmlQuery.destroy();
+            t.isLoad = true;
+            console.log("Success update data");
+          },
+
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
         );
       },
 
@@ -222,12 +249,12 @@
         this.$refs.buttonPP.disabled = false;
         this.listBoxSelected = false;
 
-        // Кнопка 1
+        // Кнопка 1 (генсхема)
         if ($(this.$refs.buttonGenscheme.componentSelector)[0] === pressed_button) {
           button = this.$refs.buttonGenscheme;
           button.disabled = true;
           this.loadListBoxData("GS");
-          // Кнопка 2
+          // Кнопка 2 (пп)
         } else if (($(this.$refs.buttonPP.componentSelector)[0] === pressed_button)) {
           button = this.$refs.buttonPP;
           button.disabled = true;
@@ -259,7 +286,8 @@
 
   }
 
-  // http://192.168.10.3:8090/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs&xmlQuery=<QuerySet%20refid="CREATE_VAR"><TextParam%20ID="GS_VAR_ID">1904040416293170</TextParam><TextParam%20ID="GS_YEAR">2019</TextParam><TextParam%20ID="GS_NAME">TEST</TextParam></QuerySet>
+  // ADD VARIANT
+  // http://192.168.10.3:8090/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs&xmlQuery=%3CQuerySet%20refid=%22CREATE_VAR%22%3E%3CTextParam%20ID=%22GS_VAR_ID%22%3E1904040416293170%3C/TextParam%3E%3CTextParam%20ID=%22GS_YEAR%22%3E2099%3C/TextParam%3E%3CTextParam%20ID=%22GS_NAME%22%3ETEST123%3C/TextParam%3E%3CTextParam%20ID=%22GS_DESC%22%3Edesprip%3C/TextParam%3E%3C/QuerySet%3E
 </script>
 
 

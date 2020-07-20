@@ -91,6 +91,7 @@ const XmlQuery =  (function () {
         return false;
       }
       let query = '<QuerySet refid="' + querySet + '">' + this.getUrl() + '<RefID ID="ResultType">JSON_Q</RefID></QuerySet>';
+      console.log("url ", this.getUrl());
       ajax = $.ajax({
         url: url,
         dataType: type,
