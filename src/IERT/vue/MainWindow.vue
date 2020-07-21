@@ -94,6 +94,7 @@
   import XmlQuery from "@/IERT/js/xmlQuery";
   import Rows from "@/IERT/vue/tabel/flex-row";
   import Preloader from "@/IERT/vue/Preloader";
+  import globalData from "@/IERT/js/globalData";
 
   export default {
     components: {
@@ -111,6 +112,7 @@
         isLoaded: false,
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
+        source_out: {},
         columns: [
           { text: 'id', datafield: 'var_id', width: '44'},
           { text: 'Год',  datafield: 'var_year', width: '44'},
@@ -160,7 +162,6 @@
         })
 
         function successQuery(json) {
-          // t.source.datafields = json.metaData.fields;
           t.source.datafields = [
               { name: 'var_id', type: 'string' },
               { name: 'var_year', type: 'string' },
@@ -169,15 +170,10 @@
               { name: 'gs_name', type: 'string' },
               { name: 'var_desc', type: 'string' },
           ]
-          t.source.localdata = json.rows;
+          t.source.localdata = globalData.source = json.rows;
           xmlQuery.destroy();
           t.$refs.myGrid.updatebounddata();
-
           t.isLoaded = true;
-          console.log("Success update data");
-
-
-
           // adding data for test
           // for (let i=0; i<15; i++) {
           //   t.$refs.myGrid.addrow(1,[

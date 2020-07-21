@@ -71,7 +71,7 @@
         <div style="margin-right: 25px; height: 100%">
           <Preloader v-if="!isLoaded" />
           <JqxListBox v-show="isLoaded" ref="listBox" :theme="theme" :height="'100%'" :width="'100%'" @select="onListBoxSelect"
-                      :source="listBoxSourceGenscheme" :selectedIndex="3" :style="{'display': 'block'}">
+                      :source="listBoxSourceGenscheme" :style="{'display': 'block'}">
           </JqxListBox>
         </div>
 
@@ -111,6 +111,7 @@
   import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
   import JqxInput from "@/jqwidgets/jqwidgets-vue/vue_jqxinput";
   import JqxForm from "@/jqwidgets/jqwidgets-vue/vue_jqxform";
+  import globalData from "@/IERT/js/globalData";
 
   export default {
     components: {
@@ -126,7 +127,7 @@
 
     name: "MainWindow",
 
-    props: ["id", "title", "closeWindows", "state"],
+    props: ["id", "title", "closeWindows", "state", "source_out"],
 
     data() {
       return {
@@ -134,8 +135,8 @@
         isLoaded: false,
         button_height: 30,
         listBoxSelected: false,
-        nameGS: null,
-        descGS: null,
+        nameGS: "",
+        descGS: "",
         idNewVariant: null,
 
         listBoxSourceGenscheme: [
@@ -152,7 +153,6 @@
       buttonFlag: function () {
         this.$refs.createWindowNewVariant.disabled = this.buttonFlag;
       }
-
     },
 
     // Перевычисляемые переменные
@@ -161,7 +161,7 @@
       // При соблюдении условий включается кнопка "создать"
       buttonFlag: function () {
           let nameGS = this.nameGS ? this.nameGS.replace(/\s+/g, ' ').trim() : this.nameGS;
-          return !(this.listBoxSelected && (nameGS !== null && nameGS !== ""))
+          return !(Boolean(this.listBoxSelected) && (nameGS !== null && nameGS !== ""))
         },
     },
 
@@ -221,22 +221,31 @@
           querySet: "CREATE_VAR"
         });
 
+        let var_id;
+        if (this.$refs.buttonGenscheme.disabled) {
+          if (this.listBoxSelected in globalData.gsVarIDs) {
+            var_id = globalData.gsVarIDs[this.listBoxSelected];
+          }
+        } else if (this.$refs.buttonPP.disabled) {
+
+        } else {
+          console.error("Ошибка: не найдены кнопки " + this.$refs.buttonGenscheme.value + " и " + this.$refs.buttonPP.value);
+        }
+
         xmlQuery.clearFilter();
-        // xmlQuery.setFilter( "GS_VAR_ID", Math.floor(Math.random()*10000000000000000), "text");
-        xmlQuery.setFilter( "GS_VAR_ID", 1702061711243530, "text");
+        xmlQuery.setFilter( "GS_VAR_ID", var_id, "text");
         xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
         xmlQuery.setFilter( "GS_NAME", this.nameGS, "text");
         xmlQuery.setFilter( "GS_DESC", this.descGS, "text");
 
-        xmlQuery.query('json',
 
+
+        xmlQuery.query('json',
           function(json) {
             t.idNewVariant = json.rows[0].var_id;
-            console.log(t.idNewVariant);
             xmlQuery.destroy();
             t.isLoaded = true;
           },
-
           function (ER) {
             xmlQuery.destroy();
             console.log("Error update data");
@@ -271,7 +280,7 @@
       },
 
       onListBoxSelect() {
-        this.listBoxSelected = true;
+        this.listBoxSelected = this.$refs.listBox.getSelectedItem().value;
       },
 
     },
@@ -284,6 +293,7 @@
     },
 
     mounted() {
+      console.log(globalData.source);
       this.loadListBoxData("GS");
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
