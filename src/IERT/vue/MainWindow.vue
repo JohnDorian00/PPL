@@ -35,10 +35,10 @@
 
 <!--      Таблица-->
       <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
-        <Preloader v-if="!isLoad"></Preloader>
-        <JqxGrid v-show="isLoad" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
-                 :columns="columns" :pageable="false" :autoheight="false"
-                 :sortable="true" :altrows="true" :enabletooltip="true"
+        <Preloader v-if="!isLoaded"></Preloader>
+        <JqxGrid v-show="isLoaded" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
+                 :columns="columns" :pageable="false" :autoheight="false" :columnsresize="true"
+                 :sortable="true" :altrows="true" :enabletooltip="true" :columnsautoresize="true"
                  :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
       </div>
@@ -60,15 +60,15 @@
           </JqxButton>
         </li>
         <li>
-          <JqxButton class="button"   ref="myTextImageButton3" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" ref="myTextImageButton3" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'}"
           >
           </JqxButton>
         </li>
         <li>
-          <JqxButton class="button"  @click="updateGridFromURL" ref="refreshTable" :width="120" :height="button_height+'px'"
-                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+          <JqxButton class="button"  @click="updateGridFromURL" ref="buttonRefreshTable" :width="120" :height="button_height+'px'"
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"
                      :theme="theme" :style="{'display': 'inline-block'}"
           ><span class="nobr">Обновить &nbsp;&nbsp;</span>
           </JqxButton>
@@ -108,14 +108,14 @@
     data() {
       return {
         theme: appConfig.windowsTheme,
-        isLoad: false,
+        isLoaded: false,
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
         columns: [
           { text: 'id', datafield: 'var_id', width: '44'},
           { text: 'Год',  datafield: 'var_year', width: '44'},
           { text: 'Номер ГС', datafield: 'var_gs_var_id', minwidth: '143'},
-          { text: 'Название варианта',  datafield: 'var_name'},
+          { text: 'Название варианта',  datafield: 'var_name', width: '200'},
           { text: 'Вариант ГС', datafield: 'gs_name', minwidth: '100'},
           { text: 'Комментарий',  datafield: 'var_desc', minwidth: '100'},
         ],
@@ -134,14 +134,22 @@
       }
     },
 
+    // Слушатели переменных
+    watch: {
+      // Отключение кнопки рефреш во время подгрузки
+      isLoaded: function () {
+        this.$refs.buttonRefreshTable.disabled = !(this.isLoaded);
+      }
+    },
+
     methods: {
       // Загрузка данных с url
       updateGridFromURL() {
         let t = this;
-        t.isLoad = false;
+        t.isLoaded = false;
 
         let xmlQuery = new XmlQuery({
-          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
           querySet: 'GET_VARS'
         });
 
@@ -162,10 +170,13 @@
               { name: 'var_desc', type: 'string' },
           ]
           t.source.localdata = json.rows;
-          t.$refs.myGrid.updatebounddata();
           xmlQuery.destroy();
-          t.isLoad = true;
+          t.$refs.myGrid.updatebounddata();
+
+          t.isLoaded = true;
           console.log("Success update data");
+
+
 
           // adding data for test
           // for (let i=0; i<15; i++) {
@@ -184,8 +195,9 @@
     },
 
     created() {
-      // Обновление таблицы
       this.updateGridFromURL();
+      // this.$refs.buttonRefreshTable.disabled = true;
+      // Обновление таблицы
     },
 
     mounted() {

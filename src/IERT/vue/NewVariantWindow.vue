@@ -40,7 +40,7 @@
           </JqxInput>
         </div>
         <div style="text-align: center; margin: 10px">Комментарий &nbsp;&nbsp;
-          <JqxInput :theme="theme"
+          <JqxInput :theme="theme" v-model="descGS"
                     :minLength="1"
                     :placeHolder="''">
           </JqxInput>
@@ -69,8 +69,8 @@
 
 
         <div style="margin-right: 25px; height: 100%">
-          <Preloader v-if="!isLoad" />
-          <JqxListBox v-show="isLoad" ref="listBox" :theme="theme" :height="'100%'" :width="'100%'" @select="onListBoxSelect"
+          <Preloader v-if="!isLoaded" />
+          <JqxListBox v-show="isLoaded" ref="listBox" :theme="theme" :height="'100%'" :width="'100%'" @select="onListBoxSelect"
                       :source="listBoxSourceGenscheme" :selectedIndex="3" :style="{'display': 'block'}">
           </JqxListBox>
         </div>
@@ -80,7 +80,7 @@
       <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
-          <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
+          <JqxButton  ref="createWindowNewVariant" @click="uploadNewVar" :height="button_height"
                       v-bind:disabled="buttonFlag" :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                       :theme="theme" :style="{'display': 'inline-block'} "
           ><span class="nobr">Создать&nbsp;&nbsp;&nbsp;</span>
@@ -131,10 +131,12 @@
     data() {
       return {
         theme: appConfig.windowsTheme,
-        isLoad: false,
+        isLoaded: false,
         button_height: 30,
         listBoxSelected: false,
         nameGS: null,
+        descGS: null,
+        idNewVariant: null,
 
         listBoxSourceGenscheme: [
         ],
@@ -167,7 +169,7 @@
       // Загрузка данных с бд
       loadListBoxData(name) {
         let t = this, query;
-        t.isLoad = false;
+        t.isLoaded = false;
 
         if (name === "GS") {
           query = "GET_GS_VARS_GS";
@@ -198,8 +200,7 @@
                           t.$refs.listBox.source = t.listBoxSourcePP;
                         }
                         xmlQuery.destroy();
-                        t.isLoad = true;
-                        console.log("Success update data");
+                        t.isLoaded = true;
                         },
 
                       function (ER) {
@@ -213,28 +214,33 @@
       // Загрузка данных в бд (создание нового варианта)
       uploadNewVar() {
         let t = this
-        t.isLoad = false;
+        t.isLoaded = false;
 
         let xmlQuery = new XmlQuery({
-          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
           querySet: "CREATE_VAR"
         });
 
-        xmlQuery.setFilter()
+        xmlQuery.clearFilter();
+        // xmlQuery.setFilter( "GS_VAR_ID", Math.floor(Math.random()*10000000000000000), "text");
+        xmlQuery.setFilter( "GS_VAR_ID", 1702061711243530, "text");
+        xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
+        xmlQuery.setFilter( "GS_NAME", this.nameGS, "text");
+        xmlQuery.setFilter( "GS_DESC", this.descGS, "text");
 
         xmlQuery.query('json',
 
           function(json) {
-
+            t.idNewVariant = json.rows[0].var_id;
+            console.log(t.idNewVariant);
             xmlQuery.destroy();
-            t.isLoad = true;
-            console.log("Success update data");
+            t.isLoaded = true;
           },
 
           function (ER) {
             xmlQuery.destroy();
             console.log("Error update data");
-            console.log(ER);
+            console.log("ERROR = ", ER);
           }
         );
       },
