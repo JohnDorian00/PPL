@@ -7,7 +7,9 @@
              :id="id"
              :theme="theme"
              :closeButtonSize="0"
-             @close="closeWindows">
+             @close="closeWindows"
+             :sourceOut = "sourceOut"
+              >
 
 <!--    Верхний бар-->
     <div ref="header" style="position: relative;">
@@ -112,7 +114,7 @@
         isLoaded: false,
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
-        source_out: {},
+        sourceOut: "asd",
         columns: [
           { text: 'id', datafield: 'var_id', width: '44'},
           { text: 'Год',  datafield: 'var_year', width: '44'},
@@ -162,6 +164,7 @@
         })
 
         function successQuery(json) {
+          t.sourceOut = json.rows;
           t.source.datafields = [
               { name: 'var_id', type: 'string' },
               { name: 'var_year', type: 'string' },
@@ -170,7 +173,7 @@
               { name: 'gs_name', type: 'string' },
               { name: 'var_desc', type: 'string' },
           ]
-          t.source.localdata = globalData.source = json.rows;
+          t.source.localdata = json.rows;
           xmlQuery.destroy();
           t.$refs.myGrid.updatebounddata();
           t.isLoaded = true;

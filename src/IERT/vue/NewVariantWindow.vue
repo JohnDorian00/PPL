@@ -127,7 +127,7 @@
 
     name: "MainWindow",
 
-    props: ["id", "title", "closeWindows", "state", "source_out"],
+    props: ["id", "title", "closeWindows", "state", "sourceOut"],
 
     data() {
       return {
@@ -142,8 +142,10 @@
         listBoxSourceGenscheme: [
         ],
 
-        listBoxSourcePP: [
-        ]
+        listBoxSourcePP: {
+          gsID: [],
+          gsName: [],
+        },
       }
     },
 
@@ -166,6 +168,12 @@
     },
 
     methods: {
+      loadListBoxPP() {
+        for (let index in globalData.source) {
+          console.log(globalData.source[index]);
+        }
+      },
+
       // Загрузка данных с бд
       loadListBoxData(name) {
         let t = this, query;
@@ -193,11 +201,12 @@
                           t.$refs.listBox.source = t.listBoxSourceGenscheme;
 
                         } else if (name === "PP") {
-                          t.listBoxSourcePP = [];
+                          t.listBoxSourcePP.gsName = [];
                           for (let key in json.rows) {
-                            t.listBoxSourcePP.push(json.rows[key].var_name);
+                            t.listBoxSourcePP.gsID.push(json.rows[key].var_gs_var_id);
+                            t.listBoxSourcePP.gsName.push(json.rows[key].var_name);
                           }
-                          t.$refs.listBox.source = t.listBoxSourcePP;
+                          t.$refs.listBox.source = t.listBoxSourcePP.gsName;
                         }
                         xmlQuery.destroy();
                         t.isLoaded = true;
@@ -227,31 +236,29 @@
             var_id = globalData.gsVarIDs[this.listBoxSelected];
           }
         } else if (this.$refs.buttonPP.disabled) {
-
+            console.log(this.listBoxSelectedID, var_id);
         } else {
           console.error("Ошибка: не найдены кнопки " + this.$refs.buttonGenscheme.value + " и " + this.$refs.buttonPP.value);
         }
 
-        xmlQuery.clearFilter();
-        xmlQuery.setFilter( "GS_VAR_ID", var_id, "text");
-        xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
-        xmlQuery.setFilter( "GS_NAME", this.nameGS, "text");
-        xmlQuery.setFilter( "GS_DESC", this.descGS, "text");
-
-
-
-        xmlQuery.query('json',
-          function(json) {
-            t.idNewVariant = json.rows[0].var_id;
-            xmlQuery.destroy();
-            t.isLoaded = true;
-          },
-          function (ER) {
-            xmlQuery.destroy();
-            console.log("Error update data");
-            console.log("ERROR = ", ER);
-          }
-        );
+        // xmlQuery.clearFilter();
+        // xmlQuery.setFilter( "GS_VAR_ID", var_id, "text");
+        // xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
+        // xmlQuery.setFilter( "GS_NAME", this.nameGS, "text");
+        // xmlQuery.setFilter( "GS_DESC", this.descGS, "text");
+        //
+        // xmlQuery.query('json',
+        //   function(json) {
+        //     t.idNewVariant = json.rows[0].var_id;
+        //     xmlQuery.destroy();
+        //     t.isLoaded = true;
+        //   },
+        //   function (ER) {
+        //     xmlQuery.destroy();
+        //     console.log("Error update data");
+        //     console.log("ERROR = ", ER);
+        //   }
+        // );
       },
 
       // Включение/отключения кнопок формата списка (кнопки генсхема/п.п. над списком)
@@ -273,6 +280,7 @@
         } else if (($(this.$refs.buttonPP.componentSelector)[0] === pressed_button)) {
           button = this.$refs.buttonPP;
           button.disabled = true;
+          // this.loadListBoxPP();
           this.loadListBoxData("PP");
         } else {
           console.error("Кнопка не найдена");
@@ -293,8 +301,8 @@
     },
 
     mounted() {
-      console.log(globalData.source);
       this.loadListBoxData("GS");
+      console.log(this.sourceOut);
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
     },
