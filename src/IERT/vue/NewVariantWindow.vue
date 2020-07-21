@@ -127,7 +127,7 @@
 
     name: "MainWindow",
 
-    props: ["id", "title", "closeWindows", "state", "sourceOut"],
+    props: ["id", "title", "closeWindows", "state", "sourcePP"],
 
     data() {
       return {
@@ -139,13 +139,9 @@
         descGS: "",
         idNewVariant: null,
 
-        listBoxSourceGenscheme: [
-        ],
+        listBoxSourceGenscheme: [],
 
-        listBoxSourcePP: {
-          gsID: [],
-          gsName: [],
-        },
+        listBoxSourcePP: [],
       }
     },
 
@@ -154,7 +150,13 @@
       // При изменении флага меняется disable окна
       buttonFlag: function () {
         this.$refs.createWindowNewVariant.disabled = this.buttonFlag;
+      },
+
+      sourcePP: function () {
+        this.loadListBoxPP();
+        this.$refs.listBox.source = this.listBoxSourcePP;
       }
+
     },
 
     // Перевычисляемые переменные
@@ -169,8 +171,9 @@
 
     methods: {
       loadListBoxPP() {
-        for (let index in globalData.source) {
-          console.log(globalData.source[index]);
+        this.listBoxSourcePP = [];
+        for (let i in this.sourcePP) {
+          this.listBoxSourcePP.push(this.sourcePP[i].var_name);
         }
       },
 
@@ -179,11 +182,13 @@
         let t = this, query;
         t.isLoaded = false;
 
-        if (name === "GS") {
-          query = "GET_GS_VARS_GS";
-        } else if (name === "PP") {
-          query = "GET_GS_VARS_VARIANT";
-        }
+        // if (name === "GS") {
+        //   query = "GET_GS_VARS_GS";
+        // } else if (name === "PP") {
+        //   query = "GET_GS_VARS_VARIANT";
+        // }
+
+        query = "GET_GS_VARS_GS";
 
         let xmlQuery = new XmlQuery({
           url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
@@ -193,21 +198,21 @@
         xmlQuery.query('json',
 
                       function(json) {
-                        if (name === "GS") {
+                        // if (name === "GS") {
                           t.listBoxSourceGenscheme = [];
                           for (let key in json.rows) {
                             t.listBoxSourceGenscheme.push(json.rows[key].name);
                           }
                           t.$refs.listBox.source = t.listBoxSourceGenscheme;
 
-                        } else if (name === "PP") {
-                          t.listBoxSourcePP.gsName = [];
-                          for (let key in json.rows) {
-                            t.listBoxSourcePP.gsID.push(json.rows[key].var_gs_var_id);
-                            t.listBoxSourcePP.gsName.push(json.rows[key].var_name);
-                          }
-                          t.$refs.listBox.source = t.listBoxSourcePP.gsName;
-                        }
+                        // } else if (name === "PP") {
+                        //   t.listBoxSourcePP.gsName = [];
+                        //   for (let key in json.rows) {
+                        //     t.listBoxSourcePP.gsID.push(json.rows[key].var_gs_var_id);
+                        //     t.listBoxSourcePP.gsName.push(json.rows[key].var_name);
+                        //   }
+                        //   t.$refs.listBox.source = t.listBoxSourcePP.gsName;
+                        // }
                         xmlQuery.destroy();
                         t.isLoaded = true;
                         },
@@ -232,33 +237,35 @@
 
         let var_id;
         if (this.$refs.buttonGenscheme.disabled) {
-          if (this.listBoxSelected in globalData.gsVarIDs) {
-            var_id = globalData.gsVarIDs[this.listBoxSelected];
+          if (this.listBoxSelected.value in globalData.gsVarIDs) {
+            var_id = globalData.gsVarIDs[this.listBoxSelected.value];
           }
         } else if (this.$refs.buttonPP.disabled) {
-            console.log(this.listBoxSelectedID, var_id);
+            var_id = this.sourcePP[this.listBoxSelected.index].var_gs_var_id;
         } else {
           console.error("Ошибка: не найдены кнопки " + this.$refs.buttonGenscheme.value + " и " + this.$refs.buttonPP.value);
         }
 
-        // xmlQuery.clearFilter();
-        // xmlQuery.setFilter( "GS_VAR_ID", var_id, "text");
-        // xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
-        // xmlQuery.setFilter( "GS_NAME", this.nameGS, "text");
-        // xmlQuery.setFilter( "GS_DESC", this.descGS, "text");
-        //
-        // xmlQuery.query('json',
-        //   function(json) {
-        //     t.idNewVariant = json.rows[0].var_id;
-        //     xmlQuery.destroy();
-        //     t.isLoaded = true;
-        //   },
-        //   function (ER) {
-        //     xmlQuery.destroy();
-        //     console.log("Error update data");
-        //     console.log("ERROR = ", ER);
-        //   }
-        // );
+        console.log(var_id);
+
+        xmlQuery.clearFilter();
+        xmlQuery.setFilter( "GS_VAR_ID", var_id, "text");
+        xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
+        xmlQuery.setFilter( "GS_NAME", this.nameGS, "text");
+        xmlQuery.setFilter( "GS_DESC", this.descGS, "text");
+
+        xmlQuery.query('json',
+          function(json) {
+            t.idNewVariant = json.rows[0].var_id;
+            xmlQuery.destroy();
+            t.isLoaded = true;
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log("ERROR = ", ER);
+          }
+        );
       },
 
       // Включение/отключения кнопок формата списка (кнопки генсхема/п.п. над списком)
@@ -275,20 +282,20 @@
         if ($(this.$refs.buttonGenscheme.componentSelector)[0] === pressed_button) {
           button = this.$refs.buttonGenscheme;
           button.disabled = true;
-          this.loadListBoxData("GS");
+          this.loadListBoxData();
           // Кнопка 2 (пп)
         } else if (($(this.$refs.buttonPP.componentSelector)[0] === pressed_button)) {
           button = this.$refs.buttonPP;
           button.disabled = true;
-          // this.loadListBoxPP();
-          this.loadListBoxData("PP");
+          this.loadListBoxPP();
+          this.$refs.listBox.source = this.listBoxSourcePP;
         } else {
           console.error("Кнопка не найдена");
         }
       },
 
       onListBoxSelect() {
-        this.listBoxSelected = this.$refs.listBox.getSelectedItem().value;
+        this.listBoxSelected = this.$refs.listBox.getSelectedItem();
       },
 
     },
@@ -301,8 +308,7 @@
     },
 
     mounted() {
-      this.loadListBoxData("GS");
-      console.log(this.sourceOut);
+      this.loadListBoxData();
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
     },
@@ -310,9 +316,7 @@
 
   }
 
-  // ADD VARIANT
-  // http://192.168.10.3:8090/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs&xmlQuery=%3CQuerySet%20refid=%22CREATE_VAR%22%3E%3CTextParam%20ID=%22GS_VAR_ID%22%3E1904040416293170%3C/TextParam%3E%3CTextParam%20ID=%22GS_YEAR%22%3E2099%3C/TextParam%3E%3CTextParam%20ID=%22GS_NAME%22%3ETEST123%3C/TextParam%3E%3CTextParam%20ID=%22GS_DESC%22%3Edesprip%3C/TextParam%3E%3C/QuerySet%3E
-</script>
+ </script>
 
 
 

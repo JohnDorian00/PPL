@@ -174,6 +174,10 @@
               { name: 'var_desc', type: 'string' },
           ]
           t.source.localdata = json.rows;
+
+          // Передача списка всех записей родителю
+          t.$emit("MainWindowTableChange", json.rows);
+
           xmlQuery.destroy();
           t.$refs.myGrid.updatebounddata();
           t.isLoaded = true;

@@ -14,7 +14,8 @@
     </JqxMenu>
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
         <component v-for="window in windows" v-bind:is="window.type" :title="window.title" :id="window.id"
-                 v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"/>
+                   v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
+                   @MainWindowTableChange="globalSourceUpdate" :sourcePP="mainWindowSource"/>
     </div>
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
@@ -49,6 +50,7 @@
         windows: [],
         id: {},
         count: 0,
+        mainWindowSource: {},
       }
     },
 
@@ -61,7 +63,6 @@
         animationShowDelay: 0,
         autoOpen: true,
         showTopLevelArrows: true,
-
       });
       this.$refs.TollBar.setOptions({
         width: '100%',
@@ -77,6 +78,10 @@
     },
 
     methods: {
+      globalSourceUpdate(data) {
+        this.mainWindowSource = data;
+      },
+
       createWindowNewVariant() {
         this.addListWindow({type: 'NewVariantWindow', title: "Создание нового варианта"});
       },
