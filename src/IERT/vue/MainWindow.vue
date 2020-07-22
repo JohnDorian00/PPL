@@ -46,38 +46,38 @@
 <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
-          <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
+          <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height+'px'"
                                  :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                  :theme="theme" :style="{'display': 'inline-block'} "
-          ><span class="nobr">Создать новый вариант &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          ><span class="nobr">Создать новый вариант&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li>
-          <JqxButton class="button"  ref="myTextImageButton2" :width="120" :height="button_height+'px'"
+          <JqxButton class="button"  ref="workVariant" @click="this.$root.$children[0].workVariant" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'}"
-          >
+          ><span class="nobr">Изменить&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li>
           <JqxButton class="button" @click="deleteVariant" ref="buttonDeleteVariant" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'}"
-          ><span class="nobr">Удалить &nbsp;&nbsp;</span>
+          ><span class="nobr">Удалить&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
-        <li>
+        <li class="last">
           <JqxButton class="button"  @click="updateGridFromURL" ref="buttonRefreshTable" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"
                      :theme="theme" :style="{'display': 'inline-block'}"
-          ><span class="nobr">Обновить &nbsp;&nbsp;</span>
+          ><span class="nobr">Обновить&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li class="last">
           <JqxButton class="button"   ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{ 'display': 'inline-block'}"
-          ><span class="nobr">Закрыть &nbsp;&nbsp;</span>
+          ><span class="nobr">Закрыть&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li class="helper"></li>
@@ -148,6 +148,8 @@
     methods: {
       onRowselect($event) {
         this.GridSelector = $event.args.row;
+        // Передача списка всех записей родителю
+        this.$emit("RowSelect", this.GridSelector);
       },
 
       // Удаление варианта из бд

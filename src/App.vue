@@ -12,10 +12,12 @@
         </li>
       </ul>
     </JqxMenu>
+    {{mainWindowRow}}
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
         <component v-for="window in windows" :is="window.type" :title="window.title" :id="window.id"
                    v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
-                   @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"/>
+                   @MainWindowTableChange="MainWindowTableChange" @RowSelect="RowSelect" :sourcePP="mainWindowSource"
+                   :row="mainWindowRow"/>
     </div>
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
@@ -31,6 +33,7 @@
   import appConfig from "@/IERT/js/appConfig";
   import MainWindow from "@/IERT/vue/MainWindow";
   import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
+  import WorkVariant from "@/IERT/vue/WorkVariant";
 
   export default {
     name: "MainApp",
@@ -40,6 +43,7 @@
       JqxButtons,
       MainWindow,
       NewVariantWindow,
+      WorkVariant,
     },
 
     data() {
@@ -51,6 +55,7 @@
         id: {},
         count: 0,
         mainWindowSource: {},
+        mainWindowRow: null,
       }
     },
 
@@ -78,6 +83,10 @@
     },
 
     methods: {
+      RowSelect(row) {
+        this.mainWindowRow = row;
+      },
+
       MainWindowTableChange(data) {
         this.mainWindowSource = data;
       },
@@ -95,6 +104,17 @@
         this.addListWindow({type: 'NewVariantWindow', title: "Создание нового варианта"});
       },
 
+      workVariant() {
+        if (this.mainWindowRow) {
+          this.addListWindow(
+  {type: 'WorkVariant', title: "Работа с вариантом " + this.mainWindowRow.var_name + ", " +
+              this.mainWindowRow.var_year + " г."
+              });
+        } else {
+          console.log("Не выбран пункт в таблице, ошибка изменения варианта");
+        }
+      },
+
       updateWindowCreateOptions(old_options,added_options) {
         if (added_options && added_options !== 0) {
           for (let key in added_options) {
@@ -107,6 +127,7 @@
       },
 
       removeWindow(id) {
+        this.mainWindowRow = null
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
         this.id = {};
@@ -124,7 +145,7 @@
           type: 'MainWindow',
           title: 'Прогресс ' + ++this.count,
           state: true,
-          close: () => vue.removeWindow(id),
+          close: () => {vue.removeWindow(id)},
           changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state,
         }
         option = this.updateWindowCreateOptions(option, added_options);
