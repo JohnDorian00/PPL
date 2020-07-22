@@ -28,7 +28,6 @@
         </div>
       </div>
     </div>
-
 <!--      Контент-->
     <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
@@ -39,12 +38,11 @@
       <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
         <Preloader v-if="!isLoaded"></Preloader>
         <JqxGrid v-show="isLoaded" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
-                 :columns="columns" :pageable="false" :autoheight="false" :columnsresize="true"
+                 :columns="columns" :pageable="false" :autoheight="false" :columnsresize="true" @rowselect="onRowselect($event)"
                  :sortable="true" :altrows="true" :enabletooltip="true" :columnsautoresize="true"
                  :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
       </div>
-
 <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
@@ -115,6 +113,7 @@
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
         sourceOut: {},
+        GridSelector: "",
         columns: [
           { text: 'id', datafield: 'var_id', width: '44'},
           { text: 'Год',  datafield: 'var_year', width: '44'},
@@ -143,17 +142,46 @@
       // Отключение кнопки рефреш во время подгрузки
       isLoaded: function () {
         this.$refs.buttonRefreshTable.disabled = !(this.isLoaded);
-      }
+      },
     },
 
     methods: {
-      deleteVariant() {
-        // TODO ajax удаление из бд
+      onRowselect($event) {
+        this.GridSelector = $event.args.row;
       },
 
-      updateAll() {
-        // Обновление всех таблиц из App
-        t.$emit("RefreshAllMainWindowTables");
+      // Удаление варианта из бд
+      deleteVariant() {
+        let t = this
+
+        if (!this.GridSelector.var_id) {
+          console.log("Не выбрана строка в таблице для удаления");
+          return
+        }
+
+        t.isLoaded = false;
+
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "DELETE_VAR"
+        });
+
+        xmlQuery.clearFilter();
+        xmlQuery.setFilter( "VAR_ID", this.GridSelector.var_id, "text");
+
+        xmlQuery.query('json',
+          function() {
+            xmlQuery.destroy();
+            t.$root.$children[0].refreshAllMainWindows();
+            t.isLoaded = true;
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log("ERROR = ", ER);
+          }
+        );
+
       },
 
       // Загрузка данных с url
