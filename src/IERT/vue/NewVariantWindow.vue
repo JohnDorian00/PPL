@@ -152,6 +152,7 @@
         this.$refs.createWindowNewVariant.disabled = this.buttonFlag;
       },
 
+      // Обновление списка listbox при изменении основного списка записей
       sourcePP: function () {
         if (this.$refs.buttonPP.disabled) {
           this.loadListBoxPP();
@@ -171,17 +172,13 @@
     },
 
     methods: {
+      // Загрзука списка на основе существующего расчета ПП
       loadListBoxPP() {
         let t = this;
         this.listBoxSourcePP = {};
-
         this.sourcePP.filter(function (item) {
           t.listBoxSourcePP[item.var_id] = item.var_name;
         });
-
-        // for (let key in this.sourcePP) {
-        //   this.listBoxSourcePP[this.sourcePP[key].var_id] = this.sourcePP[key].var_name;
-        // }
       },
 
       // Загрузка данных с бд
@@ -289,6 +286,7 @@
         }
       },
 
+      // Сохранение выбранного пункта меню при изменении выбора
       onListBoxSelect() {
         this.listBoxSelected = this.$refs.listBox.getSelectedItem();
       },

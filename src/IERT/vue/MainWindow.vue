@@ -62,10 +62,10 @@
           </JqxButton>
         </li>
         <li>
-          <JqxButton class="button" ref="myTextImageButton3" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" @click="deleteVariant" ref="buttonDeleteVariant" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'}"
-          >
+          ><span class="nobr">Удалить &nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li>
@@ -147,6 +147,10 @@
     },
 
     methods: {
+      deleteVariant() {
+        // TODO ajax удаление из бд
+      },
+
       updateAll() {
         // Обновление всех таблиц из App
         t.$emit("RefreshAllMainWindowTables");

@@ -15,9 +15,8 @@
     "vue2-leaflet": "^2.5.2"
   },
   "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
+    "IE >= 8",
+    "chrome >= 41"
   ],
   "devDependencies": {
     "babel-core": "^6.26.0",
