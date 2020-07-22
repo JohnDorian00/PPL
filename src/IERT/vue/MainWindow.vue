@@ -147,7 +147,13 @@
     },
 
     methods: {
+      updateAll() {
+        // Обновление всех таблиц из App
+        t.$emit("RefreshAllMainWindowTables");
+      },
+
       // Загрузка данных с url
+      // TODO сделать загрузку таблицы из App.vue с последующей раздачей во все окна MainWindow
       updateGridFromURL() {
         let t = this;
         t.isLoaded = false;

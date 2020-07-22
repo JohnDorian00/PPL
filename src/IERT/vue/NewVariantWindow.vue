@@ -241,6 +241,7 @@
         }
 
 
+
         xmlQuery.clearFilter();
         xmlQuery.setFilter( "GS_VAR_ID", var_gs_var_id, "text");
         xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
@@ -251,6 +252,7 @@
           function(json) {
             t.idNewVariant = json.rows[0].var_id;
             xmlQuery.destroy();
+            t.$root.$children[0].refreshAllMainWindows();
             t.isLoaded = true;
           },
           function (ER) {

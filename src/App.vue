@@ -15,7 +15,7 @@
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
         <component v-for="window in windows" :is="window.type" :title="window.title" :id="window.id"
                    v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
-                   @MainWindowTableChange="refreshAndUpdate" :sourcePP="mainWindowSource"/>
+                   @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"/>
     </div>
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
@@ -78,9 +78,17 @@
     },
 
     methods: {
-      refreshAndUpdate(data) {
+      MainWindowTableChange(data) {
         this.mainWindowSource = data;
-        
+      },
+
+      refreshAllMainWindows() {
+        // Обновление всех MainWindow при изменении данных в таблице
+        for (let i in this.$children) {
+          if (this.$children[i].$options._componentTag === "MainWindow") {
+            this.$children[i].updateGridFromURL();
+          }
+        }
       },
 
       createWindowNewVariant() {
