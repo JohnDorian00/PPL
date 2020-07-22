@@ -114,7 +114,7 @@
         isLoaded: false,
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
-        sourceOut: "asd",
+        sourceOut: {},
         columns: [
           { text: 'id', datafield: 'var_id', width: '44'},
           { text: 'Год',  datafield: 'var_year', width: '44'},

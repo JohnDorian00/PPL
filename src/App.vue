@@ -13,9 +13,9 @@
       </ul>
     </JqxMenu>
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
-        <component v-for="window in windows" v-bind:is="window.type" :title="window.title" :id="window.id"
+        <component v-for="window in windows" :is="window.type" :title="window.title" :id="window.id"
                    v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
-                   @MainWindowTableChange="globalSourceUpdate" :sourcePP="mainWindowSource"/>
+                   @MainWindowTableChange="refreshAndUpdate" :sourcePP="mainWindowSource"/>
     </div>
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
@@ -78,8 +78,9 @@
     },
 
     methods: {
-      globalSourceUpdate(data) {
+      refreshAndUpdate(data) {
         this.mainWindowSource = data;
+        
       },
 
       createWindowNewVariant() {

@@ -139,9 +139,9 @@
         descGS: "",
         idNewVariant: null,
 
-        listBoxSourceGenscheme: [],
+        listBoxSourceGenscheme: {},
 
-        listBoxSourcePP: [],
+        listBoxSourcePP: {},
       }
     },
 
@@ -153,10 +153,11 @@
       },
 
       sourcePP: function () {
-        this.loadListBoxPP();
-        this.$refs.listBox.source = this.listBoxSourcePP;
+        if (this.$refs.buttonPP.disabled) {
+          this.loadListBoxPP();
+          this.$refs.listBox.source = this.listBoxSourcePP;
+        }
       }
-
     },
 
     // Перевычисляемые переменные
@@ -171,50 +172,38 @@
 
     methods: {
       loadListBoxPP() {
-        this.listBoxSourcePP = [];
-        for (let i in this.sourcePP) {
-          this.listBoxSourcePP.push(this.sourcePP[i].var_name);
-        }
+        let t = this;
+        this.listBoxSourcePP = {};
+
+        this.sourcePP.filter(function (item) {
+          t.listBoxSourcePP[item.var_id] = item.var_name;
+        });
+
+        // for (let key in this.sourcePP) {
+        //   this.listBoxSourcePP[this.sourcePP[key].var_id] = this.sourcePP[key].var_name;
+        // }
       },
 
       // Загрузка данных с бд
-      loadListBoxData(name) {
-        let t = this, query;
+      loadListBoxData() {
+        let t = this;
         t.isLoaded = false;
-
-        // if (name === "GS") {
-        //   query = "GET_GS_VARS_GS";
-        // } else if (name === "PP") {
-        //   query = "GET_GS_VARS_VARIANT";
-        // }
-
-        query = "GET_GS_VARS_GS";
 
         let xmlQuery = new XmlQuery({
           url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
-          querySet: query
+          querySet: "GET_GS_VARS_GS"
         });
 
         xmlQuery.query('json',
 
-                      function(json) {
-                        // if (name === "GS") {
-                          t.listBoxSourceGenscheme = [];
-                          for (let key in json.rows) {
-                            t.listBoxSourceGenscheme.push(json.rows[key].name);
-                          }
+                function(json) {
+                          t.listBoxSourceGenscheme = {};
+                          json.rows.filter(function (item) {
+                            t.listBoxSourceGenscheme[item.var_id] = item.name;
+                          })
                           t.$refs.listBox.source = t.listBoxSourceGenscheme;
-
-                        // } else if (name === "PP") {
-                        //   t.listBoxSourcePP.gsName = [];
-                        //   for (let key in json.rows) {
-                        //     t.listBoxSourcePP.gsID.push(json.rows[key].var_gs_var_id);
-                        //     t.listBoxSourcePP.gsName.push(json.rows[key].var_name);
-                        //   }
-                        //   t.$refs.listBox.source = t.listBoxSourcePP.gsName;
-                        // }
-                        xmlQuery.destroy();
-                        t.isLoaded = true;
+                          xmlQuery.destroy();
+                          t.isLoaded = true;
                         },
 
                       function (ER) {
@@ -235,21 +224,25 @@
           querySet: "CREATE_VAR"
         });
 
-        let var_id;
-        if (this.$refs.buttonGenscheme.disabled) {
-          if (this.listBoxSelected.value in globalData.gsVarIDs) {
-            var_id = globalData.gsVarIDs[this.listBoxSelected.value];
-          }
-        } else if (this.$refs.buttonPP.disabled) {
-            var_id = this.sourcePP[this.listBoxSelected.index].var_gs_var_id;
+        let var_gs_var_id;
+        if (t.$refs.buttonGenscheme.disabled) {
+            var_gs_var_id = t.listBoxSelected.value
+            console.debug("Выбрана генсхема №" + var_gs_var_id + " (" + t.listBoxSelected.label + ")");
+
+        } else if (t.$refs.buttonPP.disabled) {
+            this.sourcePP.filter(function (item) {
+              if (item.var_id + "" === t.listBoxSelected.value) {
+                var_gs_var_id = item.var_gs_var_id;
+                console.debug("Выбран вариант №" + item.var_id + " (" + item.var_name + ")" + " с генсхемой №" + var_gs_var_id + " (" + item.gs_name + ")");
+              };
+            })
         } else {
-          console.error("Ошибка: не найдены кнопки " + this.$refs.buttonGenscheme.value + " и " + this.$refs.buttonPP.value);
+          console.error("Ошибка: не найдены кнопки " + t.$refs.buttonGenscheme.value + " и " + t.$refs.buttonPP.value);
         }
 
-        console.log(var_id);
 
         xmlQuery.clearFilter();
-        xmlQuery.setFilter( "GS_VAR_ID", var_id, "text");
+        xmlQuery.setFilter( "GS_VAR_ID", var_gs_var_id, "text");
         xmlQuery.setFilter( "GS_YEAR", new Date().getFullYear(), "text");
         xmlQuery.setFilter( "GS_NAME", this.nameGS, "text");
         xmlQuery.setFilter( "GS_DESC", this.descGS, "text");
