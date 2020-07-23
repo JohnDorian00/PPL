@@ -46,7 +46,6 @@
                  :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
       </div>
-<!--      @rowselect="onRowselect($event)" @rowunselect="onRowUnselect($event)" -->
       <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
@@ -143,21 +142,15 @@
     },
 
     methods: {
+      // Окно изменения варианта
       workVariant() {
         this.$emit('workVariantCreateWindow', this.id, this.GridSelector)
       },
 
+      // Смена селектора строки
       onRowselect($event) {
         this.GridSelector = $event.args.row;
-        // console.log(this.row);
-        // Передача списка всех записей родителю
-        // this.$emit("RowSelect", this.GridSelector);
       },
-      //
-      // onRowUnselect() {
-      //   // Передача списка всех записей родителю
-      //   this.$emit("RowUnselect");
-      // },
 
       // Удаление варианта из бд
       deleteVariant() {
@@ -247,13 +240,9 @@
 
     created() {
       this.updateGridFromURL();
-      // this.$refs.buttonRefreshTable.disabled = true;
-      // Обновление таблицы
     },
 
     mounted() {
-      // this.$root.findWindowInArr(this.id);
-      this.$root.$children[0].findWindowInArr(this.id);
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
     },

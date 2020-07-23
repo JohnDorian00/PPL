@@ -137,16 +137,6 @@
       },
 
       removeWindow(id) {
-        let t = this;
-
-        // Поиск типа окна, обнуление выбора строчки
-        this.windows.filter(function (item) {
-          if (item.id === id) {
-            if (item.type === "MainWindow") {
-              item.row = -1;
-            }
-          }
-        });
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
         this.id = {};
