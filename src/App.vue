@@ -12,13 +12,13 @@
         </li>
       </ul>
     </JqxMenu>
-    {{mainWindowRow}}
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
         <component v-for="window in windows" :is="window.type" :title="window.title" :id="window.id"
                    v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
-                   @MainWindowTableChange="MainWindowTableChange" @RowSelect="RowSelect" :sourcePP="mainWindowSource"
-                   :row="mainWindowRow"/>
+                   @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"
+                   @workVariantCreateWindow="workVariant"/>
     </div>
+<!--    @RowSelect="RowSelect"-->
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
 </template>
@@ -55,7 +55,6 @@
         id: {},
         count: 0,
         mainWindowSource: {},
-        mainWindowRow: null,
       }
     },
 
@@ -83,8 +82,19 @@
     },
 
     methods: {
-      RowSelect(row) {
-        this.mainWindowRow = row;
+      // RowSelect(row) {
+      //   this.mainWindowRow = row;
+      // },
+
+      findWindowInArr(id) {
+        // Поиск окна
+        let win;
+        this.windows.filter(function (item) {
+          if (item.id === id) {
+            win = item;
+          }
+        });
+        return win
       },
 
       MainWindowTableChange(data) {
@@ -104,11 +114,11 @@
         this.addListWindow({type: 'NewVariantWindow', title: "Создание нового варианта"});
       },
 
-      workVariant() {
-        if (this.mainWindowRow) {
+      workVariant(id, row) {
+        if (row !== -1) {
           this.addListWindow(
-  {type: 'WorkVariant', title: "Работа с вариантом " + this.mainWindowRow.var_name + ", " +
-              this.mainWindowRow.var_year + " г."
+  {type: 'WorkVariant', title: "Работа с вариантом " + row.var_name + ", " +
+              row.var_year + " г."
               });
         } else {
           console.log("Не выбран пункт в таблице, ошибка изменения варианта");
@@ -127,7 +137,16 @@
       },
 
       removeWindow(id) {
-        this.mainWindowRow = null
+        let t = this;
+
+        // Поиск типа окна, обнуление выбора строчки
+        this.windows.filter(function (item) {
+          if (item.id === id) {
+            if (item.type === "MainWindow") {
+              item.row = -1;
+            }
+          }
+        });
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
         this.id = {};
@@ -147,6 +166,7 @@
           state: true,
           close: () => {vue.removeWindow(id)},
           changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state,
+          mainWindowRow: -1,
         }
         option = this.updateWindowCreateOptions(option, added_options);
         this.id[id] = this.windows.length;
@@ -155,6 +175,7 @@
           tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
             .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
         });
+        // this.windows[0].type = "WorkVariant";
       }
     },
   }

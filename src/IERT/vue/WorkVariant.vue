@@ -31,7 +31,7 @@
 
       <!--      Таблица-->
       <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
-        <Preloader v-if="!isLoaded"></Preloader>
+<!--        <Preloader v-if="!isLoaded"></Preloader>-->
       </div>
 
 
@@ -107,11 +107,9 @@
     },
 
     created() {
-
     },
 
     mounted() {
-
     },
 
 

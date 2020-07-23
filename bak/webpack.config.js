@@ -1,9 +1,8 @@
 var path = require('path')
 var webpack = require('webpack')
 
-
 module.exports = {
-  entry: ['./src/main.js'],
+  entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
@@ -60,7 +59,13 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
-          presets: ['env']
+          presets: [
+            ['env', {
+              targets: {
+                browsers: "ie >= 8" // можно и указать конкретные браузеры
+              }
+            }]
+          ]
         }
       },
       {
@@ -107,6 +112,6 @@ if (process.env.NODE_ENV === 'production') {
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
-    }),
+    })
   ])
 }

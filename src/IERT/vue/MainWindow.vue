@@ -8,73 +8,81 @@
              :theme="theme"
              :closeButtonSize="0"
              @close="closeWindows"
-             :sourceOut = "sourceOut"
-              >
+             :sourceOut="sourceOut"
+  >
 
-<!--    Верхний бар-->
+    <!--    Верхний бар-->
     <div ref="header" style="position: relative;">
       <div style="display: inline;">{{title}}</div>
       <div style="display: inline; position: absolute; top:0; right: 0;
-                  margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
+                  margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;"
       >
-        <div  class="collapse-button" >
+        <div class="collapse-button">
           <img class="collapse-button" src="@/style/images/minus.png">
         </div>
-        <div class="expand-button" >
+        <div class="expand-button">
           <img class="expand-button" src="@/style/images/full-screen.png">
         </div>
-        <div id="exit-button" class="close-button" @click="closeWindows">
-          <img class="close-button"  src="@/style/images/closing.png" @click="closeWindows">
+        <div id="exit-button" class="close-button">
+          <img class="close-button" src="@/style/images/closing.png">
         </div>
       </div>
     </div>
-<!--      Контент-->
+    <!--      Контент-->
     <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
-<!--            FLEXBOX-->
-<!--        <rows ref="Rows" :rowsProps="rows"></rows>-->
+      <!--            FLEXBOX-->
+      <!--        <rows ref="Rows" :rowsProps="rows"></rows>-->
 
-<!--      Таблица-->
-      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
-        <Preloader v-if="!isLoaded"></Preloader>
-        <JqxGrid v-show="isLoaded" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false"
-                 :columns="columns" :pageable="false" :autoheight="false" :columnsresize="true" @rowselect="onRowselect($event)"
-                 :sortable="true" :altrows="true" :enabletooltip="true" :columnsautoresize="true"
-                 :editable="false" :selectionmode="'singlerow'" :theme="theme" :filterable="true"  :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
+      <!--      Таблица-->
+      <div
+        style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
+                <Preloader v-if="!isLoaded"></Preloader>
+        <JqxGrid  v-show="isLoaded" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
+                 :source="dataAdapter" :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
+                 :columnsresize="true" @rowselect="onRowselect"
+                 :sortable="true" :altrows="true"
+                 :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"
+                 :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
       </div>
-<!--      Нижнее меню (кнопки)-->
+<!--      @rowselect="onRowselect($event)" @rowunselect="onRowUnselect($event)" -->
+      <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
-          <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height+'px'"
-                                 :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                 :theme="theme" :style="{'display': 'inline-block'} "
+          <JqxButton ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant"
+                     :height="button_height+'px'"
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                     :theme="theme" :style="{'display': 'inline-block'} "
           ><span class="nobr">Создать новый вариант&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li>
-          <JqxButton class="button"  ref="workVariant" @click="this.$root.$children[0].workVariant" :height="button_height+'px'"
-                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+          <JqxButton class="button" ref="workVariant" @click="workVariant"
+                     :height="button_height+'px'" :textPosition="'left'"
+                     :textImageRelation="'imageBeforeText'"
                      :theme="theme" :style="{'display': 'inline-block'}"
           ><span class="nobr">Изменить&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li>
-          <JqxButton class="button" @click="deleteVariant" ref="buttonDeleteVariant" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" @click="deleteVariant" ref="buttonDeleteVariant" :width="120"
+                     :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'}"
           ><span class="nobr">Удалить&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li class="last">
-          <JqxButton class="button"  @click="updateGridFromURL" ref="buttonRefreshTable" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" @click="updateGridFromURL" ref="buttonRefreshTable" :width="120"
+                     :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"
-                     :theme="theme" :style="{'display': 'inline-block'}"
+                     :theme="theme" style="display:inline-block; cursor: pointer;"
           ><span class="nobr">Обновить&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
         <li class="last">
-          <JqxButton class="button"   ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{ 'display': 'inline-block'}"
           ><span class="nobr">Закрыть&nbsp;&nbsp;</span>
@@ -82,7 +90,7 @@
         </li>
         <li class="helper"></li>
       </ul>
-  </div>
+    </div>
   </JqxWindow>
 </template>
 
@@ -113,27 +121,16 @@
         button_height: 30,
         dataAdapter: new jqx.dataAdapter(this.source),
         sourceOut: {},
-        GridSelector: "",
+        GridSelector: -1,
         columns: [
-          { text: 'id', datafield: 'var_id', width: '44'},
-          { text: 'Год',  datafield: 'var_year', width: '44'},
-          { text: 'Номер ГС', datafield: 'var_gs_var_id', minwidth: '143'},
-          { text: 'Название варианта',  datafield: 'var_name', width: '200'},
-          { text: 'Вариант ГС', datafield: 'gs_name', minwidth: '100'},
-          { text: 'Комментарий',  datafield: 'var_desc', minwidth: '100'},
+          {text: 'id', datafield: 'var_id', width: '44'},
+          {text: 'Год', datafield: 'var_year', width: '44'},
+          {text: 'Номер ГС', datafield: 'var_gs_var_id', minwidth: '143'},
+          {text: 'Название варианта', datafield: 'var_name', width: '200'},
+          {text: 'Вариант ГС', datafield: 'gs_name', minwidth: '100'},
+          {text: 'Комментарий', datafield: 'var_desc', minwidth: '100'},
         ],
-        rows: [{
-          id: 1,
-          flex: true,
-          flexSize: 1,
-          data: "<div style='width: 100%; height: 100%; border: 1px solid black;'></div>",
-        }, {
-          id: 2,
-          static: true,
-          height: 30,
-          data: "<div style='width: 100%; height: 100%; border: 1px solid black;'></div>"
-        }],
-
+        isUpdate: false
       }
     },
 
@@ -146,11 +143,21 @@
     },
 
     methods: {
+      workVariant() {
+        this.$emit('workVariantCreateWindow', this.id, this.GridSelector)
+      },
+
       onRowselect($event) {
         this.GridSelector = $event.args.row;
+        // console.log(this.row);
         // Передача списка всех записей родителю
-        this.$emit("RowSelect", this.GridSelector);
+        // this.$emit("RowSelect", this.GridSelector);
       },
+      //
+      // onRowUnselect() {
+      //   // Передача списка всех записей родителю
+      //   this.$emit("RowUnselect");
+      // },
 
       // Удаление варианта из бд
       deleteVariant() {
@@ -169,10 +176,10 @@
         });
 
         xmlQuery.clearFilter();
-        xmlQuery.setFilter( "VAR_ID", this.GridSelector.var_id, "text");
+        xmlQuery.setFilter("VAR_ID", this.GridSelector.var_id, "text");
 
         xmlQuery.query('json',
-          function() {
+          function () {
             xmlQuery.destroy();
             t.$root.$children[0].refreshAllMainWindows();
             t.isLoaded = true;
@@ -183,15 +190,14 @@
             console.log("ERROR = ", ER);
           }
         );
-
       },
 
       // Загрузка данных с url
-      // TODO сделать загрузку таблицы из App.vue с последующей раздачей во все окна MainWindow
       updateGridFromURL() {
         let t = this;
         t.isLoaded = false;
-
+        if (t.isUpdate === true) return
+        t.isUpdate = true;
         let xmlQuery = new XmlQuery({
           url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
           querySet: 'GET_VARS'
@@ -206,20 +212,22 @@
         function successQuery(json) {
           t.sourceOut = json.rows;
           t.source.datafields = [
-              { name: 'var_id', type: 'string' },
-              { name: 'var_year', type: 'string' },
-              { name: 'var_gs_var_id', type: 'string' },
-              { name: 'var_name', type: 'string' },
-              { name: 'gs_name', type: 'string' },
-              { name: 'var_desc', type: 'string' },
+            {name: 'var_id', type: 'string'},
+            {name: 'var_year', type: 'string'},
+            {name: 'var_gs_var_id', type: 'string'},
+            {name: 'var_name', type: 'string'},
+            {name: 'gs_name', type: 'string'},
+            {name: 'var_desc', type: 'string'},
           ]
           t.source.localdata = json.rows;
 
           // Передача списка всех записей родителю
           t.$emit("MainWindowTableChange", json.rows);
-
           xmlQuery.destroy();
-          t.$refs.myGrid.updatebounddata();
+          setTimeout(function () {
+            if (t.isLoaded) t.$refs.myGrid.updatebounddata();
+            t.isUpdate = false;
+          }, 4)
           t.isLoaded = true;
           // adding data for test
           // for (let i=0; i<15; i++) {
@@ -244,6 +252,8 @@
     },
 
     mounted() {
+      // this.$root.findWindowInArr(this.id);
+      this.$root.$children[0].findWindowInArr(this.id);
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
     },
@@ -260,19 +270,23 @@
     text-justify: newspaper;
   }
 
-  ul li  {
+  ul li {
     display: inline-block;
     text-align: left;
     /* эмуляция inline-block для IE6-7*/
-    //display : inline;
-    //zoom : 1;
+  / / display: inline;
+  / / zoom: 1;
   }
+
   ul li.helper {
     width: 100%;
     height: 0;
     visibility: hidden;
   }
-  .last {margin-right: 100px}
+
+  .last {
+    margin-right: 100px
+  }
 
   .nobr {
     white-space: nowrap;
