@@ -31,18 +31,12 @@
     <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
       <!--      Таблица-->
-      <div
-        style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
+      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
         <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="15"
                      :panels="[{ size: '35%', min: 100 },{ min: 100, size: '65%' }]">
 
           <div>
-            <div id="feedContentArea">
-              <JqxExpander class="jqx-hideborder" ref="feedContentExpander" :theme="theme"
-                           :width="'100%'" :height="'100%'"
-                           :toggleMode="'none'" :showArrow="false">
-              </JqxExpander>
-            </div>
+
 
             <JqxTabs ref="myTabs" :theme="theme"
                      :width="'100%'" :height="'100%'" :position="'top'"
@@ -95,6 +89,9 @@
                           <ul>
                             <li>
                               <span item-title="true">ScienceDaily</span>
+                            </li>
+                            <li>
+                              <span item-title="true">ScienceDaily 2</span>
                             </li>
                           </ul>
                         </li>
