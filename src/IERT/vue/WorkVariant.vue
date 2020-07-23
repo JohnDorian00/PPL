@@ -33,27 +33,24 @@
       <!--      Таблица-->
       <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
         <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="15"
-                     :panels="[{ size: '35%', min: 100 },{ min: 100, size: '65%' }]">
+                     :panels="[{ size: '50%', min: 300 },{ min: 100, size: '50%' }]">
 
           <div>
-
-
-            <JqxTabs ref="myTabs" :theme="theme"
+            <JqxTabs ref="myTabs"  :theme="theme" :scrollable="false" :enableScrollAnimation="true"
                      :width="'100%'" :height="'100%'" :position="'top'"
                      :animationType="'none'" :selectionTracker='false'>
               <ul>
-                <li style="margin-left: 30px;">Node.js</li>
-                <li>JavaServer Pages</li>
+                <li style="margin-left: 0px;">Выбор из списка</li>
+                <li>Выбор участка по пути следования</li>
               </ul>
-              <div>
-                Node.js is an event-driven I/O server-side JavaScript environment based on V8. It
-                is intended for writing scalable network programs such as web servers. It was created
-                by Ryan Dahl in 2009, and its growth is sponsored by Joyent, which employs Dahl.
-                Similar environments written in other programming languages include Twisted for
-                Python, Perl Object Environment for Perl, libevent for C and EventMachine for Ruby.
-                Unlike most JavaScript, it is not executed in a web browser, but is instead a form
-                of server-side JavaScript. Node.js implements some CommonJS specifications. Node.js
-                includes a REPL environment for interactive testing.
+              <div style="height:100%; width:100%; overflow: hidden;">
+<!--           :source="dataAdapter" @rowselect="onRowselect"    -->
+                <JqxGrid  style="position:relative;" ref="stationGrid" :height="'100%'" :width="'100%'"
+                           :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
+                          :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                          :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"
+                          :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'" >
+                </JqxGrid>
               </div>
               <div>
                 JavaServer Pages (JSP) is a Java technology that helps software developers serve
@@ -94,12 +91,6 @@
                               <span item-title="true">ScienceDaily 2</span>
                             </li>
                           </ul>
-                        </li>
-                        <li>
-                          <span item-title="true">Geek.com</span>
-                        </li>
-                        <li>
-                          <span item-title="true">CNN.com</span>
                         </li>
                       </ul>
                     </li>
@@ -192,6 +183,11 @@
           currentFeed: '',
           currentFeedContent: {}
         },
+        columns: [
+          {text: 'id', datafield: 'var_id'},
+          {text: 'Год', datafield: 'var_year'},
+          {text: 'Номер ГС', datafield: 'var_gs_var_id'},
+        ],
         // getWidth: getWidth('tabs'),
       }
     },
