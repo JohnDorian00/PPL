@@ -31,38 +31,51 @@
     <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
       <!--      Таблица-->
-      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
-        <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="15"
-                     :panels="[{ size: '50%', min: 300 },{ min: 100, size: '50%' }]">
+      <div
+        style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
+        <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="30"
+                     :panels="[{ size: '50%', min: 320, collapsible: false },{ min: 160, size: '50%', collapsible: false }]">
 
           <div>
-            <JqxTabs ref="myTabs"  :theme="theme" :scrollable="false" :enableScrollAnimation="true"
-                     :width="'100%'" :height="'100%'" :position="'top'"
-                     :animationType="'none'" :selectionTracker='false'>
-              <ul>
-                <li style="margin-left: 0px;">Выбор из списка</li>
-                <li>Выбор участка по пути следования</li>
-              </ul>
-              <div style="height:100%; width:100%; overflow: hidden;">
-<!--           :source="dataAdapter" @rowselect="onRowselect"    -->
-                <JqxGrid  style="position:relative;" ref="stationGrid" :height="'100%'" :width="'100%'"
-                           :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
-                          :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
-                          :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"
-                          :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'" >
-                </JqxGrid>
+            <JqxExpander style="border: none;" ref="feedExpander" :theme="theme"
+                         :width="'100%'" :height="'100%'"
+                         :toggleMode="'none'" :showArrow="false">
+
+              <div class="jqx-hideborder" style="width: 100%; text-align: center">
+                Выберите участки для расчета
               </div>
-              <div>
-                JavaServer Pages (JSP) is a Java technology that helps software developers serve
-                dynamically generated web pages based on HTML, XML, or other document types. Released
-                in 1999 as Sun's answer to ASP and PHP,:citation needed JSP was designed to address
-                the perception that the Java programming environment didn't provide developers with
-                enough support for the Web. To deploy and run, a compatible web server with servlet
-                container is required. The Java Servlet and the JavaServer Pages (JSP) specifications
-                from Sun Microsystems and the JCP (Java Community Process) must both be met by the
-                container.
+              <div style="height: calc(100% - 250px)">
+                <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
+                         :width="'100%'" :height="'100%'" :position="'top'"
+                         :animationType="'none'" :selectionTracker='false'>
+                  <ul>
+                    <li style="margin-left: 10px;">Выбор из списка</li>
+                    <li style="margin-right: 10px;">Выбор участка по пути следования</li>
+                  </ul>
+                  <div style="height:50%; width:100%; overflow: hidden;">
+                    <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
+                    <JqxGrid style="position:relative;" ref="stationGrid" :height="'100%'" :width="'100%'"
+                             :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
+                             :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                             :enabletooltip="true" :columnsautoresize="true" :editable="false"
+                             :selectionmode="'singlerow'"
+                             :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'">
+                    </JqxGrid>
+                  </div>
+                  <div>
+                    JavaServer Pages (JSP) is a Java technology that helps software developers serve
+                    dynamically generated web pages based on HTML, XML, or other document types. Released
+                    in 1999 as Sun's answer to ASP and PHP,:citation needed JSP was designed to address
+                    the perception that the Java programming environment didn't provide developers with
+                    enough support for the Web. To deploy and run, a compatible web server with servlet
+                    container is required. The Java Servlet and the JavaServer Pages (JSP) specifications
+                    from Sun Microsystems and the JCP (Java Community Process) must both be met by the
+                    container.
+                  </div>
+                </JqxTabs>
               </div>
-            </JqxTabs>
+
+            </JqxExpander>
 
           </div>
 
@@ -71,10 +84,12 @@
                          :width="'100%'" :height="'100%'"
                          :toggleMode="'none'" :showArrow="false">
 
-              <div class="jqx-hideborder">
-                Feeds
+              <div class="jqx-hideborder" style="width: 100%; text-align: center">
+                Выбранные участки
               </div>
+
               <div class="jqx-hideborder jqx-hidescrollbars">
+
                 <JqxTree ref="myTree" @select="onTreeSelect($event)" :theme="theme"
                          :width="'100%'" :height="'100%'">
                   <ul>
@@ -96,6 +111,7 @@
                     </li>
                   </ul>
                 </JqxTree>
+
               </div>
             </JqxExpander>
           </div>
@@ -184,9 +200,9 @@
           currentFeedContent: {}
         },
         columns: [
-          {text: 'id', datafield: 'var_id'},
-          {text: 'Год', datafield: 'var_year'},
-          {text: 'Номер ГС', datafield: 'var_gs_var_id'},
+          {text: 'Начало участка', datafield: 'var_id'},
+          {text: 'Конец участка', datafield: 'var_year'},
+          {text: 'Наличие привязки', datafield: 'var_gs_var_id'},
         ],
         // getWidth: getWidth('tabs'),
       }
@@ -200,51 +216,8 @@
     },
 
     methods: {
-      onTreeSelect: function (event) {
-        const item = this.$refs.myTree.getItem(event.args.element);
-        this.getFeed(this.config['feeds'][item.label]);
-      },
-      onListBoxSelect: function (event) {
-        this.loadContent(event.args.index);
-      },
-      selectFirst: function () {
-        this.$refs.myListBox.selectIndex(0);
-        this.loadContent(0);
-      },
-      getFeed: function (feed) {
-        this.config['currentFeed'] = feed;
-        if (feed !== undefined) {
-          feed = this.config['dataDir'] + '/' + feed + '.' + this.config['format'];
-          this.loadFeed(feed);
-        }
-      },
-      loadFeed: function (feed, callback) {
 
-      },
-      displayFeedHeader: function (header) {
-        this.$refs.feedListExpander.setHeaderContent(header);
-      },
-      displayFeedList: function (items) {
-        const headers = this.getHeaders(items);
-        this.$refs.myListBox.source = headers;
-      },
-      getHeaders: function (items) {
-        let headers = [], header;
-        for (let i = 0; i < items.length; i += 1) {
-          header = items[i].title;
-          headers.push(header);
-        }
-        return headers
-      },
-      onChangeAnimation: function (event) {
-        const checked = event.args.checked;
-        this.$refs.myTabs.selectionTracker = checked;
-      },
-      onChangeContentAnimation: function (event) {
-        const checked = event.args.checked;
-        const animationType = checked ? 'fade' : 'none';
-        this.$refs.myTabs.animationType = animationType
-      }
+
     },
 
     beforeCreate: function () {
@@ -257,9 +230,6 @@
     },
 
     mounted() {
-      this.getFeed('sciencedaily');
-
-
     },
 
 
