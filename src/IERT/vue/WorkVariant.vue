@@ -15,14 +15,14 @@
       <div style="display: inline; position: absolute; top:0; right: 0;
                   margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
       >
-        <div  class="collapse-button" >
+        <div class="collapse-button">
           <img class="collapse-button" src="@/style/images/minus.png">
         </div>
-        <div class="expand-button" >
+        <div class="expand-button">
           <img class="expand-button" src="@/style/images/full-screen.png">
         </div>
         <div id="exit-button" class="close-button" @click="closeWindows">
-          <img class="close-button"  src="@/style/images/closing.png" @click="closeWindows">
+          <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">
         </div>
       </div>
     </div>
@@ -31,24 +31,48 @@
     <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
       <!--      Таблица-->
-      <div style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
-        <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" 
+      <div
+        style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
+        <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="15"
                      :panels="[{ size: '35%', min: 100 },{ min: 100, size: '65%' }]">
 
           <div>
-              <div id="feedContentArea">
-                <JqxExpander class="jqx-hideborder" ref="feedContentExpander" :theme="theme"
-                             :width="'100%'" :height="'100%'"
-                             :toggleMode="'none'" :showArrow="false">
-                  <div class="jqx-hideborder" id="feedItemHeader"></div>
-                  <div class="jqx-hideborder jqx-hidescrollbars">
-                    <JqxPanel ref="myPanel" class="jqx-hideborder"
-                              :width="'100%'" :height="'100%'">
-                      Select a news item to see it"s content
-                    </JqxPanel>
-                  </div>
-                </JqxExpander>
+            <div id="feedContentArea">
+              <JqxExpander class="jqx-hideborder" ref="feedContentExpander" :theme="theme"
+                           :width="'100%'" :height="'100%'"
+                           :toggleMode="'none'" :showArrow="false">
+              </JqxExpander>
+            </div>
+
+            <JqxTabs ref="myTabs" :theme="theme"
+                     :width="'100%'" :height="'100%'" :position="'top'"
+                     :animationType="'none'" :selectionTracker='false'>
+              <ul>
+                <li style="margin-left: 30px;">Node.js</li>
+                <li>JavaServer Pages</li>
+              </ul>
+              <div>
+                Node.js is an event-driven I/O server-side JavaScript environment based on V8. It
+                is intended for writing scalable network programs such as web servers. It was created
+                by Ryan Dahl in 2009, and its growth is sponsored by Joyent, which employs Dahl.
+                Similar environments written in other programming languages include Twisted for
+                Python, Perl Object Environment for Perl, libevent for C and EventMachine for Ruby.
+                Unlike most JavaScript, it is not executed in a web browser, but is instead a form
+                of server-side JavaScript. Node.js implements some CommonJS specifications. Node.js
+                includes a REPL environment for interactive testing.
               </div>
+              <div>
+                JavaServer Pages (JSP) is a Java technology that helps software developers serve
+                dynamically generated web pages based on HTML, XML, or other document types. Released
+                in 1999 as Sun's answer to ASP and PHP,:citation needed JSP was designed to address
+                the perception that the Java programming environment didn't provide developers with
+                enough support for the Web. To deploy and run, a compatible web server with servlet
+                container is required. The Java Servlet and the JavaServer Pages (JSP) specifications
+                from Sun Microsystems and the JCP (Java Community Process) must both be met by the
+                container.
+              </div>
+            </JqxTabs>
+
           </div>
 
           <div>
@@ -96,15 +120,16 @@
       <ul class="btn-group" :height="button_height">
 
         <li>
-          <JqxButton  ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant" :height="button_height"
-                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                      :theme="theme" :style="{'display': 'inline-block'} "
+          <JqxButton ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant"
+                     :height="button_height"
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                     :theme="theme" :style="{'display': 'inline-block'} "
           ><span class="nobr">Создать новый вариант&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
 
         <li class="last">
-          <JqxButton class="button"   ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{ 'display': 'inline-block'}"
           ><span class="nobr">Закрыть&nbsp;&nbsp;</span>
@@ -131,7 +156,9 @@
   import JqxExpander from "@/jqwidgets/jqwidgets-vue/vue_jqxexpander";
   import JqxTree from "@/jqwidgets/jqwidgets-vue/vue_jqxtree";
   import JqxPanel from "@/jqwidgets/jqwidgets-vue/vue_jqxpanel";
-  import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox"
+  import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
+  import Vue from 'vue';
+  import JqxTabs from "@/jqwidgets/jqwidgets-vue/vue_jqxtabs";
 
   export default {
     components: {
@@ -145,6 +172,7 @@
       JqxTree,
       JqxPanel,
       JqxListBox,
+      JqxTabs,
     },
 
     name: "WorkVariant",
@@ -154,9 +182,8 @@
         theme: appConfig.windowsTheme,
         isLoaded: false,
         button_height: 30,
-
         config: {
-          feeds: { 'CNN.com': 'cnn', 'Geek.com': 'geek', 'ScienceDaily': 'sciencedaily' },
+          feeds: {'CNN.com': 'cnn', 'Geek.com': 'geek', 'ScienceDaily': 'sciencedaily'},
           format: 'txt',
           dataDir: '../sampledata',
           feedTree: document.querySelectorAll('angularTree')[0],
@@ -168,7 +195,7 @@
           currentFeed: '',
           currentFeedContent: {}
         },
-
+        // getWidth: getWidth('tabs'),
       }
     },
 
@@ -216,38 +243,14 @@
         }
         return headers
       },
-      loadContent: function (index) {
-        const item = this.config['currentFeedContent'][index];
-        if (item != null) {
-          this.$refs.myPanel.clearcontent();
-          this.$refs.myPanel.prepend('<div style="padding: 1px;"><span>' + item.description + '</span></div>');
-          this.addContentHeaderData(item);
-          this.config['selectedIndex'] = index;
-        }
+      onChangeAnimation: function (event) {
+        const checked = event.args.checked;
+        this.$refs.myTabs.selectionTracker = checked;
       },
-      addContentHeaderData: function (item) {
-        const link = document.createElement('a');
-        link.style.whiteSpace = 'nowrap';
-        link.style.marginLeft = '15px';
-        link.target = '_blank';
-        const text = document.createTextNode('Source');
-        link.appendChild(text);
-        const date = document.createElement('div');
-        date.style.whiteSpace = 'nowrap';
-        date.style.marginLeft = '30px';
-        date.appendChild(document.createTextNode(item.pubDate));
-        const container = document.createElement('table');
-        container.style.height = '100%';
-        const element1 = document.createElement('tr');
-        container.appendChild(element1);
-        container.appendChild(document.createElement('td'));
-        container.appendChild(document.createElement('td'));
-        link.href = item.link;
-        document.querySelector('#feedItemHeader').innerHTML = null;
-        document.querySelector('#feedItemHeader').appendChild(container);
-        container.querySelectorAll('td')[0].appendChild(link);
-        container.querySelector('td:last-child').appendChild(date);
-        this.$refs.feedContentExpander.setHeaderContent(container.outerHTML);
+      onChangeContentAnimation: function (event) {
+        const checked = event.args.checked;
+        const animationType = checked ? 'fade' : 'none';
+        this.$refs.myTabs.animationType = animationType
       }
     },
 
@@ -262,6 +265,8 @@
 
     mounted() {
       this.getFeed('sciencedaily');
+
+
     },
 
 
@@ -279,19 +284,23 @@
     text-justify: newspaper;
   }
 
-  ul li  {
+  ul li {
     display: inline-block;
     text-align: left;
     /* эмуляция inline-block для IE6-7*/
-  //display : inline;
-  //zoom : 1;
+  / / display: inline;
+  / / zoom: 1;
   }
+
   ul li.helper {
     width: 100%;
     height: 0;
     visibility: hidden;
   }
-  .last {margin-right: 100px}
+
+  .last {
+    margin-right: 100px
+  }
 
   .nobr {
     white-space: nowrap;

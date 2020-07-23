@@ -161,7 +161,7 @@
           return
         }
 
-        t.isLoaded = false;
+        // t.isLoaded = false;
 
         let xmlQuery = new XmlQuery({
           url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
@@ -171,18 +171,18 @@
         xmlQuery.clearFilter();
         xmlQuery.setFilter("VAR_ID", this.GridSelector.var_id, "text");
 
-        xmlQuery.query('json',
-          function () {
-            xmlQuery.destroy();
-            t.$root.$children[0].refreshAllMainWindows();
-            t.isLoaded = true;
-          },
-          function (ER) {
-            xmlQuery.destroy();
-            console.log("Error update data");
-            console.log("ERROR = ", ER);
-          }
-        );
+        // xmlQuery.query('json',
+        //   function () {
+        //     xmlQuery.destroy();
+        //     t.$root.$children[0].refreshAllMainWindows();
+        //     t.isLoaded = true;
+        //   },
+        //   function (ER) {
+        //     xmlQuery.destroy();
+        //     console.log("Error update data");
+        //     console.log("ERROR = ", ER);
+        //   }
+        // );
       },
 
       // Загрузка данных с url
