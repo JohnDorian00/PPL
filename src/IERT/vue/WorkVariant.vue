@@ -33,28 +33,29 @@
       <!--      Таблица-->
       <div
         style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
-        <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="30"
-                     :panels="[{ size: '50%', min: 320, collapsible: false },{ min: 160, size: '50%', collapsible: false }]">
+        <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="30" @resize="onResize"
+                     :panels="panels">
 
           <div>
             <JqxExpander style="border: none;" ref="feedExpander" :theme="theme"
-                         :width="'100%'" :height="'100%'"
+                         :width="'100%'" :height="'calc(100% - 25px)'"
                          :toggleMode="'none'" :showArrow="false">
 
               <div class="jqx-hideborder" style="width: 100%; text-align: center">
                 Выберите участки для расчета
               </div>
-              <div style="height: calc(100% - 250px)">
+
+              <div style="padding: 0px;">
                 <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
-                         :width="'100%'" :height="'100%'" :position="'top'"
+                         :width="'100%'" :height="'100%'" :position="'top'" style="border: none;"
                          :animationType="'none'" :selectionTracker='false'>
                   <ul>
                     <li style="margin-left: 10px;">Выбор из списка</li>
                     <li style="margin-right: 10px;">Выбор участка по пути следования</li>
                   </ul>
-                  <div style="height:50%; width:100%; overflow: hidden;">
+                  <div style="height:100%; width:100%; overflow: hidden;">
                     <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
-                    <JqxGrid style="position:relative;" ref="stationGrid" :height="'100%'" :width="'100%'"
+                    <JqxGrid style="position:relative; border: none;" ref="stationGrid" :height="'100%'" :width="'100%'"
                              :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                              :enabletooltip="true" :columnsautoresize="true" :editable="false"
@@ -88,9 +89,9 @@
                 Выбранные участки
               </div>
 
-              <div class="jqx-hideborder jqx-hidescrollbars">
+              <div class="jqx-hideborder jqx-hidescrollbars" style="padding: 0px;">
 
-                <JqxTree ref="myTree" @select="onTreeSelect($event)" :theme="theme"
+                <JqxTree ref="myTree" :theme="theme"
                          :width="'100%'" :height="'100%'">
                   <ul>
                     <li item-expanded="true" id="t1">
@@ -204,7 +205,8 @@
           {text: 'Конец участка', datafield: 'var_year'},
           {text: 'Наличие привязки', datafield: 'var_gs_var_id'},
         ],
-        // getWidth: getWidth('tabs'),
+        dataAdapter: new jqx.dataAdapter(this.source),
+        panels: [{ size: '50%', min: 320, collapsible: false },{ min: 160, size: '50%', collapsible: false }],
       }
     },
 
@@ -216,7 +218,10 @@
     },
 
     methods: {
-
+      onResize() {
+        localStorage.setItem("EditWindowLeftPanelSize", this.panels[0].size);
+        localStorage.setItem("EditWindowRightPanelSize", this.panels[1].size);
+      },
 
     },
 
@@ -227,6 +232,11 @@
     },
 
     created() {
+      let left, right;
+      if ((left = localStorage.getItem("EditWindowLeftPanelSize")) && (right = localStorage.getItem("EditWindowRightPanelSize"))) {
+        this.panels[0].size = left;
+        this.panels[1].size = right;
+      }
     },
 
     mounted() {
