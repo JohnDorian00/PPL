@@ -16,7 +16,7 @@
       <component v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
                  v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
                  @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"
-                 @workVariantCreateWindow="workVariant"/>
+                 @workVariantCreateWindow="workVariant" :stations="stations"/>
     </div>
     <!--    @RowSelect="RowSelect"-->
     <JqxToolbar ref="TollBar" :theme="theme"/>
@@ -34,6 +34,7 @@
   import MainWindow from "@/IERT/vue/MainWindow";
   import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
   import WorkVariant from "@/IERT/vue/WorkVariant";
+  import XmlQuery from "@/IERT/js/xmlQuery";
 
   export default {
     name: "MainApp",
@@ -55,6 +56,7 @@
         id: {},
         count: 0,
         mainWindowSource: {},
+        stations: [],
       }
     },
 
@@ -82,23 +84,41 @@
     },
 
     methods: {
-      findWindowInArr(id) {
-        // Поиск окна
-        let win;
-        this.windows.filter(function (item) {
-          if (item.id === id) {
-            win = item;
-          }
+      // Загрузка списка станций
+      loadStations() {
+        let t = this;
+        t.isLoaded = false;
+
+        // Загрузка участков
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "LOAD_STAT"
         });
-        return win
+
+        xmlQuery.clearFilter();
+        xmlQuery.setFilter("YEAR", 0, "text");
+
+        xmlQuery.query('json',
+          function (json) {
+            t.stations = json.rows;
+            t.isLoaded = true;
+            xmlQuery.destroy();
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
+        )
       },
 
+      // Изменение списка вариантов
       MainWindowTableChange(data) {
         this.mainWindowSource = data;
       },
 
+      // Обновление всех MainWindow при изменении данных в таблице
       refreshAllMainWindows() {
-        // Обновление всех MainWindow при изменении данных в таблице
         for (let i in this.$children) {
           if (this.$children[i].$options._componentTag === "MainWindow") {
             this.$children[i].updateGridFromURL();
@@ -110,6 +130,7 @@
         this.addListWindow({type: 'NewVariantWindow', title: "Создание нового варианта"});
       },
 
+      // Создание окна изменения
       workVariant(id, row) {
         if (row !== -1) {
           this.addListWindow(
@@ -122,6 +143,7 @@
         }
       },
 
+      // Изменить опции создания окна
       updateWindowCreateOptions(old_options, added_options) {
         if (added_options && added_options !== 0) {
           for (let key in added_options) {
@@ -136,6 +158,13 @@
       },
 
       removeWindow(id) {
+        // Ручное закрытие для фикса isModal
+        for (let key in this.$children) {
+          if (this.$children[key].id === id) {
+            console.log(this.$children[key].$children[0]);
+            this.$children[key].$children[0].close();
+          }
+        }
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
         this.id = {};
@@ -169,6 +198,10 @@
         // this.windows[0].type = "WorkVariant";
       }
     },
+
+    created() {
+      this.loadStations();
+    }
   }
 </script>
 

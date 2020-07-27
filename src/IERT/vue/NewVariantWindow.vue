@@ -8,8 +8,7 @@
              :position="{ x: 100, y: 100 }"
              :id="id"
              :theme="theme"
-             :closeButtonSize="0"
-             @close="closeWindows">
+             :closeButtonSize="0">
 
     <!--    Верхний бар-->
     <div ref="header" style="position: relative;">

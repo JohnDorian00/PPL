@@ -7,7 +7,6 @@
              :id="id"
              :theme="theme"
              :closeButtonSize="0"
-             @close="closeWindows"
              :sourceOut="sourceOut"
   >
 

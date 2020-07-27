@@ -7,7 +7,7 @@
              :id="id"
              :theme="theme"
              :closeButtonSize="0"
-             @close="closeWindows">
+             :isModal=false>
 
     <!--    Верхний бар-->
     <div ref="header" style="position: relative;">
@@ -188,7 +188,7 @@
     },
 
     name: "WorkVariant",
-    props: ["id", "title", "closeWindows", "state", "row"],
+    props: ["id", "title", "closeWindows", "state", "row", "stations"],
     data() {
       return {
         theme: appConfig.windowsTheme,
@@ -215,6 +215,10 @@
     },
 
     methods: {
+      test(){
+        // this.$children[0].close();
+      },
+
       onResize() {
         localStorage.setItem("EditWindowLeftPanelSize", Math.round(parseFloat(this.panels[0].size.replace(/,/g, '%'))) + "%");
         localStorage.setItem("EditWindowRightPanelSize", Math.round(parseFloat(this.panels[1].size.replace(/,/g, '%'))) + "%");
@@ -281,8 +285,6 @@
         )
       },
 
-
-
       onRowselect($event) {
         this.selectedRow = $event.args.row;
         console.log(this.selectedRow);
@@ -308,7 +310,6 @@
     },
 
     mounted() {
-
     },
 
 
