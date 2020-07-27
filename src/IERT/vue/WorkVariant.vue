@@ -62,9 +62,11 @@
                              :width="'100%'"
                              :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
-                             :enabletooltip="true" :columnsautoresize="true" :editable="false"
+                             :enabletooltip="true" :columnsautoresize="false" :editable="false"
                              :selectionmode="'singlerow'" :source="stationDataAdapter"
-                             :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'">
+                             :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                             @rowselect="onRowselect"
+                    >
 
                     </JqxGrid>
                   </div>
@@ -193,14 +195,15 @@
         isLoaded: false,
         button_height: 30,
         columns: [
-          {text: 'Начало участка', datafield: 'var_id'},
-          {text: 'Конец участка', datafield: 'var_year'},
-          {text: 'Наличие привязки', datafield: 'var_gs_var_id'},
+          {text: 'Начало участка', datafield: 'start_name'},
+          {text: 'Конец участка', datafield: 'end_name'},
+          {text: 'Наличие привязки', datafield: 'exist_in_cdl', width: 124},
         ],
         stationDataAdapter: new jqx.dataAdapter(this.stationsSource),
-        panels: [{size: '50%', min: 320, collapsible: false}, {min: 160, size: '50%', collapsible: false}],
+        panels: [{size: '50%', min: 327, collapsible: false}, {min: 160, size: '50%', collapsible: false}],
         db: null,
         gsVar: null,
+        selectedRow: null,
       }
     },
 
@@ -245,46 +248,30 @@
         return openRequest
       },
 
+
       Preload() {
         let t = this;
         t.isLoaded = false;
 
-        // Загрузка станций
+        // Загрузка участков
         let xmlQuery = new XmlQuery({
-          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
-          querySet: "GET_STATIONS"
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "LOAD_LINES"
         });
+
+        xmlQuery.clearFilter();
+        xmlQuery.setFilter("VAR_ID", this.row.var_id, "text");
+
         xmlQuery.query('json',
           function (json) {
-
-            let openRequest = t.connectDB();
-            openRequest.onsuccess = function () {
-              t.db = openRequest.result;
-              // продолжить работу с базой данных, используя объект db
-              t.db.onversionchange = function () {
-                t.db.close();
-                alert("База данных устарела, пожалуста, перезагрузите страницу.")
-              };
-              let transaction = t.db.transaction("stations", "readwrite");
-              let stations = transaction.objectStore("stations");
-              stations.clear();
-
-              for (let i = 0; i < json.rows.length; i++) {
-                let obj = {
-                  var_id: json.rows[i].var_id,
-                  stgs_id: json.rows[i].stgs_id,
-                  namev: json.rows[i].namev,
-                  kod_dor: json.rows[i].kod_dor
-                }
-                stations.add(obj);
-              }
-              transaction.oncomplete = function () {
-                console.log("Станции обновлены");
-                t.bindStationsToGrid();
-              };
-            };
+            t.stationsSource.datafields = [
+              {name: 'start_name', type: 'string'},
+              {name: 'end_name', type: 'string'},
+              {name: 'exist_in_cdl', type: 'string'},
+            ]
+            t.stationsSource.localdata = json.rows;
+            t.isLoaded = true;
             xmlQuery.destroy();
-
           },
           function (ER) {
             xmlQuery.destroy();
@@ -294,53 +281,12 @@
         )
       },
 
-      bindStationsToGrid() {
-        let openRequest = this.connectDB(), t = this, rows;
-        openRequest.onsuccess = function () {
-          t.db = openRequest.result;
-          // продолжить работу с базой данных, используя объект db
-          t.db.onversionchange = function () {
-            t.db.close();
-            alert("База данных устарела, пожалуста, перезагрузите страницу.")
-          };
-
-          let transaction = t.db.transaction("stations"); // readonly
-          let stations = transaction.objectStore("stations");
-          let stationsIndex = stations.index("GsVar");
-          let request = stationsIndex.getAll(t.gsVar);
-
-          request.onsuccess = function() {
-            if (request.result !== undefined) {
-              t.stationsSource.datafields = [
-                {name: 'var_id', type: 'string'},
-                {name: 'var_year', type: 'string'},
-                {name: 'var_gs_var_id', type: 'string'},
-                {name: 'var_name', type: 'string'},
-                {name: 'gs_name', type: 'string'},
-                {name: 'var_desc', type: 'string'},
-              ]
-              t.stationsSource.localdata = request;
-              console.log("Книги", request.result); // массив книг с ценой 10
-            } else {
-              console.log("Варианта №" + t.gsVar + " не найдено");
-            }
-          };
-
-          transaction.oncomplete = function () {
-            console.log("Станции показаны");
-            t.isLoaded = true;
-          };
 
 
-        };
-
-
-
-
-
-
+      onRowselect($event) {
+        this.selectedRow = $event.args.row;
+        console.log(this.selectedRow);
       },
-
     },
 
     beforeCreate: function () {
@@ -357,8 +303,8 @@
         this.panels[1].size = right;
       }
 
-      this.Preload();
       this.gsVar = this.row.var_gs_var_id;
+      this.Preload();
     },
 
     mounted() {
@@ -367,7 +313,77 @@
 
 
   }
+  // IndexedBD
+  // let openRequest = t.connectDB();
+  // openRequest.onsuccess = function () {
+  //   t.db = openRequest.result;
+  //   // продолжить работу с базой данных, используя объект db
+  //   t.db.onversionchange = function () {
+  //     t.db.close();
+  //     alert("База данных устарела, пожалуста, перезагрузите страницу.")
+  //   };
+  //   let transaction = t.db.transaction("stations", "readwrite");
+  //   let stations = transaction.objectStore("stations");
+  //   stations.clear();
+  //
+  //   for (let i = 0; i < json.rows.length; i++) {
+  //     let obj = {
+  //       var_id: json.rows[i].var_id,
+  //       stgs_id: json.rows[i].stgs_id,
+  //       namev: json.rows[i].namev,
+  //       kod_dor: json.rows[i].kod_dor
+  //     }
+  //     stations.add(obj);
+  //   }
+  //   transaction.oncomplete = function () {
+  //     console.log("Станции обновлены");
+  //     // t.bindStationsToGrid();
+  //   };
+  // };
+  // bindStationsToGrid() {
+  //   let openRequest = this.connectDB(), t = this, rows;
+  //   openRequest.onsuccess = function () {
+  //     t.db = openRequest.result;
+  //     // продолжить работу с базой данных, используя объект db
+  //     t.db.onversionchange = function () {
+  //       t.db.close();
+  //       alert("База данных устарела, пожалуста, перезагрузите страницу.")
+  //     };
+  //
+  //     let transaction = t.db.transaction("stations"); // readonly
+  //     let stations = transaction.objectStore("stations");
+  //     let stationsIndex = stations.index("GsVar");
+  //     let request = stationsIndex.getAll(t.gsVar);
+  //
+  //     request.onsuccess = function () {
+  //       if (request.result !== undefined) {
+  //         t.stationsSource.datafields = [
+  //           {name: 'var_id', type: 'string'},
+  //           {name: 'var_year', type: 'string'},
+  //           {name: 'var_gs_var_id', type: 'string'},
+  //           {name: 'var_name', type: 'string'},
+  //           {name: 'gs_name', type: 'string'},
+  //           {name: 'var_desc', type: 'string'},
+  //         ]
+  //         t.stationsSource.localdata = request;
+  //         console.log("Книги", request.result); // массив книг с ценой 10
+  //       } else {
+  //         console.log("Варианта №" + t.gsVar + " не найдено");
+  //       }
+  //     };
+  //
+  //     transaction.oncomplete = function () {
+  //       console.log("Станции показаны");
+  //       t.isLoaded = true;
+  //     };
+  //
+  //
+  //   };
+  //
+  //
+  // },
 </script>
+
 
 <style scoped>
   .jqx-expander-content {

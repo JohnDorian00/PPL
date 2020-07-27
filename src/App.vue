@@ -82,10 +82,6 @@
     },
 
     methods: {
-      // RowSelect(row) {
-      //   this.mainWindowRow = row;
-      // },
-
       findWindowInArr(id) {
         // Поиск окна
         let win;
