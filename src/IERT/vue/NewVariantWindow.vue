@@ -5,7 +5,7 @@
              :max-width="190000"
              :min-width="0"
              :min-height="0"
-             :position="{ x: 150, y: 220 }"
+             :position="{ x: 100, y: 100 }"
              :id="id"
              :theme="theme"
              :closeButtonSize="0"
@@ -90,7 +90,7 @@
         <li class="last">
           <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                     :theme="theme" :style="{ 'display': 'inline-block'}"
+                     :theme="theme" style="display: inline-block;"
           ><span class="nobr">Закрыть&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
@@ -205,6 +205,7 @@
 
                       function (ER) {
                         xmlQuery.destroy();
+                        t.isLoaded = true;
                         console.log("Error update data");
                         console.log(ER);
                         }
@@ -254,6 +255,7 @@
           },
           function (ER) {
             xmlQuery.destroy();
+            t.isLoaded = true;
             console.log("Error update data");
             console.log("ERROR = ", ER);
           }

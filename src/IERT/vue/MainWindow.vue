@@ -3,7 +3,7 @@
              :max-width="190000"
              :min-width="937"
              :min-height="510"
-             :position="{ x: 150, y: 220 }"
+             :position="{ x: 50, y: 50 }"
              :id="id"
              :theme="theme"
              :closeButtonSize="0"
@@ -171,18 +171,19 @@
         xmlQuery.clearFilter();
         xmlQuery.setFilter("VAR_ID", this.GridSelector.var_id, "text");
 
-        // xmlQuery.query('json',
-        //   function () {
-        //     xmlQuery.destroy();
-        //     t.$root.$children[0].refreshAllMainWindows();
-        //     t.isLoaded = true;
-        //   },
-        //   function (ER) {
-        //     xmlQuery.destroy();
-        //     console.log("Error update data");
-        //     console.log("ERROR = ", ER);
-        //   }
-        // );
+        xmlQuery.query('json',
+          function () {
+            xmlQuery.destroy();
+            t.$root.$children[0].refreshAllMainWindows();
+            t.isLoaded = true;
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            t.isLoaded = true;
+            console.log("Error update data");
+            console.log("ERROR = ", ER);
+          }
+        );
       },
 
       // Загрузка данных с url
@@ -198,6 +199,7 @@
 
         xmlQuery.query('json', successQuery, function (ER) {
           xmlQuery.destroy();
+          t.isLoaded = true;
           console.log("Error update data");
           console.log(ER);
         })

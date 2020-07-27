@@ -8,17 +8,17 @@
         <li v-on:click="addListWindow({type: 'MainWindow',
             title: 'Перечень вариантов расчета перспективной потребности локомотивов'})" :style="{
               'display': 'inline-block', 'height': '25px', 'left':'0px', 'cursor':'pointer', 'text-align':'left'}"
-            > Варианты расчетов перспективной потребности
+        > Варианты расчетов перспективной потребности
         </li>
       </ul>
     </JqxMenu>
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
-        <component v-for="window in windows" :is="window.type" :title="window.title" :id="window.id"
-                   v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
-                   @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"
-                   @workVariantCreateWindow="workVariant"/>
+      <component v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
+                 v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
+                 @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"
+                 @workVariantCreateWindow="workVariant"/>
     </div>
-<!--    @RowSelect="RowSelect"-->
+    <!--    @RowSelect="RowSelect"-->
     <JqxToolbar ref="TollBar" :theme="theme"/>
   </div>
 </template>
@@ -117,18 +117,21 @@
       workVariant(id, row) {
         if (row !== -1) {
           this.addListWindow(
-  {type: 'WorkVariant', title: "Работа с вариантом " + row.var_name + ", " +
-              row.var_year + " г."
-              });
+            {
+              type: 'WorkVariant', title: "Работа с вариантом " + row.var_name + ", " +
+                row.var_year + " г.", row: row,
+            });
         } else {
           console.log("Не выбран пункт в таблице, ошибка изменения варианта");
         }
       },
 
-      updateWindowCreateOptions(old_options,added_options) {
+      updateWindowCreateOptions(old_options, added_options) {
         if (added_options && added_options !== 0) {
           for (let key in added_options) {
             if (old_options.hasOwnProperty(key)) {
+              old_options[key] = added_options[key];
+            } else {
               old_options[key] = added_options[key];
             }
           }
@@ -154,7 +157,9 @@
           type: 'MainWindow',
           title: 'Прогресс ' + ++this.count,
           state: true,
-          close: () => {vue.removeWindow(id)},
+          close: () => {
+            vue.removeWindow(id)
+          },
           changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state,
           mainWindowRow: -1,
         }

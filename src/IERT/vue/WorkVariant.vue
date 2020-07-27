@@ -3,7 +3,7 @@
              :max-width="190000"
              :min-width="937"
              :min-height="510"
-             :position="{ x: 150, y: 220 }"
+             :position="{ x: 150, y: 150 }"
              :id="id"
              :theme="theme"
              :closeButtonSize="0"
@@ -46,6 +46,7 @@
               </div>
 
               <div style="padding: 0px;">
+                <Preloader v-if="!isLoaded"/>
                 <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
                          :width="'100%'" :height="'100%'" :position="'top'" style="border: none;"
                          :animationType="'none'" :selectionTracker='false'>
@@ -53,14 +54,18 @@
                     <li style="margin-left: 10px;">Выбор из списка</li>
                     <li style="margin-right: 10px;">Выбор участка по пути следования</li>
                   </ul>
+
                   <div style="height:100%; width:100%; overflow: hidden;">
                     <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
-                    <JqxGrid style="position:relative; border: none;" ref="stationGrid" :height="'100%'" :width="'100%'"
+
+                    <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
+                             :width="'100%'"
                              :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                              :enabletooltip="true" :columnsautoresize="true" :editable="false"
-                             :selectionmode="'singlerow'"
+                             :selectionmode="'singlerow'" :source="stationDataAdapter"
                              :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'">
+
                     </JqxGrid>
                   </div>
                   <div>
@@ -181,32 +186,21 @@
     },
 
     name: "WorkVariant",
-    props: ["id", "title", "closeWindows", "state"],
+    props: ["id", "title", "closeWindows", "state", "row"],
     data() {
       return {
         theme: appConfig.windowsTheme,
         isLoaded: false,
         button_height: 30,
-        config: {
-          feeds: {'CNN.com': 'cnn', 'Geek.com': 'geek', 'ScienceDaily': 'sciencedaily'},
-          format: 'txt',
-          dataDir: '../sampledata',
-          feedTree: document.querySelectorAll('angularTree')[0],
-          feedItemHeader: document.querySelector('#feedItemHeader'),
-          feedUpperPanel: document.querySelector('#feedUpperPanel'),
-          feedHeader: document.querySelector('#feedHeader'),
-          feedContentArea: document.querySelector('#feedContentArea'),
-          selectedIndex: -1,
-          currentFeed: '',
-          currentFeedContent: {}
-        },
         columns: [
           {text: 'Начало участка', datafield: 'var_id'},
           {text: 'Конец участка', datafield: 'var_year'},
           {text: 'Наличие привязки', datafield: 'var_gs_var_id'},
         ],
-        dataAdapter: new jqx.dataAdapter(this.source),
-        panels: [{ size: '50%', min: 320, collapsible: false },{ min: 160, size: '50%', collapsible: false }],
+        stationDataAdapter: new jqx.dataAdapter(this.stationsSource),
+        panels: [{size: '50%', min: 320, collapsible: false}, {min: 160, size: '50%', collapsible: false}],
+        db: null,
+        gsVar: null,
       }
     },
 
@@ -219,27 +213,156 @@
 
     methods: {
       onResize() {
-        localStorage.setItem("EditWindowLeftPanelSize", this.panels[0].size);
-        localStorage.setItem("EditWindowRightPanelSize", this.panels[1].size);
+        localStorage.setItem("EditWindowLeftPanelSize", Math.round(parseFloat(this.panels[0].size.replace(/,/g, '%'))) + "%");
+        localStorage.setItem("EditWindowRightPanelSize", Math.round(parseFloat(this.panels[1].size.replace(/,/g, '%'))) + "%");
+      },
+
+      connectDB() {
+        let openRequest = indexedDB.open("storage", 1);
+        // проверить существование указанной версии базы данных, обновить по мере необходимости:
+        openRequest.onupgradeneeded = function () {
+          t.db = openRequest.result;
+          switch (t.db.version) { // существующая (старая) версия базы данных
+            case 0:
+              // версия 0 означает, что на клиенте нет базы данных
+              console.log("no db");
+            case 1:
+              // на клиенте версия базы данных 1
+              if (!t.db.objectStoreNames.contains('stations')) { // if there's no "books" store
+                let stations = t.db.createObjectStore('stations', {keyPath: 'id', autoIncrement: true});
+                stations.createIndex('GsVar', 'var_id');
+                console.log("created db, version = " + t.db.version);
+              }
+          }
+        };
+        openRequest.onblocked = function () {
+          console.warn("Warn", "Невозможно закрыть другое подключение к базе данных");
+        };
+        openRequest.onerror = function () {
+          console.error("Error", openRequest.error);
+        };
+
+        return openRequest
+      },
+
+      Preload() {
+        let t = this;
+        t.isLoaded = false;
+
+        // Загрузка станций
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
+          querySet: "GET_STATIONS"
+        });
+        xmlQuery.query('json',
+          function (json) {
+
+            let openRequest = t.connectDB();
+            openRequest.onsuccess = function () {
+              t.db = openRequest.result;
+              // продолжить работу с базой данных, используя объект db
+              t.db.onversionchange = function () {
+                t.db.close();
+                alert("База данных устарела, пожалуста, перезагрузите страницу.")
+              };
+              let transaction = t.db.transaction("stations", "readwrite");
+              let stations = transaction.objectStore("stations");
+              stations.clear();
+
+              for (let i = 0; i < json.rows.length; i++) {
+                let obj = {
+                  var_id: json.rows[i].var_id,
+                  stgs_id: json.rows[i].stgs_id,
+                  namev: json.rows[i].namev,
+                  kod_dor: json.rows[i].kod_dor
+                }
+                stations.add(obj);
+              }
+              transaction.oncomplete = function () {
+                console.log("Станции обновлены");
+                t.bindStationsToGrid();
+              };
+            };
+            xmlQuery.destroy();
+
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
+        )
+      },
+
+      bindStationsToGrid() {
+        let openRequest = this.connectDB(), t = this, rows;
+        openRequest.onsuccess = function () {
+          t.db = openRequest.result;
+          // продолжить работу с базой данных, используя объект db
+          t.db.onversionchange = function () {
+            t.db.close();
+            alert("База данных устарела, пожалуста, перезагрузите страницу.")
+          };
+
+          let transaction = t.db.transaction("stations"); // readonly
+          let stations = transaction.objectStore("stations");
+          let stationsIndex = stations.index("GsVar");
+          let request = stationsIndex.getAll(t.gsVar);
+
+          request.onsuccess = function() {
+            if (request.result !== undefined) {
+              t.stationsSource.datafields = [
+                {name: 'var_id', type: 'string'},
+                {name: 'var_year', type: 'string'},
+                {name: 'var_gs_var_id', type: 'string'},
+                {name: 'var_name', type: 'string'},
+                {name: 'gs_name', type: 'string'},
+                {name: 'var_desc', type: 'string'},
+              ]
+              t.stationsSource.localdata = request;
+              console.log("Книги", request.result); // массив книг с ценой 10
+            } else {
+              console.log("Варианта №" + t.gsVar + " не найдено");
+            }
+          };
+
+          transaction.oncomplete = function () {
+            console.log("Станции показаны");
+            t.isLoaded = true;
+          };
+
+
+        };
+
+
+
+
+
+
       },
 
     },
 
     beforeCreate: function () {
-      this.source = {
+      this.stationsSource = {
         datatype: 'json',
       };
     },
 
     created() {
+      // Применение сохраненных параметров
       let left, right;
       if ((left = localStorage.getItem("EditWindowLeftPanelSize")) && (right = localStorage.getItem("EditWindowRightPanelSize"))) {
         this.panels[0].size = left;
         this.panels[1].size = right;
       }
+
+      this.Preload();
+      this.gsVar = this.row.var_gs_var_id;
     },
 
     mounted() {
+
     },
 
 
