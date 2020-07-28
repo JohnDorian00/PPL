@@ -45,6 +45,11 @@
                  :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
         </JqxGrid>
       </div>
+
+<!--      <div ref="MainContent" class="main-content flex-coll-css" style="width: 100%; height: 100%;">-->
+<!--        <columns ref="columns" :rowsProps="rows"></columns>-->
+<!--      </div>-->
+
       <!--      Нижнее меню (кнопки)-->
       <ul class="btn-group" :height="button_height">
         <li>
@@ -88,6 +93,8 @@
         </li>
         <li class="helper"></li>
       </ul>
+
+
     </div>
   </JqxWindow>
 </template>
@@ -98,9 +105,10 @@
   import appConfig from "@/IERT/js/appConfig";
   import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
   import XmlQuery from "@/IERT/js/xmlQuery";
-  import Rows from "@/IERT/vue/tabel/flex-row";
   import Preloader from "@/IERT/vue/Preloader";
   import globalData from "@/IERT/js/globalData";
+  import Rows from "@/IERT/vue/tabel/flex-row";
+  import Columns from "@/IERT/vue/tabel/flex-collum";
 
   export default {
     components: {
@@ -108,7 +116,8 @@
       JqxButton,
       JqxGrid,
       Preloader,
-      Rows
+      Columns,
+      Rows,
     },
     name: "MainWindow",
     props: ["id", "title", "closeWindows", "state"],
@@ -128,7 +137,9 @@
           {text: 'Вариант ГС', datafield: 'gs_name', minwidth: '100'},
           {text: 'Комментарий', datafield: 'var_desc', minwidth: '100'},
         ],
-        isUpdate: false
+        isUpdate: false,
+
+
       }
     },
 
@@ -230,7 +241,10 @@
           //   ]);
           // }
         }
-      }
+      },
+
+
+
     },
 
     beforeCreate: function () {

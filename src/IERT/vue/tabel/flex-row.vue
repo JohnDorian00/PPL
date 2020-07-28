@@ -1,14 +1,27 @@
 <template>
   <div style="height: 100%; width: 100%;" ref="main">
-    <div v-for="row in rowsHeight" v-bind:key="row.id" style="width: 100%;" v-bind:style="{ height: row.height + 'px'} "
-         v-html="row.data"></div>
+    <div v-for="row in rowsHeight" v-bind:key="row.id" style="width: 100%;"
+         v-bind:style="{ height: row.height + 'px'}">
+      <div v-bind:key="row.id" style="width: 100%;" v-bind:style="{ height: row.height + 'px'} "
+           v-html="row.data" v-if="(row.componentName === undefined)"></div>
+      <component style="height: 100%; width: 100%;" v-if="(row.componentName !== undefined)"
+                 v-bind:is="row.componentName" v-bind="row" v-bind:data="row.data"
+                 :userData="userData"></component>
+    </div>
   </div>
 </template>
 
 <script>
+  import JqxButton from "@/jqwidgets/jqwidgets-vue/vue_jqxbuttons";
+  import LowerMenu from "@/IERT/vue/windows/AddStation/components/LowerMenu";
+
   export default {
     name: "rows",
-    props: ["rowsProps"],
+    props: ["rowsProps", "userData"],
+    components: {
+      JqxButton,
+      LowerMenu
+    },
     data() {
       return {
         isResize: false,
@@ -32,7 +45,7 @@
         })
         let onePart = heightFree / size;
         freeSizeElements.forEach(function (value) {
-          value.height = parseInt(onePart * value.flexSize)
+          value.height = onePart * value.flexSize
           heightFree = heightFree - value.height;
         })
         this.rowsHeight = staticElements.concat(freeSizeElements).sort((a, b) => {
@@ -46,14 +59,14 @@
           id: this.rowsProps[g].id,
           static: this.rowsProps[g].static,
           flex: this.rowsProps[g].flex,
-          height: this.rowsProps[g].height,
+          height: parseInt(this.rowsProps[g].height),
           data: this.rowsProps[g].data,
-          flexSize: this.rowsProps[g].flexSize
+          flexSize: parseInt(this.rowsProps[g].flexSize),
+          componentName: (this.rowsProps[g].componentName) ? this.rowsProps[g].componentName : undefined,
+          options: (this.rowsProps[g].options) ? this.rowsProps[g].options : {}
         }
       }
       this.updateHeight();
-    },
-    destroyed() {
     }
   }
 </script>

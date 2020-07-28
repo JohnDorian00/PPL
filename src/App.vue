@@ -16,7 +16,8 @@
       <component v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
                  v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
                  @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"
-                 @workVariantCreateWindow="workVariant" :stations="stations"/>
+                 @workVariantCreateWindow="createWindowEditVariant" :parentWindow="window.parentWindow"
+                 @createAddStationWindow="createWindowAddStation"  :stations="stations"/>
     </div>
     <!--    @RowSelect="RowSelect"-->
     <JqxToolbar ref="TollBar" :theme="theme"/>
@@ -33,7 +34,8 @@
   import appConfig from "@/IERT/js/appConfig";
   import MainWindow from "@/IERT/vue/MainWindow";
   import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
-  import WorkVariant from "@/IERT/vue/WorkVariant";
+  import EditVariantWindow from "@/IERT/vue/EditVariantWindow";
+  import AddStation from "@/IERT/vue/windows/AddStation/AddStation";
   import XmlQuery from "@/IERT/js/xmlQuery";
 
   export default {
@@ -44,7 +46,8 @@
       JqxButtons,
       MainWindow,
       NewVariantWindow,
-      WorkVariant,
+      EditVariantWindow,
+      AddStation,
     },
 
     data() {
@@ -84,6 +87,14 @@
     },
 
     methods: {
+      findWindowInArr(id) {
+        for (let key in this.$children) {
+          if (this.$children[key].id === id) {
+            return this.$children[key].$children[0]
+          }
+        }
+      },
+
       // Загрузка списка станций
       loadStations() {
         let t = this;
@@ -126,21 +137,26 @@
         }
       },
 
+      // Создание окна "создание нового варианта"
       createWindowNewVariant() {
         this.addListWindow({type: 'NewVariantWindow', title: "Создание нового варианта"});
       },
 
       // Создание окна изменения
-      workVariant(id, row) {
+      createWindowEditVariant(id, row) {
         if (row !== -1) {
           this.addListWindow(
             {
-              type: 'WorkVariant', title: "Работа с вариантом " + row.var_name + ", " +
+              type: 'EditVariantWindow', title: "Работа с вариантом " + row.var_name + ", " +
                 row.var_year + " г.", row: row,
             });
         } else {
           console.log("Не выбран пункт в таблице, ошибка изменения варианта");
         }
+      },
+
+      createWindowAddStation(mainWinId) {
+        this.addListWindow({type: 'AddStation', title: "Добавление путей по станциям", parentWindow: this.findWindowInArr(mainWinId)})
       },
 
       // Изменить опции создания окна
@@ -158,13 +174,7 @@
       },
 
       removeWindow(id) {
-        // Ручное закрытие для фикса isModal
-        for (let key in this.$children) {
-          if (this.$children[key].id === id) {
-            console.log(this.$children[key].$children[0]);
-            this.$children[key].$children[0].close();
-          }
-        }
+        this.findWindowInArr(id).close();
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
         this.id = {};

@@ -6,8 +6,7 @@
              :position="{ x: 150, y: 150 }"
              :id="id"
              :theme="theme"
-             :closeButtonSize="0"
-             :isModal=false>
+             :closeButtonSize="0">
 
     <!--    Верхний бар-->
     <div ref="header" style="position: relative;">
@@ -70,15 +69,40 @@
 
                     </JqxGrid>
                   </div>
-                  <div>
-                    JavaServer Pages (JSP) is a Java technology that helps software developers serve
-                    dynamically generated web pages based on HTML, XML, or other document types. Released
-                    in 1999 as Sun's answer to ASP and PHP,:citation needed JSP was designed to address
-                    the perception that the Java programming environment didn't provide developers with
-                    enough support for the Web. To deploy and run, a compatible web server with servlet
-                    container is required. The Java Servlet and the JavaServer Pages (JSP) specifications
-                    from Sun Microsystems and the JCP (Java Community Process) must both be met by the
-                    container.
+
+                  <div style="height:100%; width:100%; overflow: hidden;">
+
+                    <div style="text-align: center; margin: 5px">Сформируйте путь следования, вдоль которого будут выбраны участки</div>
+
+                    <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'50%'"
+                             :width="'100%'"
+                             :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
+                             :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                             :enabletooltip="true" :columnsautoresize="false" :editable="false"
+                             :selectionmode="'singlerow'" :source="stationDataAdapter"
+                             :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                             @rowselect="onRowselect"
+                    >
+                    </JqxGrid>
+                    <div>
+                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+                                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                    :theme="theme" style="display : inline-block; "
+                      ><span class="nobr">Добавить станцию&nbsp;&nbsp;</span>
+                      </JqxButton>
+                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+                                 :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                 :theme="theme" style="display : inline-block; "
+                      ><span class="nobr">Очистить&nbsp;&nbsp;</span>
+                      </JqxButton>
+                    </div>
+                    <div>
+                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+                                 :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                 :theme="theme" :style="{ 'display': 'inline-block'}"
+                      ><span class="nobr">Сформировать список участков&nbsp;&nbsp;</span>
+                      </JqxButton>
+                    </div>
                   </div>
                 </JqxTabs>
               </div>
@@ -132,11 +156,11 @@
       <ul class="btn-group" :height="button_height">
 
         <li>
-          <JqxButton ref="createWindowNewVariant" @click="this.$root.$children[0].createWindowNewVariant"
+          <JqxButton ref="createWindowNewVariant" @click="createAddStation"
                      :height="button_height"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'} "
-          ><span class="nobr">Создать новый вариант&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </JqxButton>
         </li>
 
@@ -215,10 +239,6 @@
     },
 
     methods: {
-      test(){
-        // this.$children[0].close();
-      },
-
       onResize() {
         localStorage.setItem("EditWindowLeftPanelSize", Math.round(parseFloat(this.panels[0].size.replace(/,/g, '%'))) + "%");
         localStorage.setItem("EditWindowRightPanelSize", Math.round(parseFloat(this.panels[1].size.replace(/,/g, '%'))) + "%");
@@ -251,7 +271,6 @@
 
         return openRequest
       },
-
 
       Preload() {
         let t = this;
@@ -289,6 +308,12 @@
         this.selectedRow = $event.args.row;
         console.log(this.selectedRow);
       },
+
+      // Окно изменения варианта
+      createAddStation() {
+        this.$emit('createAddStationWindow', this.id)
+      },
+
     },
 
     beforeCreate: function () {
