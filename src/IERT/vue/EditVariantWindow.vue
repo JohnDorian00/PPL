@@ -48,7 +48,7 @@
                 <Preloader v-if="!isLoaded"/>
                 <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
                          :width="'100%'" :height="'100%'" :position="'top'" style="border: none;"
-                         :animationType="'none'" :selectionTracker='false'>
+                         :animationType="'none'" :selectionTracker='false' @tabclick="onTabclick($event)" >
                   <ul>
                     <li style="margin-left: 10px;">Выбор из списка</li>
                     <li style="margin-right: 10px;">Выбор участка по пути следования</li>
@@ -85,22 +85,22 @@
                     >
                     </JqxGrid>
                     <div>
-                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :height="button_height+'px'"
                                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                     :theme="theme" style="display : inline-block; "
                       ><span class="nobr">Добавить станцию&nbsp;&nbsp;</span>
                       </JqxButton>
-                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :height="button_height+'px'"
                                  :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                  :theme="theme" style="display : inline-block; "
                       ><span class="nobr">Очистить&nbsp;&nbsp;</span>
                       </JqxButton>
                     </div>
                     <div>
-                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :height="button_height+'px'"
                                  :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                  :theme="theme" :style="{ 'display': 'inline-block'}"
-                      ><span class="nobr">Сформировать список участков&nbsp;&nbsp;</span>
+                      ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                       </JqxButton>
                     </div>
                   </div>
@@ -239,6 +239,25 @@
     },
 
     methods: {
+      appendSavedParams() {
+        let left, right, tabIndex;
+
+        // Делить экранов, сплиттер
+        if ((left = localStorage.getItem("EditWindowLeftPanelSize")) && (right = localStorage.getItem("EditWindowRightPanelSize"))) {
+          this.panels[0].size = left;
+          this.panels[1].size = right;
+        }
+
+        if (tabIndex = localStorage.getItem("TabIndex")) {
+          this.$refs.myTabs.select(tabIndex);
+        }
+
+      },
+
+      onTabclick: function (event) {
+        localStorage.setItem("TabIndex", event.args.item);
+      },
+
       onResize() {
         localStorage.setItem("EditWindowLeftPanelSize", Math.round(parseFloat(this.panels[0].size.replace(/,/g, '%'))) + "%");
         localStorage.setItem("EditWindowRightPanelSize", Math.round(parseFloat(this.panels[1].size.replace(/,/g, '%'))) + "%");
@@ -323,18 +342,13 @@
     },
 
     created() {
-      // Применение сохраненных параметров
-      let left, right;
-      if ((left = localStorage.getItem("EditWindowLeftPanelSize")) && (right = localStorage.getItem("EditWindowRightPanelSize"))) {
-        this.panels[0].size = left;
-        this.panels[1].size = right;
-      }
-
       this.gsVar = this.row.var_gs_var_id;
       this.Preload();
     },
 
     mounted() {
+      // Применение сохраненных параметров
+      this.appendSavedParams();
     },
 
 

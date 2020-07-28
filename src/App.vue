@@ -174,6 +174,7 @@
       },
 
       removeWindow(id) {
+        console.log("Window with id = " + id + " closed");
         this.findWindowInArr(id).close();
         this.$refs.TollBar.destroyTool(this.id[id]);
         this.windows.splice(this.id[id], 1)
