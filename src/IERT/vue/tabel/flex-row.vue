@@ -13,17 +13,17 @@
 
 <script>
   import JqxButton from "@/jqwidgets/jqwidgets-vue/vue_jqxbuttons";
-  import LowerMenu from "@/IERT/vue/windows/AddStation/components/AddStationLowerMenu";
   import AddStationLowerMenu from "@/IERT/vue/windows/AddStation/components/AddStationLowerMenu";
   import MainWindowContent from "@/IERT/vue/windows/MainWindow/components/MainWindowContent";
+  import AddStationContent from "@/IERT/vue/windows/AddStation/components/AddStationContent";
 
   export default {
     name: "rows",
     props: ["rowsProps", "userData"],
     components: {
       JqxButton,
-      LowerMenu,
       AddStationLowerMenu,
+      AddStationContent,
       MainWindowContent
     },
     data() {

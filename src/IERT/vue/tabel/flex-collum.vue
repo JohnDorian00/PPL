@@ -13,11 +13,11 @@
 <script>
   // import LeftPanelVariantWindows from '@/IERT/vue/windows/VariantWindows/component/LeftPanel';
   // import SelectorPanelVariantWindows from '@/IERT/vue/windows/VariantWindows/component/SelectotorPanel';
+  import AddStationTableStations from "@/IERT/vue/windows/AddStation/components/AddStationTableStations";
 
   export default {
     components: {
-      // LeftPanelVariantWindows,
-      // SelectorPanelVariantWindows
+      AddStationTableStations
     },
     name: "columns",
     props: ["rowsProps"],

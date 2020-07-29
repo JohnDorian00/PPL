@@ -21,7 +21,7 @@
       </div>
 
       <div ref="MainContent" class="main-content flex-coll-css" style="width: 100%; height: 100%;">
-        <Rows ref="rows" :userData="userData" :rowsProps="rows"></Rows>
+        <rows ref="rows" :userData="userData" :rowsProps="rows"></rows>
       </div>
 
 
@@ -123,13 +123,14 @@
             id: 1,
             flex: true,
             flexSize: 1,
-            data: "<div style='width: 100%; height: 100%; border: 1px solid black; box-sizing:border-box;'>a</div>"
+            data: "<div style='width: 100%; height: 100%; border: 1px solid black; box-sizing:border-box;'></div>",
+            componentName: 'AddStationContent'
           }, {
             id: 2,
             static: true,
             height: 100,
-            data: "<div style='width: 100%; height: 100%; border: 1px solid black; box-sizing:border-box;'>s</div>",
-            componentName: 'LowerMenu'
+            data: "<div style='width: 100%; height: 100%; border: 1px solid black; box-sizing:border-box;'></div>",
+            componentName: 'AddStationLowerMenu'
           }],
           dragArea: {
             left: 0,
@@ -142,7 +143,7 @@
             rowsHeightHeader: {leftPanel: 35, mainContent: 645}
           },
           height: {contentHeight: 660},
-          userData: {closeWindows: this.closeWindows},
+          userData: {closeWindows: this.closeWindows, parentWindow: this.parentWindow},
         }
       },
 

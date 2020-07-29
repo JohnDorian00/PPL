@@ -26,7 +26,7 @@
     import appConfig from "@/IERT/js/appConfig";
 
     export default {
-      name: "LowerMenu",
+      name: "AddStationLowerMenu",
 
       props: ["userData"],
 
