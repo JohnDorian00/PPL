@@ -230,7 +230,7 @@
           t.$emit("MainWindowTableChange", json.rows);
           xmlQuery.destroy();
           setTimeout(function () {
-            if (t.isLoaded) t.$refs.myGrid.updatebounddata();
+            if (t.isLoaded) t.$refs.myGrid.updatebounddata('cells');
             t.isUpdate = false;
           }, 4)
           t.isLoaded = true;

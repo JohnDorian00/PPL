@@ -62,7 +62,7 @@
                              :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                              :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                             :selectionmode="'singlerow'" :source="stationDataAdapter"
+                             :selectionmode="'singlerow'" :source="linesDataAdapter"
                              :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
                              @rowselect="onRowselect"
                     >
@@ -76,32 +76,44 @@
 
                     <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'50%'"
                              :width="'100%'"
-                             :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
+                             :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                              :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                             :selectionmode="'singlerow'" :source="stationDataAdapter"
+                             :selectionmode="'singlerow'" :source="stationsSource"
                              :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
                              @rowselect="onRowselect"
                     >
                     </JqxGrid>
-                    <div>
-                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :height="button_height+'px'"
-                                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                    :theme="theme" style="display : inline-block; "
-                      ><span class="nobr">Добавить станцию&nbsp;&nbsp;</span>
-                      </JqxButton>
-                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :height="button_height+'px'"
-                                 :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                 :theme="theme" style="display : inline-block; "
-                      ><span class="nobr">Очистить&nbsp;&nbsp;</span>
-                      </JqxButton>
-                    </div>
-                    <div>
-                      <JqxButton class="button" ref="closeButton" @click="closeWindows" :height="button_height+'px'"
-                                 :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                 :theme="theme" :style="{ 'display': 'inline-block'}"
-                      ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                      </JqxButton>
+                    <div style="position: absolute; bottom: 0; width: 100%">
+
+                      <div style="display : block; width: 100%">
+
+                        <div style="display : inline-block;">
+                          <JqxButton ref="closeButton" @click="deleteStation" :height="button_height+'px'"
+                                        :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                        :theme="theme" style="display : inline-block; margin-left: 5px"
+                          ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                          </JqxButton>
+                        </div>
+
+                        <div style="display : inline-block; float: right">
+                          <JqxButton ref="closeButton" @click="clearStations" :height="button_height+'px'"
+                                     :textImageRelation="'imageBeforeText'" :textPosition="'center'"
+                                     :theme="theme" style="display : inline-block; margin-right: 8px"
+                          ><span class="nobr">Очистить&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                          </JqxButton>
+                        </div>
+
+                      </div>
+
+                      <div style="display : block; width: 100%">
+                        <JqxButton ref="closeButton" @click="closeWindows" :height="button_height+'px'"
+                                   :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                   :theme="theme" style="margin-left: 5px;"
+                        ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        </JqxButton>
+                      </div>
+
                     </div>
                   </div>
                 </JqxTabs>
@@ -223,7 +235,11 @@
           {text: 'Конец участка', datafield: 'end_name'},
           {text: 'Наличие привязки', datafield: 'exist_in_cdl', width: 124},
         ],
-        stationDataAdapter: new jqx.dataAdapter(this.stationsSource),
+        stationsColumns: [
+          {text: 'Начало участка', datafield: 'name'},
+        ],
+        linesDataAdapter: new jqx.dataAdapter(this.linesSource),
+        stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
         panels: [{size: '50%', min: 327, collapsible: false}, {min: 160, size: '50%', collapsible: false}],
         db: null,
         gsVar: null,
@@ -239,6 +255,26 @@
     },
 
     methods: {
+
+      // Добавление станции
+      addStation(station) {
+        console.log(23);
+        this.stationsSource.localdata.push(station);
+        this.$refs.stationGrid.updatebounddata('cells');
+      },
+
+      // Удаление станции
+      deleteStation() {
+        this.$refs.stationGrid.clearselection();
+      },
+
+
+      // Очистка списка станций
+      clearStations() {
+        this.stationsSource.localdata = [];
+        this.$refs.stationGrid.updatebounddata('cells');
+      },
+
       appendSavedParams() {
         let left, right, tabIndex;
 
@@ -248,6 +284,7 @@
           this.panels[1].size = right;
         }
 
+        // Индекс вкладки
         if (tabIndex = localStorage.getItem("TabIndex")) {
           this.$refs.myTabs.select(tabIndex);
         }
@@ -306,12 +343,12 @@
 
         xmlQuery.query('json',
           function (json) {
-            t.stationsSource.datafields = [
+            t.linesSource.datafields = [
               {name: 'start_name', type: 'string'},
               {name: 'end_name', type: 'string'},
               {name: 'exist_in_cdl', type: 'string'},
             ]
-            t.stationsSource.localdata = json.rows;
+            t.linesSource.localdata = json.rows;
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -336,12 +373,26 @@
     },
 
     beforeCreate: function () {
-      this.stationsSource = {
+      this.linesSource = {
         datatype: 'json',
       };
+
+      this.stationsSource = {
+        datatype: 'json',
+      }
     },
 
     created() {
+      this.stationsSource = {
+        datafields : [
+          {name: 'name', type: 'string'},
+        ],
+        localdata : [
+          {name: "test", end_name: "test2"},
+          {name: "test", end_name: "test2"},
+          {name: "test", end_name: "test2"},]
+      }
+
       this.gsVar = this.row.var_gs_var_id;
       this.Preload();
     },
@@ -349,6 +400,7 @@
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
+      console.log(this.stations[0]);
     },
 
 

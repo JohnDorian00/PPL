@@ -32,7 +32,7 @@
   import JqxMenu from "@/jqwidgets/jqwidgets-vue/vue_jqxmenu";
   import JqxButtons from "@/jqwidgets/jqwidgets-vue/vue_jqxbuttons";
   import appConfig from "@/IERT/js/appConfig";
-  import MainWindow from "@/IERT/vue/MainWindow";
+  import MainWindow from "@/IERT/vue/windows/MainWindow/MainWindow";
   import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
   import EditVariantWindow from "@/IERT/vue/EditVariantWindow";
   import AddStation from "@/IERT/vue/windows/AddStation/AddStation";

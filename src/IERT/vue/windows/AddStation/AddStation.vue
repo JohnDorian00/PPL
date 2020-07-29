@@ -21,7 +21,6 @@
 
       <div ref="MainContent" class="main-content flex-coll-css" style="width: 100%; height: 100%;">
         <Rows ref="rows" :userData="userData" :rowsProps="rows"></Rows>
-
       </div>
 
 
