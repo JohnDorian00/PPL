@@ -89,7 +89,7 @@
                       <div style="display : block; width: 100%">
 
                         <div style="display : inline-block;">
-                          <JqxButton ref="closeButton" @click="deleteStation" :height="button_height+'px'"
+                          <JqxButton ref="closeButton" @click="this.$root.$children[0].createWindowAddStation" :height="button_height+'px'"
                                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                         :theme="theme" style="display : inline-block; margin-left: 5px"
                           ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -97,7 +97,7 @@
                         </div>
 
                         <div style="display : inline-block; float: right">
-                          <JqxButton ref="closeButton" @click="clearStations" :height="button_height+'px'"
+                          <JqxButton ref="closeButton" @click="deleteStation" :height="button_height+'px'"
                                      :textImageRelation="'imageBeforeText'" :textPosition="'center'"
                                      :theme="theme" style="display : inline-block; margin-right: 8px"
                           ><span class="nobr">Очистить&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -258,16 +258,21 @@
 
       // Добавление станции
       addStation(station) {
-        console.log(23);
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
       },
 
       // Удаление станции
       deleteStation() {
-        this.$refs.stationGrid.clearselection();
+        let station;
+        station = this.$refs.stationGrid.getrowdata(this.$refs.stationGrid.getselectedrowindex());
+        if (station) {
+          this.stationsSource.localdata.splice(station.boundindex, 1);
+          this.$refs.stationGrid.updatebounddata('cells');
+        } else {
+          console.log("Не выбрана станция для удаления");
+        }
       },
-
 
       // Очистка списка станций
       clearStations() {
@@ -362,7 +367,7 @@
 
       onRowselect($event) {
         this.selectedRow = $event.args.row;
-        console.log(this.selectedRow);
+        // console.log(this.selectedRow);
       },
 
       // Окно изменения варианта
@@ -388,9 +393,9 @@
           {name: 'name', type: 'string'},
         ],
         localdata : [
-          {name: "test", end_name: "test2"},
-          {name: "test", end_name: "test2"},
-          {name: "test", end_name: "test2"},]
+          {id: "0", name: "test", },
+          {id: "1", name: "test1", },
+          {id: "2", name: "test2", },]
       }
 
       this.gsVar = this.row.var_gs_var_id;
@@ -400,7 +405,7 @@
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
-      console.log(this.stations[0]);
+
     },
 
 

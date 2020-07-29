@@ -14,7 +14,8 @@
                :initContent="initContent"
                @open="updateSizeContent"
                @resized="updateSizeContent"
-               @resizing="updateSizeContent">
+               @resizing="updateSizeContent"
+               :is-modal="true">
       <div>
         Header
       </div>
