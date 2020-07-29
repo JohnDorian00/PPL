@@ -2,11 +2,11 @@
   <div>
     <ul class="btn-group" :height="button_height">
       <li>
-        <JqxButton ref="createWindowNewVariant"
+        <JqxButton ref="createWindowNewVariant" @click="addStationClick"
                    :height="button_height+'px'"
                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                    :theme="theme" :style="{'display': 'inline-block'} "
-        ><span class="nobr">Создать новый вариант&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        ><span class="nobr">Добавить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
         </JqxButton>
       </li>
       <li class="last">
@@ -41,7 +41,16 @@
         }
       },
 
+      methods : {
+        addStationClick() {
+          console.log(123);
+          this.$emit("preAddStation");
+        }
+      },
+
       mounted() {
+        console.log(this.userData);
+        this.userData.parentWindow.$parent.addStation(this.userData.stations[10]);
       }
 
     }

@@ -1,11 +1,29 @@
 <template>
+  <div style="width: 100%; height: 100%; white-space:nowrap; position: relative">
 
+    <div style="display: inline-block; width: 200px; height: 100%; position: relative">
+      <JqxGrid   style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
+                 :columnsmenu="false"  :pageable="false" :autoheight="false"
+                 :columnsresize="true"
+                 :sortable="true" :altrows="true"
+                 :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"
+                 :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
+      </JqxGrid>
+    </div>
 
+    <div style="display: inline-block; width: calc(100% - 200px - 10px); height: 100%; position: relative; float: right; ">
+      <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'100%'" :width="'100%'"
+               :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
+               :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+               :enabletooltip="true" :columnsautoresize="false" :editable="false"
+               :selectionmode="'singlerow'" :source="stationsSource"
+               :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+               @rowselect="onRowselect" @preAddStation="addStation"
+      >
+      </JqxGrid>
+    </div>
 
-  <div ref="MainContent" class="main-content flex-coll-css" style="width: 100%; height: 100%;">
-    <columns ref="columns" :rowsProps="rows"></columns>
   </div>
-
 
 </template>
 
@@ -17,6 +35,7 @@
   import JqxPanel from "@/jqwidgets/jqwidgets-vue/vue_jqxpanel.vue";
   import Rows from "@/IERT/vue/tabel/flex-row";
   import Columns from "@/IERT/vue/tabel/flex-collum";
+  import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid";
 
   export default {
     components: {
@@ -26,9 +45,11 @@
       JqxButton,
       JqxDockPanel,
       JqxPanel,
+      JqxGrid,
+
     },
     name: "AddStationContent",
-    props: ["id", "title", "closeWindows", "state"],
+    props: ["id", "title", "closeWindows", "state", "userData"],
     data() {
       return {
         theme: appConfig.windowsTheme,
@@ -40,6 +61,7 @@
         },
 
         height: {contentHeight: 660},
+
         rows: [{
           id: 1,
           flex: true,
@@ -53,22 +75,53 @@
           data: "<div style='width: 100%; height: 100%; border: 1px solid black; box-sizing:border-box;'>dsa</div>",
           // componentName: "AddStationTableStations"
         }],
-        userData : {},
+
+        stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
+
+        isLoaded : true,
+
+        stationsColumns: [
+          {text: 'Код станции', datafield: 'esr'},
+          {text: 'Наименование', datafield: 'name'},
+        ],
+
+        selectedRow : null,
+
+        station: null,
       }
     },
+
+    beforeCreate() {
+      this.stationsSource = {
+        datatype: 'json',
+      }
+    },
+
     created() {
+      this.stationsSource = {
+        datafields : [
+          {name: 'esr', type: 'string'},
+          {name: 'name', type: 'string'},
+        ],
+        localdata : this.userData.stations
+      }
       window.addEventListener('resize', this.updateSizeWindows);
       setTimeout(this.updateSizeWindows, 200);
     },
 
     mounted() {
-      this.initContent();
+
     },
 
     destroyed() {
       window.removeEventListener('resize', this.updateSizeWindows)
     },
     methods: {
+      addStation() {
+        console.log(1234);
+        this.$emit('addStation', this.station)
+      },
+
       updateSizeWindows: function () {
         this.dragArea = {
           left: 0,
@@ -77,14 +130,21 @@
           height: document.documentElement.clientHeight - 75
         };
       },
+
       updateSizeContent: function () {
         this.height.contentHeight = (this.$refs.MainContent.clientHeight - 140) + 'px';
         this.height.contentHeight = (this.$refs.MainContent.clientWidth - 140) + 'px';
         this.$refs.columns.updateWidth();
       },
+
       initContent: function () {
         this.updateSizeContent();
-      }
+      },
+
+      onRowselect($event) {
+        this.selectedRow = $event.args.row;
+        this.station = this.userData.stations[this.selectedRow.boundindex];
+      },
     }
   }
 </script>

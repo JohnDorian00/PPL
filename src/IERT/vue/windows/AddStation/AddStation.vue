@@ -1,7 +1,7 @@
 <template>
   <div>
-    <JqxWindow :width="300"
-               :height="300"
+    <JqxWindow :width="600"
+               :height="500"
                :max-height="190000"
                :min-height="100"
                :max-width="190000"
@@ -10,20 +10,60 @@
                :title="title"
                :id="id"
                :theme="theme"
-               :dragArea="dragArea"
-               :initContent="initContent"
-               @open="updateSizeContent"
-               @resized="updateSizeContent"
-               @resizing="updateSizeContent"
+               @preAddStation="addStation"
                :is-modal="true">
       <div>
         Header
       </div>
 
-      <div ref="MainContent" class="main-content flex-coll-css" style="width: 100%; height: 100%;">
-        <rows ref="rows" :userData="userData" :rowsProps="rows"></rows>
-      </div>
+      <div ref="MainContent" style="width: 100%; height: calc(100%); white-space:nowrap; position: relative">
 
+        <div style="display: inline-block; width: 200px; height: 100%; position: relative">
+          <JqxGrid   style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
+                     :columnsmenu="false"  :pageable="false" :autoheight="false"
+                     :columnsresize="true"
+                     :sortable="true" :altrows="true"
+                     :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"
+                     :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'" :showfilterrow="true">
+          </JqxGrid>
+        </div>
+
+        <div style="display: inline-block; width: calc(100% - 200px - 10px); height: 100%; position: relative; float: right; ">
+          <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'100%'" :width="'100%'"
+                   :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
+                   :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                   :enabletooltip="true" :columnsautoresize="false" :editable="false"
+                   :selectionmode="'singlerow'" :source="stationsSource"
+                   :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                   @rowselect="onRowselect"
+          >
+          </JqxGrid>
+        </div>
+
+
+
+        <div>
+          <ul class="btn-group" :height="button_height">
+            <li>
+              <JqxButton ref="createWindowNewVariant" @click="addStation"
+                         :height="button_height+'px'"
+                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                         :theme="theme" :style="{'display': 'inline-block'} "
+              ><span class="nobr">Добавить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              </JqxButton>
+            </li>
+            <li class="last">
+              <JqxButton class="button" ref="closeButton"  :width="120" :height="button_height+'px'"
+                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                         :theme="theme" :style="{ 'display': 'inline-block'}" @click="userData.closeWindows"
+              ><span class="nobr">Закрыть&nbsp;&nbsp;</span>
+              </JqxButton>
+            </li>
+            <li class="helper"></li>
+          </ul>
+        </div>
+
+      </div>
 
     <!--    Верхний бар-->
 <!--    <div ref="header" style="position: relative;">-->
@@ -89,13 +129,12 @@
     import JqxButton from '@/jqwidgets/jqwidgets-vue/vue_jqxbuttons.vue';
     import appConfig from "@/IERT/js/appConfig";
     import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
-    import XmlQuery from "@/IERT/js/xmlQuery";
     import Rows from "@/IERT/vue/tabel/flex-row";
     import Preloader from "@/IERT/vue/Preloader";
     import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
     import JqxInput from "@/jqwidgets/jqwidgets-vue/vue_jqxinput";
     import JqxForm from "@/jqwidgets/jqwidgets-vue/vue_jqxform";
-    import globalData from "@/IERT/js/globalData";
+
 
     export default {
       components: {
@@ -111,7 +150,7 @@
 
       name: "AddStation",
 
-      props: ["id", "title", "closeWindows", "parentWindow"],
+      props: ["id", "title", "closeWindows", "parentWindow", "stations"],
 
       data() {
         return {
@@ -143,47 +182,48 @@
             rowsHeightHeader: {leftPanel: 35, mainContent: 645}
           },
           height: {contentHeight: 660},
-          userData: {closeWindows: this.closeWindows, parentWindow: this.parentWindow},
+          userData: {closeWindows: this.closeWindows, parentWindow: this.parentWindow, stations: this.stations},
+          station : null,
+          stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
+
+          stationsColumns: [
+            {text: 'Код станции', datafield: 'esr'},
+            {text: 'Наименование', datafield: 'name'},
+          ],
+
+          selectedRow : null,
+
         }
       },
 
       methods: {
+        addStation() {
+          if (this.station) {
+            this.parentWindow.addStation(this.station)
+          }
+        },
         // Сохранение выбранного пункта меню при изменении выбора
         onListBoxSelect() {
           this.listBoxSelected = this.$refs.listBox.getSelectedItem();
         },
 
-        updateSizeWindows: function () {
-          this.dragArea = {
-            left: 0,
-            top: 32,
-            width: document.documentElement.clientWidth,
-            height: document.documentElement.clientHeight - 75
-          };
+        onRowselect($event) {
+          this.selectedRow = $event.args.row;
+          this.station = this.userData.stations[this.selectedRow.boundindex];
         },
-
-        updateSizeContent: function () {
-          this.height.contentHeight = (this.$refs.MainContent.clientHeight - 140) + 'px';
-          this.height.contentHeight = (this.$refs.MainContent.clientWidth - 140) + 'px';
-          this.$refs.rows.updateHeight();
-        },
-
-        initContent: function () {
-          this.updateSizeContent();
-        }
       },
 
       mounted() {
         // console.log(this.parentWindow);
       },
 
-      created() {
-        window.addEventListener('resize', this.updateSizeWindows);
-        setTimeout(this.updateSizeWindows, 200);
+      beforeCreate() {
+        this.stationsSource = {
+          datatype: 'json',
+        }
       },
-      destroyed() {
-        window.removeEventListener('resize', this.updateSizeWindows)
-      },
+
+
 
     }
 </script>

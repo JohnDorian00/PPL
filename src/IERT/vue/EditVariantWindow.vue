@@ -6,7 +6,8 @@
              :position="{ x: 150, y: 150 }"
              :id="id"
              :theme="theme"
-             :closeButtonSize="0">
+             :closeButtonSize="0"
+             @addStation="addStation">
 
     <!--    Верхний бар-->
     <div ref="header" style="position: relative;">
@@ -89,7 +90,7 @@
                       <div style="display : block; width: 100%">
 
                         <div style="display : inline-block;">
-                          <JqxButton ref="closeButton" @click="this.$root.$children[0].createWindowAddStation" :height="button_height+'px'"
+                          <JqxButton ref="buttonAddStations" @click="createAddStation" :height="button_height+'px'"
                                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                         :theme="theme" style="display : inline-block; margin-left: 5px"
                           ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -168,7 +169,7 @@
       <ul class="btn-group" :height="button_height">
 
         <li>
-          <JqxButton ref="createWindowNewVariant" @click="createAddStation"
+          <JqxButton ref="createWindowAddStation"
                      :height="button_height"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'} "
@@ -236,7 +237,7 @@
           {text: 'Наличие привязки', datafield: 'exist_in_cdl', width: 124},
         ],
         stationsColumns: [
-          {text: 'Начало участка', datafield: 'name'},
+          {text: 'Основные станции пути следования', datafield: 'name'},
         ],
         linesDataAdapter: new jqx.dataAdapter(this.linesSource),
         stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
