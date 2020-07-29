@@ -71,20 +71,22 @@
                     </JqxGrid>
                   </div>
 
-                  <div style="height:100%; width:100%; overflow: hidden;">
+                  <div style="height: calc(100%); width:100%; overflow: hidden; position:relative;">
 
-                    <div style="text-align: center; margin: 5px">Сформируйте путь следования, вдоль которого будут выбраны участки</div>
+                    <div style="text-align: center; margin: 5px; ">Сформируйте путь следования, вдоль которого будут выбраны участки</div>
 
-                    <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'50%'"
-                             :width="'100%'"
-                             :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
-                             :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
-                             :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                             :selectionmode="'singlerow'" :source="stationsSource"
-                             :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
-                             @rowselect="onRowselect"
-                    >
-                    </JqxGrid>
+                    <div style="height: calc(100% - 110px)">
+                      <JqxGrid v-if="isLoaded" style="border: none; position:relative;" ref="stationGrid" :height="'100%'"
+                               :width="'100%'"
+                               :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
+                               :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                               :enabletooltip="true" :columnsautoresize="false" :editable="false"
+                               :selectionmode="'singlerow'" :source="stationsSource"
+                               :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                               @rowselect="onRowselect"
+                      >
+                      </JqxGrid>
+                    </div>
                     <div style="position: absolute; bottom: 0; width: 100%">
 
                       <div style="display : block; width: 100%">
@@ -98,7 +100,7 @@
                         </div>
 
                         <div style="display : inline-block; float: right">
-                          <JqxButton ref="closeButton" @click="deleteStation" :height="button_height+'px'"
+                          <JqxButton ref="closeButton" @click="clearStations" :height="button_height+'px'"
                                      :textImageRelation="'imageBeforeText'" :textPosition="'center'"
                                      :theme="theme" style="display : inline-block; margin-right: 8px"
                           ><span class="nobr">Очистить&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -261,6 +263,7 @@
       addStation(station) {
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
+        console.log(this.stationsSource.localdata);
       },
 
       // Удаление станции
@@ -394,6 +397,15 @@
           {name: 'name', type: 'string'},
         ],
         localdata : [
+          {id: "0", name: "test", },
+          {id: "1", name: "test1", },
+          {id: "2", name: "test2", },
+          {id: "0", name: "test", },
+          {id: "1", name: "test1", },
+          {id: "2", name: "test2", },
+          {id: "0", name: "test", },
+          {id: "1", name: "test1", },
+          {id: "2", name: "test2", },
           {id: "0", name: "test", },
           {id: "1", name: "test1", },
           {id: "2", name: "test2", },]

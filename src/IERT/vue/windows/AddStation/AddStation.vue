@@ -16,8 +16,10 @@
         Header
       </div>
 
-      <div ref="MainContent" style="width: 100%; height: calc(100%); white-space:nowrap; position: relative">
+      <div ref="MainContent" style="width: 100%; height: 100%; position: absolute">
+<!--        white-space:nowrap;-->
 
+      <div style="height: calc(100% - 100px);">
         <div style="display: inline-block; width: 200px; height: 100%; position: relative">
           <JqxGrid   style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
                      :columnsmenu="false"  :pageable="false" :autoheight="false"
@@ -39,24 +41,24 @@
           >
           </JqxGrid>
         </div>
+      </div>
 
 
-
-        <div>
+        <div style="width: 100%; display : block;">
           <ul class="btn-group" :height="button_height">
             <li>
-              <JqxButton ref="createWindowNewVariant" @click="addStation"
-                         :height="button_height+'px'"
-                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                         :theme="theme" :style="{'display': 'inline-block'} "
-              ><span class="nobr">Добавить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <JqxButton class="button" ref="createWindowNewVariant" :height="button_height" @click="addStation"
+                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                          :theme="theme" :style="{'display': 'inline-block'} "
+              ><span class="nobr">Создать&nbsp;&nbsp;&nbsp;</span>
               </JqxButton>
+
             </li>
             <li class="last">
-              <JqxButton class="button" ref="closeButton"  :width="120" :height="button_height+'px'"
+              <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                         :theme="theme" :style="{ 'display': 'inline-block'}" @click="userData.closeWindows"
-              ><span class="nobr">Закрыть&nbsp;&nbsp;</span>
+                         :theme="theme" style="display: inline-block;"
+              ><span class="nobr">Закрыть&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </JqxButton>
             </li>
             <li class="helper"></li>
@@ -155,7 +157,7 @@
       data() {
         return {
           theme: appConfig.windowsTheme,
-          isLoaded: false,
+          isLoaded: true,
           button_height: 30,
           listBoxSource: [0,1,2,3,4,5,6],
           rows: [{
@@ -199,7 +201,7 @@
       methods: {
         addStation() {
           if (this.station) {
-            this.parentWindow.addStation(this.station)
+            this.parentWindow.$parent.addStation(this.station)
           }
         },
         // Сохранение выбранного пункта меню при изменении выбора
@@ -223,6 +225,16 @@
         }
       },
 
+      created() {
+        this.stationsSource = {
+          datafields : [
+            {name: 'esr', type: 'string'},
+            {name: 'name', type: 'string'},
+          ],
+          localdata : this.userData.stations
+        }
+      },
+
 
 
     }
@@ -236,19 +248,23 @@
     text-justify: newspaper;
   }
 
-  ul li  {
+  ul li {
     display: inline-block;
     text-align: left;
     /* эмуляция inline-block для IE6-7*/
-  //display : inline;
-  //zoom : 1;
+  / / display: inline;
+  / / zoom: 1;
   }
+
   ul li.helper {
     width: 100%;
     height: 0;
     visibility: hidden;
   }
-  .last {margin-right: 100px}
+
+  .last {
+    margin-right: 100px
+  }
 
   .nobr {
     white-space: nowrap;
@@ -262,7 +278,6 @@
   }
 
   .btn-group {
-    background-color: rgba(0, 0, 255, 0);
     position: absolute;
     left: 0;
     bottom: 0;
