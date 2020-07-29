@@ -170,7 +170,7 @@ License: https://jqwidgets.com/license/
                 filter: null,
                 // sets the grid data view.
                 dataview: null,
-                // sets the rendering delay. 
+                // sets the rendering delay.
                 updatedelay: null,
                 // sets the auto height option. This option is appropriate when the grid's paging is enables or when the grid has quite a few rows.
                 autoheight: false,
@@ -1427,7 +1427,7 @@ License: https://jqwidgets.com/license/
                     filterdatecomparisonoperators: ['equal', 'not equal', 'less than', 'less than or equal', 'greater than', 'greater than or equal', 'null', 'not null'],
                     filterbooleancomparisonoperators: ['equal', 'not equal'],
                     validationstring: "Entered value is not valid",
-                    emptydatastring: "No data to display",
+                    emptydatastring: "Нет данных",
                     filterselectstring: "Select Filter",
                     loadtext: "Loading...",
                     clearstring: "Clear",
@@ -9972,7 +9972,7 @@ License: https://jqwidgets.com/license/
             }
 
             this._cellscache = new Array();
-            // ! 
+            // !
             this._pagescache = new Array();
 
             if (this.source.updaterow && (sync == undefined || sync == true)) {
@@ -11457,7 +11457,7 @@ License: https://jqwidgets.com/license/
             var bottomSizeOffset = 2;
             var rightSizeOffset = 0;
 
-            // right scroll offset. 
+            // right scroll offset.
             if (me.vScrollBar[0].style.visibility == 'visible') {
                 rightSizeOffset = scrollSize + scrollOffset;
             }

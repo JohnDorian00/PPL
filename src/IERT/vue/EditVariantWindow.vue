@@ -110,7 +110,7 @@
                       </div>
 
                       <div style="display : block; width: 100%">
-                        <JqxButton ref="closeButton" @click="closeWindows" :height="button_height+'px'"
+                        <JqxButton ref="closeButton" @click="makeLinesList" :height="button_height+'px'"
                                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                    :theme="theme" style="margin-left: 5px;"
                         ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -258,15 +258,99 @@
     },
 
     methods: {
+      calcUchs(json) {
+        let t = this, linesList = "";
+        t.isLoaded = false;
+
+        for (let key in json) {
+          if (key === "0") {
+            linesList += json[key].uch_id;
+            continue;
+          }
+          linesList += ',' + json[key].uch_id;
+        }
+
+        // Загрузка участков
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "CALCULATE_UCHS"
+        });
+
+        xmlQuery.clearFilter();
+        xmlQuery.setFilter("VAR_ID", this.row.var_id, "text");
+        xmlQuery.setFilter("UCH_LIST", linesList, "text");
+
+        xmlQuery.query('json',
+          function (json) {
+            console.log(json);
+            // t.linesSource.datafields = [
+            //   {name: 'start_name', type: 'string'},
+            //   {name: 'end_name', type: 'string'},
+            //   {name: 'exist_in_cdl', type: 'string'},
+            // ]
+            // t.linesSource.localdata = json.rows;
+            t.isLoaded = true;
+            xmlQuery.destroy();
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
+        )
+
+      },
+
+      // Формирование списка участков по пути следования
+      makeLinesList() {
+        let t = this, stationsList = "";
+        t.isLoaded = false;
+
+        for (let key in this.stationsSource.localdata) {
+          if (key === '0') {
+            stationsList += this.stationsSource.localdata[key].stan_id;
+            continue;
+          }
+          stationsList += "_" + this.stationsSource.localdata[key].stan_id;
+        }
+
+        // Загрузка участков
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "UCHS_ON_PATH"
+        });
+
+        xmlQuery.clearFilter();
+        xmlQuery.setFilter("VAR_ID", this.row.var_id, "text");
+        xmlQuery.setFilter("LIST", stationsList, "text");
+
+        xmlQuery.query('json',
+          function (json) {
+               t.calcUchs(json.rows);
+            // t.linesSource.datafields = [
+            //   {name: 'start_name', type: 'string'},
+            //   {name: 'end_name', type: 'string'},
+            //   {name: 'exist_in_cdl', type: 'string'},
+            // ]
+            // t.linesSource.localdata = json.rows;
+            t.isLoaded = true;
+            xmlQuery.destroy();
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
+        )
+      },
 
       // Добавление станции
       addStation(station) {
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
-        console.log(this.stationsSource.localdata);
       },
 
-      // Удаление станции
+      // Удаление станции по выделению
       deleteStation() {
         let station;
         station = this.$refs.stationGrid.getrowdata(this.$refs.stationGrid.getselectedrowindex());
@@ -396,19 +480,7 @@
         datafields : [
           {name: 'name', type: 'string'},
         ],
-        localdata : [
-          {id: "0", name: "test", },
-          {id: "1", name: "test1", },
-          {id: "2", name: "test2", },
-          {id: "0", name: "test", },
-          {id: "1", name: "test1", },
-          {id: "2", name: "test2", },
-          {id: "0", name: "test", },
-          {id: "1", name: "test1", },
-          {id: "2", name: "test2", },
-          {id: "0", name: "test", },
-          {id: "1", name: "test1", },
-          {id: "2", name: "test2", },]
+        localdata : []
       }
 
       this.gsVar = this.row.var_gs_var_id;
