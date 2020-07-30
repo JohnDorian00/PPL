@@ -111,6 +111,7 @@
               // на клиенте версия базы данных 1
               if (!db.objectStoreNames.contains('stations')) { // if there's no "books" store
                 db.createObjectStore('stations', {keyPath: 'stan_id'});
+                db.createObjectStore('lines', {keyPath: 'uch_id'});
                 console.log("created db, version = " + db.version);
               }
           }

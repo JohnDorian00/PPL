@@ -58,12 +58,12 @@
                   <div style="height:100%; width:100%; overflow: hidden;">
                     <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
 
-                    <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
+                    <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="linesGrid" :height="'100%'"
                              :width="'100%'"
                              :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                              :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                             :selectionmode="'singlerow'" :source="linesDataAdapter"
+                             :selectionmode="'singlerow'" :source="linesSource"
                              :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
                              @rowselect="onRowselect"
                     >
@@ -110,7 +110,7 @@
                       </div>
 
                       <div style="display : block; width: 100%">
-                        <JqxButton ref="closeButton" @click="makeLinesList" :height="button_height+'px'"
+                        <JqxButton @click="makeLinesList" :height="button_height+'px'"
                                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                    :theme="theme" style="margin-left: 5px;"
                         ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -259,6 +259,101 @@
     },
 
     methods: {
+
+      loadLines() {
+        let t = this;
+        t.isLoaded = false;
+
+        // Загрузка участков
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "LOAD_LINES"
+        });
+
+        xmlQuery.clearFilter();
+        xmlQuery.setFilter("VAR_ID", this.row.var_id, "text");
+
+        xmlQuery.query('json',
+          function (json) {
+            if (json.rowsAffected === 0) {
+              console.warn("Ошибка получения участков из базы данных");
+            }
+            let openRequest = t.$parent.connectDB();
+            // Загрузка станций в IndexedDB
+            openRequest.onsuccess = function () {
+              let db = openRequest.result;
+              // продолжить работу с базой данных, используя объект db
+              db.onversionchange = function () {
+                db.close();
+                alert("База данных устарела, пожалуста, перезагрузите страницу.")
+              };
+              let transaction = db.transaction("lines", "readwrite");
+              let lines = transaction.objectStore("lines");
+              lines.clear();
+
+              let obj;
+
+              for (let i = 0; i < json.rows.length; i++) {
+                obj = {
+                  uch_id: json.rows[i].uch_id,
+                  start_stan: json.rows[i].start_stan,
+                  start_name: json.rows[i].start_name,
+                  end_stan: json.rows[i].end_stan,
+                  end_name: json.rows[i].end_name,
+                  exist_in_cdl: json.rows[i].exist_in_cdl,
+                }
+                lines.add(obj);
+              }
+              transaction.oncomplete = function () {
+                console.log("Участки обновлены");
+              };
+              transaction.onerror = function () {
+                if (event.target.error.name === "ConstraintError") {
+                  console.log("Станция с таким id уже существует, ", obj); // обрабатываем ошибку
+                  event.preventDefault(); // предотвращаем отмену транзакции
+                  event.stopPropagation(); // предотвращаем всплытие ошибки
+                } else {
+                  // транзакция будет отменена
+                  // обработать ошибку в transaction.onabort
+                  console.log("Ошибка обновления станций, ", event.target);
+                }
+              }
+            };
+
+            t.isLoaded = true;
+            xmlQuery.destroy();
+          },
+
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
+        )
+      },
+
+      // Поиск станции по айди
+      findLinesInDB(stations_id) {
+        let r = this.$parent.connectDB(), t = this;
+
+        r.onsuccess = function () {
+          let db = r.result,
+            objectStore = db.transaction("stations").objectStore("stations");
+
+          for (let key in stations_id) {
+            let stationReq = objectStore.get(stations_id[key]);
+            stationReq.onsuccess = function () {
+              if (stationReq.result) {
+                t.selectedStationsSource.localdata.push(stationReq.result);
+              }
+              else {
+                console.warn("Станция с id " + stations_id[key] + " не найдена");
+              }
+            }
+          }
+        }
+      },
+
       // Поиск станции по айди
       findStationInDB(stations_id) {
         let r = this.$parent.connectDB(), t = this;
@@ -348,13 +443,14 @@
 
         xmlQuery.query('json',
           function (json) {
-               t.calcUchs(json.rows);
-            // t.linesSource.datafields = [
-            //   {name: 'start_name', type: 'string'},
-            //   {name: 'end_name', type: 'string'},
-            //   {name: 'exist_in_cdl', type: 'string'},
-            // ]
-            // t.linesSource.localdata = json.rows;
+            console.log(json);
+            let stationsList = [];
+            json.rows.filter(function (item, key) {
+              stationsList.push(item.uch_id);
+            })
+            t.calcUchs(json.rows);
+            // t.findLinesInDB(linesList);
+
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -436,6 +532,7 @@
               {name: 'exist_in_cdl', type: 'string'},
             ]
             t.linesSource.localdata = json.rows;
+            t.$refs.linesGrid.updatebounddata();
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -474,6 +571,8 @@
     },
 
     created() {
+      this.loadLines();
+
       this.stationsSource = {
         datafields : [
           {name: 'name', type: 'string'},
@@ -489,13 +588,13 @@
       }
 
       this.gsVar = this.row.var_gs_var_id;
-      this.Preload();
+
     },
 
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
-      this.findStationInDB([1,2,3,4]);
+      this.Preload();
     },
   }
 </script>
