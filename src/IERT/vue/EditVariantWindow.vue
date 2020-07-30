@@ -110,7 +110,7 @@
                       </div>
 
                       <div style="display : block; width: 100%">
-                        <JqxButton @click="makeLinesList" :height="button_height+'px'"
+                        <JqxButton @click="makeLinesList" :height="button_height+'px'" :disabled="makeLinesListDisableFlag"
                                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                    :theme="theme" style="margin-left: 5px;"
                         ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -128,38 +128,27 @@
 
           <div>
             <JqxExpander style="border: none;" ref="feedExpander" :theme="theme"
-                         :width="'100%'" :height="'100%'"
+                         :width="'100%'" :height="'calc(100% - 25px)'"
                          :toggleMode="'none'" :showArrow="false">
 
               <div class="jqx-hideborder" style="width: 100%; text-align: center">
                 Выбранные участки
               </div>
 
-              <div class="jqx-hideborder jqx-hidescrollbars" style="padding: 0px;">
+              <div style="height: 100%; padding: 0;">
 
-                <JqxTree ref="myTree" :theme="theme"
-                         :width="'100%'" :height="'100%'">
-                  <ul>
-                    <li item-expanded="true" id="t1">
-                      <span item-title="true">News and Blogs</span>
-                      <ul>
-                        <li>
-                          <span item-title="true">Favorites</span>
-                          <ul>
-                            <li>
-                              <span item-title="true">ScienceDaily</span>
-                            </li>
-                            <li>
-                              <span item-title="true">ScienceDaily 2</span>
-                            </li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
-                </JqxTree>
+                <JqxGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid" :height="'100%'"
+                         :width="'100%'"
+                         :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false" :autoheight="false"
+                         :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                         :enabletooltip="true" :columnsautoresize="false" :editable="false"
+                         :selectionmode="'singlerow'" :source="selectedStationsSource"
+                         :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                >
+                </JqxGrid>
 
               </div>
+
             </JqxExpander>
           </div>
 
@@ -241,14 +230,19 @@
         stationsColumns: [
           {text: 'Основные станции пути следования', datafield: 'name'},
         ],
+        selectedStationsColumns: [
+          {text: 'start_name', datafield: 'start_name'},
+          {text: 'end_name', datafield: 'end_name'},
+          {text: 'uch_id', datafield: 'uch_id'},
+        ],
         linesDataAdapter: new jqx.dataAdapter(this.linesSource),
         stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
         selectedStationsDataAdapter: new jqx.dataAdapter(this.selectedStationsSource),
-        panels: [{size: '50%', min: 327, collapsible: false}, {min: 160, size: '50%', collapsible: false}],
+        panels: [{size: '50%', min: 327, collapsible: false}, {min: 226, size: '50%', collapsible: false}],
         gsVar: null,
         selectedRow: null,
         stationsList: [],
-
+        makeLinesListDisableFlag: false,
       }
     },
 
@@ -257,6 +251,11 @@
       // Отключение кнопки рефреш во время подгрузки
       isLoaded: function () {
       },
+
+      selectedStationsLen: function () {
+        console.log(this.selectedStationsLen);
+      }
+
     },
 
     methods: {
@@ -349,13 +348,13 @@
             linesReq.onsuccess = function () {
               if (linesReq.result) {
                 t.selectedStationsSource.localdata.push(linesReq.result);
+                t.$refs.selectedGrid.updatebounddata('cells');
               }
               else {
                 console.warn("Станция с id " + t.stationsList[key] + " не найдена");
               }
             }
           }
-          // TODO t.$refs.RIGHTGRID.updatebounddata();
         }
       },
 
@@ -480,6 +479,9 @@
       clearStations() {
         this.stationsSource.localdata = [];
         this.$refs.stationGrid.updatebounddata('cells');
+
+        // this.selectedStationsSource.localdata = [];
+        // this.$refs.selectedGrid.updatebounddata('cells');
       },
 
       appendSavedParams() {
@@ -503,8 +505,8 @@
       },
 
       onResize() {
-        localStorage.setItem("EditWindowLeftPanelSize", Math.round(parseFloat(this.panels[0].size.replace(/,/g, '%'))) + "%");
-        localStorage.setItem("EditWindowRightPanelSize", Math.round(parseFloat(this.panels[1].size.replace(/,/g, '%'))) + "%");
+        localStorage.setItem("EditWindowLeftPanelSize", parseFloat(this.panels[0].size.replace(/,/g, '%')) + "%");
+        localStorage.setItem("EditWindowRightPanelSize", parseFloat(this.panels[1].size.replace(/,/g, '%')) + "%");
       },
 
       Preload() {
@@ -578,7 +580,9 @@
 
       this.selectedStationsSource = {
         datafields : [
-          {name: 'name', type: 'string'},
+          {name: 'start_name', type: 'string'},
+          {name: 'end_name', type: 'string'},
+          {name: 'uch_id', type: 'string'},
         ],
         localdata : []
       }
