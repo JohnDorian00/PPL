@@ -247,6 +247,7 @@
         panels: [{size: '50%', min: 327, collapsible: false}, {min: 160, size: '50%', collapsible: false}],
         gsVar: null,
         selectedRow: null,
+        stationsList: [],
 
       }
     },
@@ -260,6 +261,7 @@
 
     methods: {
 
+      // Загрузка участков в IndexedDB
       loadLines() {
         let t = this;
         t.isLoaded = false;
@@ -332,25 +334,28 @@
         )
       },
 
-      // Поиск станции по айди
-      findLinesInDB(stations_id) {
+      // Поиск участков по айди
+      findLinesInDB() {
         let r = this.$parent.connectDB(), t = this;
 
         r.onsuccess = function () {
           let db = r.result,
-            objectStore = db.transaction("stations").objectStore("stations");
+            objectStore = db.transaction("lines").objectStore("lines");
 
-          for (let key in stations_id) {
-            let stationReq = objectStore.get(stations_id[key]);
-            stationReq.onsuccess = function () {
-              if (stationReq.result) {
-                t.selectedStationsSource.localdata.push(stationReq.result);
+          t.selectedStationsSource.localdata = [];
+
+          for (let key in t.stationsList) {
+            let linesReq = objectStore.get(t.stationsList[key]);
+            linesReq.onsuccess = function () {
+              if (linesReq.result) {
+                t.selectedStationsSource.localdata.push(linesReq.result);
               }
               else {
-                console.warn("Станция с id " + stations_id[key] + " не найдена");
+                console.warn("Станция с id " + t.stationsList[key] + " не найдена");
               }
             }
           }
+          // TODO t.$refs.RIGHTGRID.updatebounddata();
         }
       },
 
@@ -376,16 +381,16 @@
         }
       },
 
-      calcUchs(json) {
+      calcUchs() {
         let t = this, linesList = "";
         t.isLoaded = false;
 
-        for (let key in json) {
+        for (let key in t.stationsList) {
           if (key === "0") {
-            linesList += json[key].uch_id;
+            linesList += t.stationsList[key];
             continue;
           }
-          linesList += ',' + json[key].uch_id;
+          linesList += ',' + t.stationsList[key];
         }
 
         // Загрузка участков
@@ -395,17 +400,11 @@
         });
 
         xmlQuery.clearFilter();
-        xmlQuery.setFilter("VAR_ID", this.row.var_id, "text");
+        xmlQuery.setFilter("VAR_ID", t.row.var_id, "text");
         xmlQuery.setFilter("UCH_LIST", linesList, "text");
 
         xmlQuery.query('json',
           function (json) {
-            // t.linesSource.datafields = [
-            //   {name: 'start_name', type: 'string'},
-            //   {name: 'end_name', type: 'string'},
-            //   {name: 'exist_in_cdl', type: 'string'},
-            // ]
-            // t.linesSource.localdata = json.rows;
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -415,7 +414,6 @@
             console.log(ER);
           }
         )
-
       },
 
       // Формирование списка участков по пути следования
@@ -443,14 +441,12 @@
 
         xmlQuery.query('json',
           function (json) {
-            console.log(json);
-            let stationsList = [];
+            t.stationsList = [];
             json.rows.filter(function (item, key) {
-              stationsList.push(item.uch_id);
+              t.stationsList.push(item.uch_id);
             })
-            t.calcUchs(json.rows);
-            // t.findLinesInDB(linesList);
-
+            t.findLinesInDB();
+            t.calcUchs();
             t.isLoaded = true;
             xmlQuery.destroy();
           },
