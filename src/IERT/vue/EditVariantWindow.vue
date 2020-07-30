@@ -393,34 +393,6 @@
         localStorage.setItem("EditWindowRightPanelSize", Math.round(parseFloat(this.panels[1].size.replace(/,/g, '%'))) + "%");
       },
 
-      connectDB() {
-        let openRequest = indexedDB.open("storage", 1);
-        // проверить существование указанной версии базы данных, обновить по мере необходимости:
-        openRequest.onupgradeneeded = function () {
-          t.db = openRequest.result;
-          switch (t.db.version) { // существующая (старая) версия базы данных
-            case 0:
-              // версия 0 означает, что на клиенте нет базы данных
-              console.log("no db");
-            case 1:
-              // на клиенте версия базы данных 1
-              if (!t.db.objectStoreNames.contains('stations')) { // if there's no "books" store
-                let stations = t.db.createObjectStore('stations', {keyPath: 'id', autoIncrement: true});
-                stations.createIndex('GsVar', 'var_id');
-                console.log("created db, version = " + t.db.version);
-              }
-          }
-        };
-        openRequest.onblocked = function () {
-          console.warn("Warn", "Невозможно закрыть другое подключение к базе данных");
-        };
-        openRequest.onerror = function () {
-          console.error("Error", openRequest.error);
-        };
-
-        return openRequest
-      },
-
       Preload() {
         let t = this;
         t.isLoaded = false;

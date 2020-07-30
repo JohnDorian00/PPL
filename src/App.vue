@@ -60,6 +60,7 @@
         count: 0,
         mainWindowSource: {},
         stations: [],
+        db : null,
       }
     },
 
@@ -79,7 +80,7 @@
         initTools: function (type, index) {
         }
       });
-      window.addEventListener('resize', this.updateSizeApp)
+      window.addEventListener('resize', this.updateSizeApp);
     },
 
     destroyed() {
@@ -93,6 +94,34 @@
             return this.$children[key].$children[0]
           }
         }
+      },
+
+      connectDB() {
+        let openRequest = indexedDB.open("storage", 1), t = this;
+        // проверить существование указанной версии базы данных, обновить по мере необходимости:
+        openRequest.onupgradeneeded = function () {
+          t.db = openRequest.result;
+          switch (t.db.version) { // существующая (старая) версия базы данных
+            case 0:
+              // версия 0 означает, что на клиенте нет базы данных
+              console.log("no db");
+            case 1:
+              // на клиенте версия базы данных 1
+              if (!t.db.objectStoreNames.contains('stations')) { // if there's no "books" store
+                let stations = t.db.createObjectStore('stations', {keyPath: 'stan_id'});
+                // stations.createIndex('GsVar', 'var_id');
+                console.log("created db, version = " + t.db.version);
+              }
+          }
+        };
+        openRequest.onblocked = function () {
+          console.warn("Warn", "Невозможно закрыть другое подключение к базе данных");
+        };
+        openRequest.onerror = function () {
+          console.error("Error", openRequest.error);
+        };
+
+        return openRequest
       },
 
       // Загрузка списка станций
@@ -112,6 +141,49 @@
         xmlQuery.query('json',
           function (json) {
             t.stations = json.rows;
+
+            // Загрузка станций в IndexedDB
+            let openRequest = t.connectDB();
+            openRequest.onsuccess = function () {
+              t.db = openRequest.result;
+              // продолжить работу с базой данных, используя объект db
+              t.db.onversionchange = function () {
+                t.db.close();
+                alert("База данных устарела, пожалуста, перезагрузите страницу.")
+              };
+              let transaction = t.db.transaction("stations", "readwrite");
+              let stations = transaction.objectStore("stations");
+              stations.clear();
+
+              let obj;
+
+              for (let i = 0; i < json.rows.length; i++) {
+                obj = {
+                  dor_kod: json.rows[i].dor_kod,
+                  esr: json.rows[i].esr,
+                  mnem: json.rows[i].mnem,
+                  name: json.rows[i].name,
+                  sname: json.rows[i].sname,
+                  stan_id: json.rows[i].stan_id,
+                }
+                stations.put(obj);
+              }
+              transaction.oncomplete = function () {
+                console.log("Станции обновлены");
+              };
+              transaction.onerror = function () {
+                if (event.target.error.name === "ConstraintError") {
+                  console.log("Станция с таким id уже существует, ", obj); // обрабатываем ошибку
+                  event.preventDefault(); // предотвращаем отмену транзакции
+                  event.stopPropagation(); // предотвращаем всплытие ошибки
+                } else {
+                  // транзакция будет отменена
+                  // обработать ошибку в transaction.onabort
+                  console.log("Ошибка обновления станций, ", event.target);
+                }
+              }
+            };
+
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -213,6 +285,7 @@
     created() {
       this.loadStations();
     }
+
   }
 </script>
 
