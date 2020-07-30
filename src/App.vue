@@ -60,7 +60,7 @@
         count: 0,
         mainWindowSource: {},
         stations: [],
-        db : null,
+        station: null,
       }
     },
 
@@ -88,6 +88,7 @@
     },
 
     methods: {
+
       findWindowInArr(id) {
         for (let key in this.$children) {
           if (this.$children[key].id === id) {
@@ -97,20 +98,20 @@
       },
 
       connectDB() {
-        let openRequest = indexedDB.open("storage", 1), t = this;
+        let t = this, db;
+        let openRequest = indexedDB.open("storage", 1);
         // проверить существование указанной версии базы данных, обновить по мере необходимости:
         openRequest.onupgradeneeded = function () {
-          t.db = openRequest.result;
-          switch (t.db.version) { // существующая (старая) версия базы данных
+          db = openRequest.result;
+          switch (db.version) { // существующая (старая) версия базы данных
             case 0:
               // версия 0 означает, что на клиенте нет базы данных
               console.log("no db");
             case 1:
               // на клиенте версия базы данных 1
-              if (!t.db.objectStoreNames.contains('stations')) { // if there's no "books" store
-                let stations = t.db.createObjectStore('stations', {keyPath: 'stan_id'});
-                // stations.createIndex('GsVar', 'var_id');
-                console.log("created db, version = " + t.db.version);
+              if (!db.objectStoreNames.contains('stations')) { // if there's no "books" store
+                db.createObjectStore('stations', {keyPath: 'stan_id'});
+                console.log("created db, version = " + db.version);
               }
           }
         };
@@ -118,10 +119,9 @@
           console.warn("Warn", "Невозможно закрыть другое подключение к базе данных");
         };
         openRequest.onerror = function () {
-          console.error("Error", openRequest.error);
+          console.error("Error", t.request.error);
         };
-
-        return openRequest
+        return openRequest;
       },
 
       // Загрузка списка станций
@@ -142,16 +142,16 @@
           function (json) {
             t.stations = json.rows;
 
-            // Загрузка станций в IndexedDB
             let openRequest = t.connectDB();
+            // Загрузка станций в IndexedDB
             openRequest.onsuccess = function () {
-              t.db = openRequest.result;
+              let db = openRequest.result;
               // продолжить работу с базой данных, используя объект db
-              t.db.onversionchange = function () {
-                t.db.close();
+              db.onversionchange = function () {
+                db.close();
                 alert("База данных устарела, пожалуста, перезагрузите страницу.")
               };
-              let transaction = t.db.transaction("stations", "readwrite");
+              let transaction = db.transaction("stations", "readwrite");
               let stations = transaction.objectStore("stations");
               stations.clear();
 

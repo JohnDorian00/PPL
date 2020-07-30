@@ -138,7 +138,7 @@
           {text: 'Комментарий', datafield: 'var_desc', minwidth: '100'},
         ],
         isUpdate: false,
-
+        station: null,
 
       }
     },
@@ -260,6 +260,8 @@
     mounted() {
       // FLEXBOX
       // this.$refs.Rows.updateHeight();
+
+
     },
 
 

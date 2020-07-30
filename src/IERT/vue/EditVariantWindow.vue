@@ -243,10 +243,11 @@
         ],
         linesDataAdapter: new jqx.dataAdapter(this.linesSource),
         stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
+        selectedStationsDataAdapter: new jqx.dataAdapter(this.selectedStationsSource),
         panels: [{size: '50%', min: 327, collapsible: false}, {min: 160, size: '50%', collapsible: false}],
-        db: null,
         gsVar: null,
         selectedRow: null,
+
       }
     },
 
@@ -258,6 +259,28 @@
     },
 
     methods: {
+      // Поиск станции по айди
+      findStationInDB(stations_id) {
+        let r = this.$parent.connectDB(), t = this;
+
+        r.onsuccess = function () {
+          let db = r.result,
+            objectStore = db.transaction("stations").objectStore("stations");
+
+          for (let key in stations_id) {
+            let stationReq = objectStore.get(stations_id[key]);
+            stationReq.onsuccess = function () {
+              if (stationReq.result) {
+                t.selectedStationsSource.localdata.push(stationReq.result);
+              }
+              else {
+                console.warn("Станция с id " + stations_id[key] + " не найдена");
+              }
+            }
+          }
+        }
+      },
+
       calcUchs(json) {
         let t = this, linesList = "";
         t.isLoaded = false;
@@ -282,7 +305,6 @@
 
         xmlQuery.query('json',
           function (json) {
-            console.log(json);
             // t.linesSource.datafields = [
             //   {name: 'start_name', type: 'string'},
             //   {name: 'end_name', type: 'string'},
@@ -445,10 +467,21 @@
       this.stationsSource = {
         datatype: 'json',
       }
+
+      this.selectedStationsSource = {
+        datatype: 'json'
+      }
     },
 
     created() {
       this.stationsSource = {
+        datafields : [
+          {name: 'name', type: 'string'},
+        ],
+        localdata : []
+      };
+
+      this.selectedStationsSource = {
         datafields : [
           {name: 'name', type: 'string'},
         ],
@@ -462,80 +495,9 @@
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
-
+      this.findStationInDB([1,2,3,4]);
     },
-
-
   }
-  // IndexedBD
-  // let openRequest = t.connectDB();
-  // openRequest.onsuccess = function () {
-  //   t.db = openRequest.result;
-  //   // продолжить работу с базой данных, используя объект db
-  //   t.db.onversionchange = function () {
-  //     t.db.close();
-  //     alert("База данных устарела, пожалуста, перезагрузите страницу.")
-  //   };
-  //   let transaction = t.db.transaction("stations", "readwrite");
-  //   let stations = transaction.objectStore("stations");
-  //   stations.clear();
-  //
-  //   for (let i = 0; i < json.rows.length; i++) {
-  //     let obj = {
-  //       var_id: json.rows[i].var_id,
-  //       stgs_id: json.rows[i].stgs_id,
-  //       namev: json.rows[i].namev,
-  //       kod_dor: json.rows[i].kod_dor
-  //     }
-  //     stations.add(obj);
-  //   }
-  //   transaction.oncomplete = function () {
-  //     console.log("Станции обновлены");
-  //     // t.bindStationsToGrid();
-  //   };
-  // };
-  // bindStationsToGrid() {
-  //   let openRequest = this.connectDB(), t = this, rows;
-  //   openRequest.onsuccess = function () {
-  //     t.db = openRequest.result;
-  //     // продолжить работу с базой данных, используя объект db
-  //     t.db.onversionchange = function () {
-  //       t.db.close();
-  //       alert("База данных устарела, пожалуста, перезагрузите страницу.")
-  //     };
-  //
-  //     let transaction = t.db.transaction("stations"); // readonly
-  //     let stations = transaction.objectStore("stations");
-  //     let stationsIndex = stations.index("GsVar");
-  //     let request = stationsIndex.getAll(t.gsVar);
-  //
-  //     request.onsuccess = function () {
-  //       if (request.result !== undefined) {
-  //         t.stationsSource.datafields = [
-  //           {name: 'var_id', type: 'string'},
-  //           {name: 'var_year', type: 'string'},
-  //           {name: 'var_gs_var_id', type: 'string'},
-  //           {name: 'var_name', type: 'string'},
-  //           {name: 'gs_name', type: 'string'},
-  //           {name: 'var_desc', type: 'string'},
-  //         ]
-  //         t.stationsSource.localdata = request;
-  //         console.log("Книги", request.result); // массив книг с ценой 10
-  //       } else {
-  //         console.log("Варианта №" + t.gsVar + " не найдено");
-  //       }
-  //     };
-  //
-  //     transaction.oncomplete = function () {
-  //       console.log("Станции показаны");
-  //       t.isLoaded = true;
-  //     };
-  //
-  //
-  //   };
-  //
-  //
-  // },
 </script>
 
 
