@@ -100,19 +100,19 @@
                         </div>
 
                         <div style="display : inline-block; float: right">
-                          <JqxButton ref="closeButton" @click="clearStations" :height="button_height+'px'"
+                          <JqxButton @click="deleteStation" ref="buttonClearStations" :height="button_height+'px'"
                                      :textImageRelation="'imageBeforeText'" :textPosition="'center'"
                                      :theme="theme" style="display : inline-block; margin-right: 8px"
-                          ><span class="nobr">Очистить&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                          ><span class="nobr">Очистить станции&nbsp;&nbsp;&nbsp;&nbsp;</span>
                           </JqxButton>
                         </div>
 
                       </div>
 
                       <div style="display : block; width: 100%">
-                        <JqxButton @click="makeLinesList" :height="button_height+'px'" :disabled="makeLinesListDisableFlag"
+                        <JqxButton @click="makeLinesList" ref="buttonMakeLines" :height="button_height+'px'"
                                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                   :theme="theme" style="margin-left: 5px;"
+                                   :theme="theme" style="margin-left: 5px;" :disabled="true"
                         ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                         </JqxButton>
                       </div>
@@ -168,8 +168,16 @@
           </JqxButton>
         </li>
 
+
+        <li>
+          <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
+                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                     :theme="theme" :style="{ 'display': 'inline-block'}"
+          ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          </JqxButton>
+        </li>
         <li class="last">
-          <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
+          <JqxButton class="button" ref="buttonClose" @click="closeWindows" :width="120" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{ 'display': 'inline-block'}"
           ><span class="nobr">Закрыть&nbsp;&nbsp;</span>
@@ -231,9 +239,12 @@
           {text: 'Основные станции пути следования', datafield: 'name'},
         ],
         selectedStationsColumns: [
-          {text: 'start_name', datafield: 'start_name'},
-          {text: 'end_name', datafield: 'end_name'},
-          {text: 'uch_id', datafield: 'uch_id'},
+          {text: 'Название участка', datafield: 'line_name'},
+          {text: 'Тех. скорость, км/ч', datafield: 'tech_spd'},
+          {text: 'Уч. скорость, км/ч', datafield: 'line_spd'},
+          {text: 'Коэф. потр.', datafield: 'koef_potr'},
+          {text: 'Кол-во поездов', datafield: 'trains_amount'},
+          {text: 'Потребность лок.', datafield: 'trains_need'},
         ],
         linesDataAdapter: new jqx.dataAdapter(this.linesSource),
         stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
@@ -242,7 +253,7 @@
         gsVar: null,
         selectedRow: null,
         stationsList: [],
-        makeLinesListDisableFlag: false,
+        makeLinesListDisableFlag: true,
       }
     },
 
@@ -252,13 +263,17 @@
       isLoaded: function () {
       },
 
-      selectedStationsLen: function () {
-        console.log(this.selectedStationsLen);
+      makeLinesListDisableFlag: function () {
+        this.$refs.buttonMakeLines.disabled = this.makeLinesListDisableFlag;
       }
-
     },
 
     methods: {
+
+      clearLines() {
+        this.selectedStationsSource.localdata = [];
+        this.$refs.selectedGrid.updatebounddata('cells');
+      },
 
       // Загрузка участков в IndexedDB
       loadLines() {
@@ -347,7 +362,15 @@
             let linesReq = objectStore.get(t.stationsList[key]);
             linesReq.onsuccess = function () {
               if (linesReq.result) {
-                t.selectedStationsSource.localdata.push(linesReq.result);
+                let obj = {
+                  line_name: linesReq.result.start_name + " - " + linesReq.result.end_name,
+                  tech_spd: "",
+                  line_spd: "",
+                  koef_potr: 0,
+                  trains_amount: "",
+                  trains_need: 0,
+                };
+                t.selectedStationsSource.localdata.push(obj);
                 t.$refs.selectedGrid.updatebounddata('cells');
               }
               else {
@@ -461,6 +484,9 @@
       addStation(station) {
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
+        if (this.stationsSource.localdata.length > 1) {
+          this.makeLinesListDisableFlag = false;
+        }
       },
 
       // Удаление станции по выделению
@@ -470,6 +496,9 @@
         if (station) {
           this.stationsSource.localdata.splice(station.boundindex, 1);
           this.$refs.stationGrid.updatebounddata('cells');
+          if (this.stationsSource.localdata.length < 2) {
+            this.makeLinesListDisableFlag = true;
+          }
         } else {
           console.log("Не выбрана станция для удаления");
         }
@@ -479,6 +508,7 @@
       clearStations() {
         this.stationsSource.localdata = [];
         this.$refs.stationGrid.updatebounddata('cells');
+        this.makeLinesListDisableFlag = true;
 
         // this.selectedStationsSource.localdata = [];
         // this.$refs.selectedGrid.updatebounddata('cells');
@@ -580,15 +610,16 @@
 
       this.selectedStationsSource = {
         datafields : [
-          {name: 'start_name', type: 'string'},
-          {name: 'end_name', type: 'string'},
-          {name: 'uch_id', type: 'string'},
+          {name: 'line_name', type: 'string'},
+          {name: 'tech_spd', type: 'string'},
+          {name: 'line_spd', type: 'string'},
+          {name: 'koef_potr', type: 'string'},
+          {name: 'trains_amount', type: 'string'},
+          {name: 'trains_need', type: 'string'},
         ],
         localdata : []
       }
-
       this.gsVar = this.row.var_gs_var_id;
-
     },
 
     mounted() {
