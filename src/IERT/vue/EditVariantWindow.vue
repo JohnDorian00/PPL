@@ -81,9 +81,9 @@
                                :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
                                :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                                :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                               :selectionmode="'singlerow'" :source="stationsSource"
+                               :selectionmode="'multiplerowsextended'" :source="stationsSource"
                                :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
-                               @rowselect="onRowselect"
+                               @rowselect="deleteStation"
                       >
                       </JqxGrid>
                     </div>
@@ -100,7 +100,7 @@
                         </div>
 
                         <div style="display : inline-block; float: right">
-                          <JqxButton @click="deleteStation" ref="buttonClearStations" :height="button_height+'px'"
+                          <JqxButton @click="clearStations" ref="buttonClearStations" :height="button_height+'px'"
                                      :textImageRelation="'imageBeforeText'" :textPosition="'center'"
                                      :theme="theme" style="display : inline-block; margin-right: 8px"
                           ><span class="nobr">Очистить станции&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -269,6 +269,13 @@
     },
 
     methods: {
+
+      unselectStationGrid() {
+        let t = this;
+        t.stationsSource.localdata.filter( function (item,index) {
+          t.$refs.stationGrid.unselectrow(index);
+        });
+      },
 
       clearLines() {
         this.selectedStationsSource.localdata = [];
@@ -484,6 +491,7 @@
       addStation(station) {
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
+        this.unselectStationGrid();
         if (this.stationsSource.localdata.length > 1) {
           this.makeLinesListDisableFlag = false;
         }
@@ -492,7 +500,9 @@
       // Удаление станции по выделению
       deleteStation() {
         let station;
+        console.log(this.$refs.stationGrid.getselectedrowindex());
         station = this.$refs.stationGrid.getrowdata(this.$refs.stationGrid.getselectedrowindex());
+        console.log(station);
         if (station) {
           this.stationsSource.localdata.splice(station.boundindex, 1);
           this.$refs.stationGrid.updatebounddata('cells');
@@ -502,6 +512,7 @@
         } else {
           console.log("Не выбрана станция для удаления");
         }
+        this.unselectStationGrid();
       },
 
       // Очистка списка станций
