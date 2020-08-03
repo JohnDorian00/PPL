@@ -246,9 +246,11 @@
           {text: 'Кол-во поездов', datafield: 'trains_amount'},
           {text: 'Потребность лок.', datafield: 'trains_need'},
         ],
+
         linesDataAdapter: new jqx.dataAdapter(this.linesSource),
         stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
         selectedStationsDataAdapter: new jqx.dataAdapter(this.selectedStationsSource),
+
         panels: [{size: '50%', min: 327, collapsible: false}, {min: 226, size: '50%', collapsible: false}],
         gsVar: null,
         selectedRow: null,
@@ -267,10 +269,36 @@
 
       makeLinesListDisableFlag: function () {
         this.$refs.buttonMakeLines.disabled = this.makeLinesListDisableFlag;
-      }
+      },
+
     },
 
     methods: {
+
+      // Сортировка участков по exist_in_cdl и по алфавитному порядку (start_name)
+      linesSort() {
+        this.linesSource.localdata.sort(function(a, b){
+          let nameA=a.start_name,
+              nameB=b.start_name,
+              existInCDLA=a.exist_in_cdl,
+              existInCDLB=b.exist_in_cdl;
+
+          if (existInCDLA > existInCDLB) {
+            return -1
+          }
+          else if (existInCDLA < existInCDLB) {
+            return 1
+          }
+          else {
+            if (nameA > nameB)
+              return 1
+            if (nameA < nameB) //сортируем строки по возрастанию
+              return -1
+          }
+
+          return 0 // Никакой сортировки
+        })
+      },
 
       refreshAllTables() {
         this.$refs.linesGrid.updatebounddata();
@@ -278,8 +306,28 @@
         this.$refs.selectedGrid.updateBoundData();
       },
 
-      selectLine() {
+      selectLine(line) {
+        let t = this;
         // TODO Добавить участок в правый грид, удалить участок из левого грида
+        let index = this.linesSource.localdata.findIndex(item => item.uch_id == line.uch_id),
+            item = this.linesSource.localdata[index];
+
+        console.log(index, item);
+        // Скрыть участок из левого грида
+        this.linesSource.localdata.splice(index, 1);
+        this.linesSort();
+
+        // Добавить участок в правый грид
+        let obj = {
+          
+        }
+        this.selectedStationsSource.localdata.push(item);
+
+        this.refreshAllTables();
+
+        setTimeout(function () {
+          t.$refs.linesGrid.unselectrow(index);
+        }, 100)
       },
 
       unselectStationGrid() {
@@ -294,7 +342,7 @@
         this.refreshAllTables();
       },
 
-      // Добавить участок в db
+      // Добавить участок в db, удалить из правого грида, обновить linesSource
       addLineToDB(line) {
         //line = {uch_id: 5, start_stan: 123, start_name: "test123", end_stan: 321, end_name: "test321", exist_in_cdl: 0};
 
@@ -334,7 +382,7 @@
         };
       },
 
-      // Удалить участок из IndexedDB
+      // Удалить участок из IndexedDB, добавить в правый грид, обновить linesSource
       delLineFromDB(lineID) {
         //lineID = 0;
         let t = this;
@@ -360,7 +408,15 @@
             let request2 = lines.delete(lineID);
 
             request2.onsuccess = function () {
-              console.log("Участок удален", request.result);
+              let indexedLines = lines.index("OrderByName");
+              request = indexedLines.getAll();
+
+              request.onsuccess = function() {
+                // console.log(request.result);
+                // TODO обновить linesGRID
+              }
+
+              console.log("Участок удален", t.deletedLine);
             }
 
           };
@@ -670,8 +726,13 @@
               {name: 'start_name', type: 'string'},
               {name: 'end_name', type: 'string'},
               {name: 'exist_in_cdl', type: 'string'},
+              {name: 'start_stan', type: 'string'},
+              {name: 'end_stan', type: 'string'},
+              {name: 'uch_id', type: 'string'},
+
             ]
             t.linesSource.localdata = json.rows;
+            t.linesSort();
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -685,7 +746,7 @@
 
       onRowselect($event) {
         this.selectedRow = this.linesSource.localdata[$event.args.row.boundindex];
-        console.log($event.args.row);
+        this.selectLine($event.args.row);
       },
 
       // Окно изменения варианта
@@ -695,23 +756,21 @@
 
     },
 
-    beforeCreate: function () {
+    beforeCreate() {
       this.linesSource = {
         datatype: 'json',
       };
 
       this.stationsSource = {
         datatype: 'json',
-      }
+      };
 
       this.selectedStationsSource = {
         datatype: 'json'
-      }
+      };
     },
 
     created() {
-      // this.loadLines();
-
       this.stationsSource = {
         datafields : [
           {name: 'name', type: 'string'},
@@ -750,6 +809,7 @@
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
+      // this.loadLines();
       this.Preload();
       this.$refs.linesGrid.updatebounddata('cells');
     },
