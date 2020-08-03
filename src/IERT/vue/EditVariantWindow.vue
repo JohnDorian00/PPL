@@ -49,7 +49,7 @@
                 <Preloader v-if="!isLoaded"/>
                 <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
                          :width="'100%'" :height="'100%'" :position="'top'" style="border: none;"
-                         :animationType="'none'" :selectionTracker='false' @tabclick="onTabclick($event)" >
+                         :animationType="'none'" :selectionTracker='false' @tabclick="onTabclick($event)">
                   <ul>
                     <li style="margin-left: 10px;">Выбор из списка</li>
                     <li style="margin-right: 10px;">Выбор участка по пути следования</li>
@@ -73,10 +73,13 @@
 
                   <div style="height: calc(100%); width:100%; overflow: hidden; position:relative;">
 
-                    <div style="text-align: center; margin: 5px; ">Сформируйте путь следования, вдоль которого будут выбраны участки</div>
+                    <div style="text-align: center; margin: 5px; ">Сформируйте путь следования, вдоль которого будут
+                      выбраны участки
+                    </div>
 
                     <div style="height: calc(100% - 110px)">
-                      <JqxGrid v-if="isLoaded" style="border: none; position:relative;" ref="stationGrid" :height="'100%'"
+                      <JqxGrid v-if="isLoaded" style="border: none; position:relative;" ref="stationGrid"
+                               :height="'100%'"
                                :width="'100%'"
                                :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
                                :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
@@ -93,8 +96,8 @@
 
                         <div style="display : inline-block;">
                           <JqxButton ref="buttonAddStations" @click="createAddStation" :height="button_height+'px'"
-                                        :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                        :theme="theme" style="display : inline-block; margin-left: 5px"
+                                     :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                     :theme="theme" style="display : inline-block; margin-left: 5px"
                           ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                           </JqxButton>
                         </div>
@@ -113,7 +116,8 @@
                         <JqxButton @click="makeLinesList" ref="buttonMakeLines" :height="button_height+'px'"
                                    :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                                    :theme="theme" style="margin-left: 5px;" :disabled="true"
-                        ><span class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        ><span
+                          class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                         </JqxButton>
                       </div>
 
@@ -137,13 +141,15 @@
 
               <div style="height: 100%; padding: 0;">
 
-                <jqxTreeGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid" :height="'100%'"
-                         :width="'100%'"
-                         :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false" :autoheight="false"
-                         :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
-                         :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                         :selectionMode="'singlerow'" :source="selectedStationsSource"
-                         :theme="theme" :filterable="true" :filterMode="'default'" :sortmode="'columns'"
+                <jqxTreeGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid"
+                             :height="'100%'"
+                             :width="'100%'"
+                             :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false"
+                             :autoheight="false"
+                             :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
+                             :enabletooltip="true" :columnsautoresize="false" :editable="false"
+                             :selectionMode="'singlerow'" :source="selectedStationsSource"
+                             :theme="theme" :filterable="true" :filterMode="'default'" :sortmode="'columns'"
                 >
                 </jqxTreeGrid>
 
@@ -277,19 +283,17 @@
 
       // Сортировка участков по exist_in_cdl и по алфавитному порядку (start_name)
       linesSort() {
-        this.linesSource.localdata.sort(function(a, b){
-          let nameA=a.start_name,
-              nameB=b.start_name,
-              existInCDLA=a.exist_in_cdl,
-              existInCDLB=b.exist_in_cdl;
+        this.linesSource.localdata.sort(function (a, b) {
+          let nameA = a.start_name,
+            nameB = b.start_name,
+            existInCDLA = a.exist_in_cdl,
+            existInCDLB = b.exist_in_cdl;
 
           if (existInCDLA > existInCDLB) {
             return -1
-          }
-          else if (existInCDLA < existInCDLB) {
+          } else if (existInCDLA < existInCDLB) {
             return 1
-          }
-          else {
+          } else {
             if (nameA > nameB)
               return 1
             if (nameA < nameB) //сортируем строки по возрастанию
@@ -310,29 +314,23 @@
         let t = this;
         // TODO Добавить участок в правый грид, удалить участок из левого грида
         let index = this.linesSource.localdata.findIndex(item => item.uch_id == line.uch_id),
-            item = this.linesSource.localdata[index];
+          item = this.linesSource.localdata[index];
 
         console.log(index, item);
         // Скрыть участок из левого грида
         this.linesSource.localdata.splice(index, 1);
         this.linesSort();
-
-        // Добавить участок в правый грид
-        let obj = {
-          
-        }
-        this.selectedStationsSource.localdata.push(item);
-
         this.refreshAllTables();
+        t.$refs.linesGrid.unselectrow(index);
+        let items = [ item ];
+        // Добавить участок в правый грид
+        this.calcUchs([item.uch_id]);
 
-        setTimeout(function () {
-          t.$refs.linesGrid.unselectrow(index);
-        }, 100)
       },
 
       unselectStationGrid() {
         let t = this;
-        t.stationsSource.localdata.filter( function (item,index) {
+        t.stationsSource.localdata.filter(function (item, index) {
           t.$refs.stationGrid.unselectrow(index);
         });
       },
@@ -361,13 +359,13 @@
           let lines = transaction.objectStore("lines");
 
           let obj = {
-              uch_id: line.uch_id,
-              start_stan: line.start_stan,
-              start_name: line.start_name,
-              end_stan: line.end_stan,
-              end_name: line.end_name,
-              exist_in_cdl: line.exist_in_cdl,
-            }
+            uch_id: line.uch_id,
+            start_stan: line.start_stan,
+            start_name: line.start_name,
+            end_stan: line.end_stan,
+            end_name: line.end_name,
+            exist_in_cdl: line.exist_in_cdl,
+          }
           lines.add(obj);
 
           transaction.oncomplete = function () {
@@ -402,7 +400,7 @@
 
           let request = lines.get(lineID);
 
-          request.onsuccess = function() {
+          request.onsuccess = function () {
             t.deletedLine = request.result;
 
             let request2 = lines.delete(lineID);
@@ -411,7 +409,7 @@
               let indexedLines = lines.index("OrderByName");
               request = indexedLines.getAll();
 
-              request.onsuccess = function() {
+              request.onsuccess = function () {
                 // console.log(request.result);
                 // TODO обновить linesGRID
               }
@@ -525,8 +523,7 @@
                 };
                 t.selectedStationsSource.localdata.push(obj);
                 t.$refs.selectedGrid.updatebounddata('cells');
-              }
-              else {
+              } else {
                 console.warn("Станция с id " + t.stationsList[key] + " не найдена");
               }
             }
@@ -547,8 +544,7 @@
             stationReq.onsuccess = function () {
               if (stationReq.result) {
                 t.selectedStationsSource.localdata.push(stationReq.result);
-              }
-              else {
+              } else {
                 console.warn("Станция с id " + stations_id[key] + " не найдена");
               }
             }
@@ -556,16 +552,17 @@
         }
       },
 
-      calcUchs() {
+      // Поиск участков и их добавление в правый грид
+      calcUchs(stationsList) {
         let t = this, linesList = "";
         t.isLoaded = false;
 
-        for (let key in t.stationsList) {
+        for (let key in stationsList) {
           if (key === "0") {
-            linesList += t.stationsList[key];
+            linesList += stationsList[key];
             continue;
           }
-          linesList += ',' + t.stationsList[key];
+          linesList += ',' + stationsList[key];
         }
 
         // Загрузка участков
@@ -580,6 +577,44 @@
 
         xmlQuery.query('json',
           function (json) {
+            console.log(json);
+
+            let r = t.$parent.connectDB();
+
+            r.onsuccess = function () {
+              let db = r.result,
+                lines = db.transaction("lines").objectStore("lines");
+
+              if (json.rowsAffected > 0) {
+                let request = lines.get(json.rows[0].uch_id);
+
+                request.onsuccess = function () {
+
+                  // Выделенный участок
+                  let line = request.result;
+
+                  // Выделенная информация под участок
+                  let linesInfo = [];
+
+                  for (let key in json.rows) {
+                    tmp.push(json.rows[key])
+                  }
+
+                  //TODO добавление участков в дерево правого грида
+
+                  
+
+                  console.log(line, tmp);
+
+
+
+
+
+                  //TODO добавление участков в дерево правого грида (по группам локомотивов)
+                }
+              }
+            }
+
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -626,7 +661,7 @@
               t.stationsList.push(item.uch_id);
             })
             t.findLinesInDB();
-            t.calcUchs();
+            // t.calcUchs();
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -772,16 +807,16 @@
 
     created() {
       this.stationsSource = {
-        datafields : [
+        datafields: [
           {name: 'name', type: 'string'},
         ],
-        localdata : []
+        localdata: []
       };
 
       this.selectedStationsSource = {
-        datafields : [
-          { name: 'EmployeeID', type: 'number' },
-          { name: 'ReportsTo', type: 'number' },
+        datafields: [
+          {name: 'EmployeeID', type: 'number'},
+          {name: 'ReportsTo', type: 'number'},
 
           {name: 'line_name', type: 'string'},
           {name: 'tech_spd', type: 'string'},
@@ -792,12 +827,31 @@
         ],
         hierarchy:
           {
-            keyDataField: { name: 'EmployeeID' },
-            parentDataField: { name: 'ReportsTo' }
+            keyDataField: {name: 'EmployeeID'},
+            parentDataField: {name: 'ReportsTo'}
           },
-        localdata : [
-          { "EmployeeID": 1, "ReportsTo": 2, "line_name": "Nancy1", "tech_spd": "12",  "line_spd": "12", "koef_potr": "0", "trains_amount": "123", "trains_need": "456"},
-          { "EmployeeID": 2, "ReportsTo": null, "test": "test", "line_name": "Nancy2", "tech_spd": "12",  "line_spd": "12", "koef_potr": "0", "trains_amount": "123", "trains_need": "456"},
+        localdata: [
+          {
+            "EmployeeID": 1,
+            "ReportsTo": 2,
+            "line_name": "Nancy1",
+            "tech_spd": "12",
+            "line_spd": "12",
+            "koef_potr": "0",
+            "trains_amount": "123",
+            "trains_need": "456"
+          },
+          {
+            "EmployeeID": 2,
+            "ReportsTo": null,
+            "test": "test",
+            "line_name": "Nancy2",
+            "tech_spd": "12",
+            "line_spd": "12",
+            "koef_potr": "0",
+            "trains_amount": "123",
+            "trains_need": "456"
+          },
         ]
       }
       this.gsVar = this.row.var_gs_var_id;
