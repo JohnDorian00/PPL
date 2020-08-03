@@ -47,10 +47,10 @@
         <div style="width: 100%; display : block;">
           <ul class="btn-group" :height="button_height">
             <li>
-              <JqxButton class="button" ref="createWindowNewVariant" :height="button_height" @click="addStation"
+              <JqxButton class="button" ref="buttonAdd" :height="button_height" @click="addStation"
                           :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                           :theme="theme" :style="{'display': 'inline-block'} "
-              ><span class="nobr">Создать&nbsp;&nbsp;&nbsp;</span>
+              ><span class="nobr">Добавить&nbsp;&nbsp;&nbsp;</span>
               </JqxButton>
 
             </li>
@@ -184,7 +184,6 @@
             rowsHeightHeader: {leftPanel: 35, mainContent: 645}
           },
           height: {contentHeight: 660},
-          userData: {closeWindows: this.closeWindows, parentWindow: this.parentWindow, stations: this.stations},
           station : null,
           stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
 
@@ -201,17 +200,19 @@
       methods: {
         addStation() {
           if (this.station) {
-            this.parentWindow.$parent.addStation(this.station)
+            let index = this.stations.indexOf(this.station);
+            this.parentWindow.$parent.addStation(this.station, index);
+
+            // Удаление станции из списка
+            this.stations.splice(i, 1);
+            this.$refs.stationGrid.updatebounddata('cells');
+            this.$refs.stationGrid.unselectrow(i);
           }
-        },
-        // Сохранение выбранного пункта меню при изменении выбора
-        onListBoxSelect() {
-          this.listBoxSelected = this.$refs.listBox.getSelectedItem();
         },
 
         onRowselect($event) {
           this.selectedRow = $event.args.row;
-          this.station = this.userData.stations[this.selectedRow.boundindex];
+          this.station = this.stations[this.selectedRow.boundindex];
         },
       },
 
@@ -231,7 +232,7 @@
             {name: 'esr', type: 'string'},
             {name: 'name', type: 'string'},
           ],
-          localdata : this.userData.stations
+          localdata : this.stations
         }
       },
 

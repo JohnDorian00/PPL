@@ -5,7 +5,7 @@
     <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}">
       <ul>
 
-        <li v-on:click="addListWindow({type: 'MainWindow',
+        <li @click="addListWindow({type: 'MainWindow',
             title: 'Перечень вариантов расчета перспективной потребности локомотивов'})" :style="{
               'display': 'inline-block', 'height': '25px', 'left':'0px', 'cursor':'pointer', 'text-align':'left'}"
         > Варианты расчетов перспективной потребности
@@ -275,10 +275,10 @@
         option = this.updateWindowCreateOptions(option, added_options);
         this.id[id] = this.windows.length;
         this.windows.push(option);
-        this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
-          tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
-            .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
-        });
+        // this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
+        //   tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
+        //     .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
+        // });
         // this.windows[0].type = "WorkVariant";
       }
     },

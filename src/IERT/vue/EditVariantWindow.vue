@@ -137,15 +137,15 @@
 
               <div style="height: 100%; padding: 0;">
 
-                <JqxGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid" :height="'100%'"
+                <jqxTreeGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid" :height="'100%'"
                          :width="'100%'"
                          :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false" :autoheight="false"
-                         :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                         :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
                          :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                         :selectionmode="'singlerow'" :source="selectedStationsSource"
-                         :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                         :selectionMode="'singlerow'" :source="selectedStationsSource"
+                         :theme="theme" :filterable="true" :filterMode="'default'" :sortmode="'columns'"
                 >
-                </JqxGrid>
+                </jqxTreeGrid>
 
               </div>
 
@@ -199,14 +199,13 @@
   import XmlQuery from "@/IERT/js/xmlQuery";
   import Rows from "@/IERT/vue/tabel/flex-row";
   import Preloader from "@/IERT/vue/Preloader";
-  import globalData from "@/IERT/js/globalData";
   import JqxSplitter from "@/jqwidgets/jqwidgets-vue/vue_jqxsplitter";
   import JqxExpander from "@/jqwidgets/jqwidgets-vue/vue_jqxexpander";
   import JqxTree from "@/jqwidgets/jqwidgets-vue/vue_jqxtree";
   import JqxPanel from "@/jqwidgets/jqwidgets-vue/vue_jqxpanel";
   import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
-  import Vue from 'vue';
   import JqxTabs from "@/jqwidgets/jqwidgets-vue/vue_jqxtabs";
+  import JqxTreeGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxtreegrid";
 
   export default {
     components: {
@@ -221,6 +220,7 @@
       JqxPanel,
       JqxListBox,
       JqxTabs,
+      JqxTreeGrid,
     },
 
     name: "WorkVariant",
@@ -228,7 +228,7 @@
     data() {
       return {
         theme: appConfig.windowsTheme,
-        isLoaded: false,
+        isLoaded: true,
         button_height: 30,
         columns: [
           {text: 'Начало участка', datafield: 'start_name'},
@@ -253,6 +253,7 @@
         gsVar: null,
         selectedRow: null,
         stationsList: [],
+        deletedStationsStack: [],
         makeLinesListDisableFlag: true,
       }
     },
@@ -270,6 +271,10 @@
 
     methods: {
 
+      selectLine() {
+        // TODO Добавить участок в правый грид, удалить участок из левого грида
+      },
+
       unselectStationGrid() {
         let t = this;
         t.stationsSource.localdata.filter( function (item,index) {
@@ -280,6 +285,16 @@
       clearLines() {
         this.selectedStationsSource.localdata = [];
         this.$refs.selectedGrid.updatebounddata('cells');
+      },
+
+      // Добавить участок в selected
+      addLineToDB(lineID) {
+
+      },
+
+      // Удалить участок из IndexedDB
+      delLineFromDB() {
+
       },
 
       // Загрузка участков в IndexedDB
@@ -300,6 +315,7 @@
           function (json) {
             if (json.rowsAffected === 0) {
               console.warn("Ошибка получения участков из базы данных");
+              return
             }
             let openRequest = t.$parent.connectDB();
             // Загрузка станций в IndexedDB
@@ -471,7 +487,12 @@
         xmlQuery.query('json',
           function (json) {
             t.stationsList = [];
-            json.rows.filter(function (item, key) {
+            if (json.rowsAffected < 1) {
+              console.log("Отсутствуют участки между данными станциями");
+              t.isLoaded = true;
+              return
+            }
+            json.rows.filter(function (item) {
               t.stationsList.push(item.uch_id);
             })
             t.findLinesInDB();
@@ -488,10 +509,17 @@
       },
 
       // Добавление станции
-      addStation(station) {
+      addStation(station, oldId) {
+
+        // добавить в стек
+        station.oldId = oldId;
+
+
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
-        this.unselectStationGrid();
+
+        this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex());
+
         if (this.stationsSource.localdata.length > 1) {
           this.makeLinesListDisableFlag = false;
         }
@@ -499,20 +527,19 @@
 
       // Удаление станции по выделению
       deleteStation() {
-        let station;
-        console.log(this.$refs.stationGrid.getselectedrowindex());
-        station = this.$refs.stationGrid.getrowdata(this.$refs.stationGrid.getselectedrowindex());
-        console.log(station);
-        if (station) {
-          this.stationsSource.localdata.splice(station.boundindex, 1);
-          this.$refs.stationGrid.updatebounddata('cells');
-          if (this.stationsSource.localdata.length < 2) {
-            this.makeLinesListDisableFlag = true;
-          }
-        } else {
-          console.log("Не выбрана станция для удаления");
-        }
-        this.unselectStationGrid();
+        console.log(this.$children);
+        // let station;
+        // station = this.$refs.stationGrid.getrowdata(this.$refs.stationGrid.getselectedrowindex());
+        // if (station) {
+        //   this.stationsSource.localdata.splice(station.boundindex, 1);
+        //   this.$refs.stationGrid.updatebounddata('cells');
+        //   if (this.stationsSource.localdata.length < 2) {
+        //     this.makeLinesListDisableFlag = true;
+        //   }
+        // } else {
+        //   console.log("Не выбрана станция для удаления");
+        // }
+        // this.unselectStationGrid();
       },
 
       // Очистка списка станций
@@ -584,8 +611,8 @@
       },
 
       onRowselect($event) {
-        this.selectedRow = $event.args.row;
-        // console.log(this.selectedRow);
+        this.selectedRow = this.linesSource.localdata[$event.args.row.boundindex];
+        console.log(this.selectedRow);
       },
 
       // Окно изменения варианта
@@ -610,7 +637,7 @@
     },
 
     created() {
-      this.loadLines();
+      // this.loadLines();
 
       this.stationsSource = {
         datafields : [
@@ -621,6 +648,9 @@
 
       this.selectedStationsSource = {
         datafields : [
+          { name: 'EmployeeID', type: 'number' },
+          { name: 'ReportsTo', type: 'number' },
+
           {name: 'line_name', type: 'string'},
           {name: 'tech_spd', type: 'string'},
           {name: 'line_spd', type: 'string'},
@@ -628,15 +658,24 @@
           {name: 'trains_amount', type: 'string'},
           {name: 'trains_need', type: 'string'},
         ],
-        localdata : []
+        hierarchy:
+          {
+            keyDataField: { name: 'EmployeeID' },
+            parentDataField: { name: 'ReportsTo' }
+          },
+        localdata : [
+          { "EmployeeID": 1, "ReportsTo": 2, "line_name": "Nancy1", "tech_spd": "12",  "line_spd": "12", "koef_potr": "0", "trains_amount": "123", "trains_need": "456"},
+          { "EmployeeID": 2, "ReportsTo": null, "line_name": "Nancy2", "tech_spd": "12",  "line_spd": "12", "koef_potr": "0", "trains_amount": "123", "trains_need": "456"},
+        ]
       }
       this.gsVar = this.row.var_gs_var_id;
+      this.$root.$children[0].loadStations();
     },
 
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
-      this.Preload();
+      // this.Preload();
     },
   }
 </script>
