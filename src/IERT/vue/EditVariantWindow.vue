@@ -161,7 +161,7 @@
 
         <li>
           <JqxButton ref="createWindowAddStation"
-                     :height="button_height"
+                     :height="button_height" @click=""
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'} "
           ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -255,6 +255,7 @@
         stationsList: [],
         deletedStationsStack: [],
         makeLinesListDisableFlag: true,
+        deletedLine: null,
       }
     },
 
@@ -271,6 +272,12 @@
 
     methods: {
 
+      refreshAllTables() {
+        this.$refs.linesGrid.updatebounddata();
+        this.$refs.stationGrid.updatebounddata();
+        this.$refs.selectedGrid.updateBoundData();
+      },
+
       selectLine() {
         // TODO Добавить участок в правый грид, удалить участок из левого грида
       },
@@ -284,17 +291,84 @@
 
       clearLines() {
         this.selectedStationsSource.localdata = [];
-        this.$refs.selectedGrid.updatebounddata('cells');
+        this.refreshAllTables();
       },
 
-      // Добавить участок в selected
-      addLineToDB(lineID) {
+      // Добавить участок в db
+      addLineToDB(line) {
+        //line = {uch_id: 5, start_stan: 123, start_name: "test123", end_stan: 321, end_name: "test321", exist_in_cdl: 0};
 
+        let t = this;
+
+        let openRequest = t.$parent.connectDB();
+        // Загрузка станций в IndexedDB
+        openRequest.onsuccess = function () {
+          let db = openRequest.result;
+          // продолжить работу с базой данных, используя объект db
+          db.onversionchange = function () {
+            db.close();
+            alert("База данных устарела, пожалуста, перезагрузите страницу.")
+          };
+          let transaction = db.transaction("lines", "readwrite");
+          let lines = transaction.objectStore("lines");
+
+          let obj = {
+              uch_id: line.uch_id,
+              start_stan: line.start_stan,
+              start_name: line.start_name,
+              end_stan: line.end_stan,
+              end_name: line.end_name,
+              exist_in_cdl: line.exist_in_cdl,
+            }
+          lines.add(obj);
+
+          transaction.oncomplete = function () {
+            console.log("Участок добавлен", obj);
+          };
+          transaction.onerror = function () {
+            if (event.target.error.name === "ConstraintError") {
+              console.log("Участок с таким id уже существует, ", obj);
+              return
+            }
+          }
+        };
       },
 
       // Удалить участок из IndexedDB
-      delLineFromDB() {
+      delLineFromDB(lineID) {
+        //lineID = 0;
+        let t = this;
 
+        let openRequest = t.$parent.connectDB();
+        // Загрузка станций в IndexedDB
+        openRequest.onsuccess = function () {
+          let db = openRequest.result;
+          // продолжить работу с базой данных, используя объект db
+          db.onversionchange = function () {
+            db.close();
+            alert("База данных устарела, пожалуста, перезагрузите страницу.")
+          };
+          let transaction = db.transaction("lines", "readwrite");
+          let lines = transaction.objectStore("lines");
+
+
+          let request = lines.get(lineID);
+
+          request.onsuccess = function() {
+            t.deletedLine = request.result;
+
+            let request2 = lines.delete(lineID);
+
+            request2.onsuccess = function () {
+              console.log("Участок удален", request.result);
+            }
+
+          };
+
+          transaction.onerror = function () {
+            console.log(event.target.error);
+          }
+        };
       },
 
       // Загрузка участков в IndexedDB
@@ -545,7 +619,7 @@
       // Очистка списка станций
       clearStations() {
         this.stationsSource.localdata = [];
-        this.$refs.stationGrid.updatebounddata('cells');
+        this.refreshAllTables();
         this.makeLinesListDisableFlag = true;
 
         // this.selectedStationsSource.localdata = [];
@@ -598,7 +672,6 @@
               {name: 'exist_in_cdl', type: 'string'},
             ]
             t.linesSource.localdata = json.rows;
-            t.$refs.linesGrid.updatebounddata();
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -612,7 +685,7 @@
 
       onRowselect($event) {
         this.selectedRow = this.linesSource.localdata[$event.args.row.boundindex];
-        console.log(this.selectedRow);
+        console.log($event.args.row);
       },
 
       // Окно изменения варианта
@@ -665,17 +738,20 @@
           },
         localdata : [
           { "EmployeeID": 1, "ReportsTo": 2, "line_name": "Nancy1", "tech_spd": "12",  "line_spd": "12", "koef_potr": "0", "trains_amount": "123", "trains_need": "456"},
-          { "EmployeeID": 2, "ReportsTo": null, "line_name": "Nancy2", "tech_spd": "12",  "line_spd": "12", "koef_potr": "0", "trains_amount": "123", "trains_need": "456"},
+          { "EmployeeID": 2, "ReportsTo": null, "test": "test", "line_name": "Nancy2", "tech_spd": "12",  "line_spd": "12", "koef_potr": "0", "trains_amount": "123", "trains_need": "456"},
         ]
       }
       this.gsVar = this.row.var_gs_var_id;
       this.$root.$children[0].loadStations();
+
+      console.log(this.selectedStationsSource.localdata[1]);
     },
 
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
-      // this.Preload();
+      this.Preload();
+      this.$refs.linesGrid.updatebounddata('cells');
     },
   }
 </script>
