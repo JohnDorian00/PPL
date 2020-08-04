@@ -143,7 +143,7 @@
               <div style="height: 100%; padding: 0;">
                 <Preloader v-if="!isLoaded"/>
                 <jqxTreeGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid"
-                             :height="'100%'" @cellBeginEdit="treeGridOnCellBeginEdit($event)"
+                             :height="'100%'"
                              :width="'100%'"
                              :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false"
                              :autoheight="false"
@@ -249,9 +249,23 @@
         selectedStationsColumns: [
           {text: 'Название участка', datafield: 'line_name', editable: false},
           {text: 'Тех. скорость, км/ч', datafield: 'tech_spd', editable: false},
-          {text: 'Уч. скорость, км/ч', datafield: 'line_spd', },
+          {text: 'Уч. скорость, км/ч', datafield: 'line_spd',
+            validation: function (cell, value) {
+              if (value.toString().length < 2) {
+                return { message: "Name should be minimum 4 characters", result: false };
+              }
+              return true;
+            }
+          },
           {text: 'Коэф. потр.', datafield: 'koef_potr', editable: false},
-          {text: 'Кол-во поездов', datafield: 'trains_amount'},
+          {text: 'Кол-во поездов', datafield: 'trains_amount',
+            validation: function (cell, value) {
+              if (value.toString().length < 2) {
+                return { message: "Name should be minimum 4 characters", result: false };
+              }
+              return true;
+            }
+          },
           {text: 'Потребность лок.', datafield: 'trains_need', editable: false},
         ],
 
@@ -282,9 +296,6 @@
     },
 
     methods: {
-      treeGridOnCellBeginEdit(e) {
-        console.log(e);
-      },
       // Сортировка участков по exist_in_cdl и по алфавитному порядку (start_name)
       linesSort() {
         this.linesSource.localdata.sort(function (a, b) {
@@ -316,7 +327,6 @@
 
       selectLine(line) {
         let t = this;
-        // TODO Добавить участок в правый грид, удалить участок из левого грида
         let index = this.linesSource.localdata.findIndex(item => item.uch_id == line.uch_id),
           item = this.linesSource.localdata[index];
 
@@ -370,7 +380,6 @@
             ]
             t.linesSource.localdata = json.rows;
             t.linesSort();
-            console.log(t.linesSource.localdata);
             t.$refs.linesGrid.updatebounddata();
 
             let openRequest = t.$parent.connectDB();
@@ -587,6 +596,7 @@
       calcUchs(stationsList) {
         let t = this, linesList = "";
         t.isLoaded = false;
+        t.$refs.linesGrid.disabled = true;
 
         for (let key in stationsList) {
           if (key === "0") {
@@ -643,7 +653,7 @@
                   let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
                   t.linesSource.localdata.splice(index, 1);
                   t.$refs.linesGrid.clearselection();
-                  t.refreshAllTables();
+                  t.$refs.linesGrid.updatebounddata();
 
 
                   //TODO добавление участков в дерево правого грида (по группам локомотивов)
@@ -670,6 +680,7 @@
             }
 
             t.isLoaded = true;
+            t.$refs.linesGrid.disabled = false;
             xmlQuery.destroy();
           },
           function (ER) {
@@ -729,21 +740,9 @@
         })
 
         t.selectedStationsSource.localdata.push(obj);
-
+        t.$refs.selectedGrid.updateBoundData();
         console.log(t.selectedStationsSource.localdata);
-
-        // {
-        //   "EmployeeID": 1,
-        //   "ReportsTo": 2,
-        //   "line_name": "Nancy1",
-        //   "tech_spd": "12",
-        //   "line_spd": "12",
-        //   "koef_potr": "0",
-        //   "trains_amount": "123",
-        //   "trains_need": "456"
-        // },
-
-
+        
       },
 
       // Формирование списка участков по пути следования
