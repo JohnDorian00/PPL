@@ -320,9 +320,6 @@
         let index = this.linesSource.localdata.findIndex(item => item.uch_id == line.uch_id),
           item = this.linesSource.localdata[index];
 
-        // t.$refs.linesGrid.unselectrow(index);
-        t.$refs.linesGrid.clearselection();
-        let items = [item];
         // Добавить участок в правый грид
         this.calcUchs([item.uch_id]);
 
@@ -331,8 +328,8 @@
       unselectStationGrid() {
         let t = this;
         t.stationsSource.localdata.filter((item, index) => {
-          // t.$refs.stationGrid.unselectrow(index);
-          t.$refs.stationGrid.clearselection();
+          t.$refs.stationGrid.unselectrow(index);
+          // t.$refs.stationGrid.clearselection();
         });
       },
 
@@ -373,6 +370,8 @@
             ]
             t.linesSource.localdata = json.rows;
             t.linesSort();
+            console.log(t.linesSource.localdata);
+            t.$refs.linesGrid.updatebounddata();
 
             let openRequest = t.$parent.connectDB();
             // Загрузка станций в IndexedDB
@@ -643,7 +642,9 @@
 
                   let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
                   t.linesSource.localdata.splice(index, 1);
+                  t.$refs.linesGrid.clearselection();
                   t.refreshAllTables();
+
 
                   //TODO добавление участков в дерево правого грида (по группам локомотивов)
                 }
@@ -684,7 +685,7 @@
         let t = this;
 
         // TODO поиск максимального id
-        let parentID = (t.selectedStationsSource.localdata[t.selectedStationsSource.localdata.length - 1].EmployeeID) + 1;
+          //maxid();
 
         // Добавление корня
         let obj = {
@@ -802,8 +803,8 @@
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
 
-        // this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex());
-        t.$refs.stationGrid.clearselection();
+        this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex());
+        // t.$refs.stationGrid.clearselection();
 
         if (this.stationsSource.localdata.length > 1) {
           this.makeLinesListDisableFlag = false;
