@@ -514,7 +514,7 @@
                 console.log("Коды участков обновлены");
               };
               transaction.onerror = function () {
-                  console.log("Ошибка обновления кодов участков, ", event.target);
+                console.log("Ошибка обновления кодов участков, ", event.target);
               }
             };
 
@@ -695,43 +695,38 @@
           lokoNameSet.add(item.loko_name);
         })
 
-
         // Добавление информации по участку
         let i = 0;
         lokoNameSet.forEach((item) => {
-          console.log(item);
-          console.log(i);
+          // Добавление локомотивов участка
           obj.children.push({
             line_name: item,
             children: []
           })
 
+          // Информация об участке
           for (let key in lineInfo) {
-
             if (lineInfo[key].loko_name === item) {
               obj.children[i].children.push({
-                line_name: lineInfo[key].vid_uch,
+                line_name: lineInfo[key].kat_id,
                 tech_spd: lineInfo[key].v_uch,
                 line_spd: lineInfo[key].v_uch,
+                koef_potr: 0,
+                trains_amount: lineInfo[key].train_count,
+                trains_need: 0,
+                bak: {
+                  trains_amount: lineInfo[key].b_train_count,
+                  spd: lineInfo[key].b_v_uch,
+                }
               });
             }
-
-
-            // let lineName = lineInfo[key].loko_name;
-            // obj.children.push({
-            //   // EmployeeID: null,
-            //   line_name: lineInfo[key].loko_name,
-            //   tech_spd: lineInfo[key].v_uch,
-            //   line_spd: lineInfo[key].v_uch,
-            // })
           }
           i++;
         })
 
-        // console.log(obj);
-
         t.selectedStationsSource.localdata.push(obj);
 
+        console.log(t.selectedStationsSource.localdata);
 
         // {
         //   "EmployeeID": 1,
