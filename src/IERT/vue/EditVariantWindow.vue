@@ -47,7 +47,7 @@
               </div>
 
               <div style="padding: 0px;">
-                <Preloader v-if="!isLoaded"/>
+
                 <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
                          :width="'100%'" :height="'100%'" :position="'top'" style="border: none;"
                          :animationType="'none'" :selectionTracker='false' @tabclick="onTabclick($event)">
@@ -58,8 +58,8 @@
 
                   <div style="height:100%; width:100%; overflow: hidden;">
                     <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
-
-                    <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="linesGrid" :height="'100%'"
+                    <Preloader v-if="!isLinesLoaded"/>
+                    <JqxGrid v-show="isLinesLoaded" style="position:relative; border: none;" ref="linesGrid" :height="'100%'"
                              :width="'100%'"
                              :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
@@ -141,15 +141,15 @@
               </div>
 
               <div style="height: 100%; padding: 0;">
-
+                <Preloader v-if="!isLoaded"/>
                 <jqxTreeGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid"
-                             :height="'100%'"
+                             :height="'100%'" @cellBeginEdit="treeGridOnCellBeginEdit($event)"
                              :width="'100%'"
                              :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false"
                              :autoheight="false"
                              :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
-                             :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                             :selectionMode="'singlerow'" :source="selectedStationsSource"
+                             :enabletooltip="true" :columnsautoresize="false" :editable="true"
+                             :selectionMode="'custom'" :source="selectedStationsSource"
                              :theme="theme" :filterable="true" :filterMode="'default'" :sortmode="'columns'"
                 >
                 </jqxTreeGrid>
@@ -236,6 +236,7 @@
       return {
         theme: appConfig.windowsTheme,
         isLoaded: true,
+        isLinesLoaded: true,
         button_height: 30,
         columns: [
           {text: 'Начало участка', datafield: 'start_name'},
@@ -246,12 +247,12 @@
           {text: 'Основные станции пути следования', datafield: 'name'},
         ],
         selectedStationsColumns: [
-          {text: 'Название участка', datafield: 'line_name'},
-          {text: 'Тех. скорость, км/ч', datafield: 'tech_spd'},
-          {text: 'Уч. скорость, км/ч', datafield: 'line_spd'},
-          {text: 'Коэф. потр.', datafield: 'koef_potr'},
+          {text: 'Название участка', datafield: 'line_name', editable: false},
+          {text: 'Тех. скорость, км/ч', datafield: 'tech_spd', editable: false},
+          {text: 'Уч. скорость, км/ч', datafield: 'line_spd', },
+          {text: 'Коэф. потр.', datafield: 'koef_potr', editable: false},
           {text: 'Кол-во поездов', datafield: 'trains_amount'},
-          {text: 'Потребность лок.', datafield: 'trains_need'},
+          {text: 'Потребность лок.', datafield: 'trains_need', editable: false},
         ],
 
         linesDataAdapter: new jqx.dataAdapter(this.linesSource),
@@ -281,7 +282,9 @@
     },
 
     methods: {
-
+      treeGridOnCellBeginEdit(e) {
+        console.log(e);
+      },
       // Сортировка участков по exist_in_cdl и по алфавитному порядку (start_name)
       linesSort() {
         this.linesSource.localdata.sort(function (a, b) {
@@ -317,7 +320,8 @@
         let index = this.linesSource.localdata.findIndex(item => item.uch_id == line.uch_id),
           item = this.linesSource.localdata[index];
 
-        t.$refs.linesGrid.unselectrow(index);
+        // t.$refs.linesGrid.unselectrow(index);
+        t.$refs.linesGrid.clearselection();
         let items = [item];
         // Добавить участок в правый грид
         this.calcUchs([item.uch_id]);
@@ -327,7 +331,8 @@
       unselectStationGrid() {
         let t = this;
         t.stationsSource.localdata.filter((item, index) => {
-          t.$refs.stationGrid.unselectrow(index);
+          // t.$refs.stationGrid.unselectrow(index);
+          t.$refs.stationGrid.clearselection();
         });
       },
 
@@ -339,7 +344,7 @@
       // Загрузка участков в IndexedDB
       loadLines() {
         let t = this;
-        t.isLoaded = false;
+        t.isLinesLoaded = false;
 
         // Загрузка участков
         let xmlQuery = new XmlQuery({
@@ -411,7 +416,7 @@
               }
             };
 
-            t.isLoaded = true;
+            t.isLinesLoaded = true;
             xmlQuery.destroy();
           },
 
@@ -426,7 +431,6 @@
       // Загрузка расшифровки кодов локомотивов
       loadLocoCodes() {
         let t = this;
-        t.isLoaded = false;
 
         // Загрузка участков
         let xmlQuery = new XmlQuery({
@@ -478,7 +482,6 @@
       // Загрузка расшифровки кодов участков
       loadLinesCodes() {
         let t = this;
-        t.isLoaded = false;
 
         // Загрузка участков
         let xmlQuery = new XmlQuery({
@@ -799,7 +802,8 @@
         this.stationsSource.localdata.push(station);
         this.$refs.stationGrid.updatebounddata('cells');
 
-        this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex());
+        // this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex());
+        t.$refs.stationGrid.clearselection();
 
         if (this.stationsSource.localdata.length > 1) {
           this.makeLinesListDisableFlag = false;
