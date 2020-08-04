@@ -316,13 +316,12 @@
         let index = this.linesSource.localdata.findIndex(item => item.uch_id == line.uch_id),
           item = this.linesSource.localdata[index];
 
-        console.log(index, item);
         // Скрыть участок из левого грида
         this.linesSource.localdata.splice(index, 1);
         this.linesSort();
         this.refreshAllTables();
         t.$refs.linesGrid.unselectrow(index);
-        let items = [ item ];
+        let items = [item];
         // Добавить участок в правый грид
         this.calcUchs([item.uch_id]);
 
@@ -330,7 +329,7 @@
 
       unselectStationGrid() {
         let t = this;
-        t.stationsSource.localdata.filter(function (item, index) {
+        t.stationsSource.localdata.filter((item, index) => {
           t.$refs.stationGrid.unselectrow(index);
         });
       },
@@ -577,7 +576,6 @@
 
         xmlQuery.query('json',
           function (json) {
-            console.log(json);
 
             let r = t.$parent.connectDB();
 
@@ -597,20 +595,32 @@
                   let linesInfo = [];
 
                   for (let key in json.rows) {
-                    tmp.push(json.rows[key])
+                    linesInfo.push(json.rows[key])
                   }
-
                   //TODO добавление участков в дерево правого грида
+                  console.log(line, linesInfo);
 
-                  
-
-                  console.log(line, tmp);
-
+                  t.addToSelectedGrid(line, linesInfo);
 
 
+                  t.refreshAllTables();
 
 
                   //TODO добавление участков в дерево правого грида (по группам локомотивов)
+                }
+              } else {
+                for (let key in stationsList) {
+                  let r = lines.get(stationsList[key]);
+
+                  r.onsuccess = function () {
+                    let line = r.result;
+                    t.selectedStationsSource.localdata.push({
+                      line_name: line.start_name + " - " + line.end_name,
+                      children: [],
+                    });
+                    t.refreshAllTables();
+                    console.log("Отсутствует привязка к участку", t.selectedRow);
+                  }
                 }
               }
             }
@@ -624,6 +634,68 @@
             console.log(ER);
           }
         )
+      },
+
+      addToSelectedGrid(line, lineInfo) {
+        let t = this;
+
+        // TODO поиск максимального id
+        let parentID = (t.selectedStationsSource.localdata[t.selectedStationsSource.localdata.length - 1].EmployeeID) + 1;
+
+        // Добавление корня
+        let obj = {
+          // EmployeeID: parentID,
+
+          line_name: line.start_name + " - " + line.end_name,
+          children: [],
+        }
+
+        // Поиск уникальных имен локомотивов
+        let lokoNameSet = new Set();
+        lineInfo.filter((item) => {
+          lokoNameSet.add(item.loko_name);
+        })
+
+
+        // Добавление информации по участку
+        for (let item of lokoNameSet) {
+          obj.children.push({
+            line_name: item,
+            children: []
+          })
+          // for (let key in lineInfo) {
+          //   if (lineInfo[key].loko_name === lokoNameSet) {
+          //
+          //   }
+          //
+          //
+          //   let lineName = lineInfo[key].loko_name;
+          //   obj.children.push({
+          //     // EmployeeID: null,
+          //     line_name: lineInfo[key].loko_name,
+          //     tech_spd: lineInfo[key].v_uch,
+          //     line_spd: lineInfo[key].v_uch,
+          //   })
+          //
+          // }
+        }
+        // console.log(obj);
+
+        t.selectedStationsSource.localdata.push(obj);
+
+
+        // {
+        //   "EmployeeID": 1,
+        //   "ReportsTo": 2,
+        //   "line_name": "Nancy1",
+        //   "tech_spd": "12",
+        //   "line_spd": "12",
+        //   "koef_potr": "0",
+        //   "trains_amount": "123",
+        //   "trains_need": "456"
+        // },
+
+
       },
 
       // Формирование списка участков по пути следования
@@ -816,7 +888,6 @@
       this.selectedStationsSource = {
         datafields: [
           {name: 'EmployeeID', type: 'number'},
-          {name: 'ReportsTo', type: 'number'},
 
           {name: 'line_name', type: 'string'},
           {name: 'tech_spd', type: 'string'},
@@ -824,40 +895,41 @@
           {name: 'koef_potr', type: 'string'},
           {name: 'trains_amount', type: 'string'},
           {name: 'trains_need', type: 'string'},
+          {name: 'children', type: 'array'},
         ],
         hierarchy:
           {
-            keyDataField: {name: 'EmployeeID'},
-            parentDataField: {name: 'ReportsTo'}
+            root: 'children'
           },
         localdata: [
           {
             "EmployeeID": 1,
-            "ReportsTo": 2,
             "line_name": "Nancy1",
             "tech_spd": "12",
             "line_spd": "12",
             "koef_potr": "0",
             "trains_amount": "123",
-            "trains_need": "456"
+            "trains_need": "456",
+            "children": [
+              {
+                "EmployeeID": 2,
+                "test": "test",
+                "line_name": "Nancy2",
+                "tech_spd": "12",
+                "line_spd": "12",
+                "koef_potr": "0",
+                "trains_amount": "123",
+                "trains_need": "456",
+              },
+            ]
           },
-          {
-            "EmployeeID": 2,
-            "ReportsTo": null,
-            "test": "test",
-            "line_name": "Nancy2",
-            "tech_spd": "12",
-            "line_spd": "12",
-            "koef_potr": "0",
-            "trains_amount": "123",
-            "trains_need": "456"
-          },
+
         ]
       }
       this.gsVar = this.row.var_gs_var_id;
       this.$root.$children[0].loadStations();
 
-      console.log(this.selectedStationsSource.localdata[1]);
+      console.log(this.selectedStationsSource.localdata[0]);
     },
 
     mounted() {
