@@ -89,6 +89,7 @@
 
     methods: {
 
+      // Поиск окна в списке окон (по window.id)
       findWindowInArr(id) {
         for (let key in this.$children) {
           if (this.$children[key].id === id) {
@@ -97,6 +98,7 @@
         }
       },
 
+      // Подключение к бд storage
       connectDB() {
         let t = this, db;
         let openRequest = indexedDB.open("storage", 1);
@@ -109,10 +111,12 @@
               console.log("no db");
             case 1:
               // на клиенте версия базы данных 1
-              if (!db.objectStoreNames.contains('stations')) { // if there's no "books" store
+              if (!db.objectStoreNames.contains('stations')) {
                 db.createObjectStore('stations', {keyPath: 'stan_id'});
                 let lines = db.createObjectStore('lines', {keyPath: 'uch_id'});
                 lines.createIndex('OrderByName', 'start_name');
+                db.createObjectStore('linesCodes', {keyPath: 'vid_uch'});
+                db.createObjectStore('locoCodes', {keyPath: 'kod_gr'});
                 console.log("created db, version = " + db.version);
               }
           }

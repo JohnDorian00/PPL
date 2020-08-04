@@ -3,6 +3,7 @@
              :max-width="190000"
              :min-width="937"
              :min-height="510"
+             :width="1250"
              :position="{ x: 150, y: 150 }"
              :id="id"
              :theme="theme"
@@ -316,10 +317,6 @@
         let index = this.linesSource.localdata.findIndex(item => item.uch_id == line.uch_id),
           item = this.linesSource.localdata[index];
 
-        // Скрыть участок из левого грида
-        this.linesSource.localdata.splice(index, 1);
-        this.linesSort();
-        this.refreshAllTables();
         t.$refs.linesGrid.unselectrow(index);
         let items = [item];
         // Добавить участок в правый грид
@@ -339,91 +336,6 @@
         this.refreshAllTables();
       },
 
-      // Добавить участок в db, удалить из правого грида, обновить linesSource
-      addLineToDB(line) {
-        //line = {uch_id: 5, start_stan: 123, start_name: "test123", end_stan: 321, end_name: "test321", exist_in_cdl: 0};
-
-        let t = this;
-
-        let openRequest = t.$parent.connectDB();
-        // Загрузка станций в IndexedDB
-        openRequest.onsuccess = function () {
-          let db = openRequest.result;
-          // продолжить работу с базой данных, используя объект db
-          db.onversionchange = function () {
-            db.close();
-            alert("База данных устарела, пожалуста, перезагрузите страницу.")
-          };
-          let transaction = db.transaction("lines", "readwrite");
-          let lines = transaction.objectStore("lines");
-
-          let obj = {
-            uch_id: line.uch_id,
-            start_stan: line.start_stan,
-            start_name: line.start_name,
-            end_stan: line.end_stan,
-            end_name: line.end_name,
-            exist_in_cdl: line.exist_in_cdl,
-          }
-          lines.add(obj);
-
-          transaction.oncomplete = function () {
-            console.log("Участок добавлен", obj);
-          };
-          transaction.onerror = function () {
-            if (event.target.error.name === "ConstraintError") {
-              console.log("Участок с таким id уже существует, ", obj);
-              return
-            }
-          }
-        };
-      },
-
-      // Удалить участок из IndexedDB, добавить в правый грид, обновить linesSource
-      delLineFromDB(lineID) {
-        //lineID = 0;
-        let t = this;
-
-        let openRequest = t.$parent.connectDB();
-        // Загрузка станций в IndexedDB
-        openRequest.onsuccess = function () {
-          let db = openRequest.result;
-          // продолжить работу с базой данных, используя объект db
-          db.onversionchange = function () {
-            db.close();
-            alert("База данных устарела, пожалуста, перезагрузите страницу.")
-          };
-          let transaction = db.transaction("lines", "readwrite");
-          let lines = transaction.objectStore("lines");
-
-
-          let request = lines.get(lineID);
-
-          request.onsuccess = function () {
-            t.deletedLine = request.result;
-
-            let request2 = lines.delete(lineID);
-
-            request2.onsuccess = function () {
-              let indexedLines = lines.index("OrderByName");
-              request = indexedLines.getAll();
-
-              request.onsuccess = function () {
-                // console.log(request.result);
-                // TODO обновить linesGRID
-              }
-
-              console.log("Участок удален", t.deletedLine);
-            }
-
-          };
-
-          transaction.onerror = function () {
-            console.log(event.target.error);
-          }
-        };
-      },
-
       // Загрузка участков в IndexedDB
       loadLines() {
         let t = this;
@@ -441,9 +353,22 @@
         xmlQuery.query('json',
           function (json) {
             if (json.rowsAffected === 0) {
-              console.warn("Ошибка получения участков из базы данных");
+              console.warn("Ошибка получения участков с сервера");
               return
             }
+
+            t.linesSource.datafields = [
+              {name: 'start_name', type: 'string'},
+              {name: 'end_name', type: 'string'},
+              {name: 'exist_in_cdl', type: 'string'},
+              {name: 'start_stan', type: 'string'},
+              {name: 'end_stan', type: 'string'},
+              {name: 'uch_id', type: 'string'},
+
+            ]
+            t.linesSource.localdata = json.rows;
+            t.linesSort();
+
             let openRequest = t.$parent.connectDB();
             // Загрузка станций в IndexedDB
             openRequest.onsuccess = function () {
@@ -498,13 +423,118 @@
         )
       },
 
+      // Загрузка расшифровки кодов локомотивов
+      loadLocoCodes() {
+        let t = this;
+        t.isLoaded = false;
+
+        // Загрузка участков
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "LOAD_LOCO_CODES"
+        });
+
+        xmlQuery.query('json',
+          function (json) {
+            let openRequest = t.$parent.connectDB();
+            // Загрузка станций в IndexedDB
+            openRequest.onsuccess = function () {
+              let db = openRequest.result;
+              // продолжить работу с базой данных, используя объект db
+              db.onversionchange = function () {
+                db.close();
+                alert("База данных устарела, пожалуста, перезагрузите страницу.")
+              };
+              let transaction = db.transaction("locoCodes", "readwrite");
+              let locoCodes = transaction.objectStore("locoCodes");
+              locoCodes.clear();
+
+              let obj;
+
+              for (let i = 0; i < json.rows.length; i++) {
+                obj = {
+                  kod_gr: json.rows[i].kod_gr,
+                  name: json.rows[i].name,
+                }
+                locoCodes.put(obj);
+              }
+              transaction.oncomplete = function () {
+                console.log("Коды локомотивов обновлены");
+              };
+              transaction.onerror = function () {
+                console.log("Ошибка обновления кодов локомотивов, ", event.target);
+              }
+            };
+            xmlQuery.destroy();
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
+        )
+      },
+
+      // Загрузка расшифровки кодов участков
+      loadLinesCodes() {
+        let t = this;
+        t.isLoaded = false;
+
+        // Загрузка участков
+        let xmlQuery = new XmlQuery({
+          url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+          querySet: "LOAD_UCHS_CODES"
+        });
+
+        xmlQuery.query('json',
+          function (json) {
+            let openRequest = t.$parent.connectDB();
+            // Загрузка станций в IndexedDB
+            openRequest.onsuccess = function () {
+              let db = openRequest.result;
+              // продолжить работу с базой данных, используя объект db
+              db.onversionchange = function () {
+                db.close();
+                alert("База данных устарела, пожалуста, перезагрузите страницу.")
+              };
+              let transaction = db.transaction("linesCodes", "readwrite");
+              let linesCodes = transaction.objectStore("linesCodes");
+              linesCodes.clear();
+
+              let obj;
+
+              for (let i = 0; i < json.rows.length; i++) {
+                obj = {
+                  vid_uch: json.rows[i].vid_uch,
+                  sname_vid: json.rows[i].sname_vid,
+                }
+                linesCodes.put(obj);
+              }
+              transaction.oncomplete = function () {
+                console.log("Коды участков обновлены");
+              };
+              transaction.onerror = function () {
+                  console.log("Ошибка обновления кодов участков, ", event.target);
+              }
+            };
+
+            xmlQuery.destroy();
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
+        )
+      },
+
       // Поиск участков по айди
       findLinesInDB() {
         let r = this.$parent.connectDB(), t = this;
 
         r.onsuccess = function () {
           let db = r.result,
-            objectStore = db.transaction("lines").objectStore("lines");
+            objectStore = db.transaction("lines", "readonly").objectStore("lines");
 
           t.selectedStationsSource.localdata = [];
 
@@ -536,7 +566,7 @@
 
         r.onsuccess = function () {
           let db = r.result,
-            objectStore = db.transaction("stations").objectStore("stations");
+            objectStore = db.transaction("stations", "readonly").objectStore("stations");
 
           for (let key in stations_id) {
             let stationReq = objectStore.get(stations_id[key]);
@@ -581,7 +611,7 @@
 
             r.onsuccess = function () {
               let db = r.result,
-                lines = db.transaction("lines").objectStore("lines");
+                lines = db.transaction("lines", "readonly").objectStore("lines");
 
               if (json.rowsAffected > 0) {
                 let request = lines.get(json.rows[0].uch_id);
@@ -591,23 +621,30 @@
                   // Выделенный участок
                   let line = request.result;
 
+                  if (!line) {
+                    console.log("Отсутствуют список участков в IndexedDB или запись не найдена");
+                    return
+                  }
+
+                  let linesCodes = db.transaction("linesCodes", "readonly").objectStore("linesCodes");
+
                   // Выделенная информация под участок
                   let linesInfo = [];
-
                   for (let key in json.rows) {
+                    // console.log(json.rows[key].kod_gr);  kod_gr  kat_id
                     linesInfo.push(json.rows[key])
                   }
-                  //TODO добавление участков в дерево правого грида
-                  console.log(line, linesInfo);
 
+                  //TODO добавление участков в дерево правого грида
                   t.addToSelectedGrid(line, linesInfo);
 
-
+                  let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
+                  t.linesSource.localdata.splice(index, 1);
                   t.refreshAllTables();
-
 
                   //TODO добавление участков в дерево правого грида (по группам локомотивов)
                 }
+                // Если нет привязки, то ->
               } else {
                 for (let key in stationsList) {
                   let r = lines.get(stationsList[key]);
@@ -618,6 +655,9 @@
                       line_name: line.start_name + " - " + line.end_name,
                       children: [],
                     });
+
+                    let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
+                    t.linesSource.localdata.splice(index, 1);
                     t.refreshAllTables();
                     console.log("Отсутствует привязка к участку", t.selectedRow);
                   }
@@ -829,17 +869,7 @@
 
         xmlQuery.query('json',
           function (json) {
-            t.linesSource.datafields = [
-              {name: 'start_name', type: 'string'},
-              {name: 'end_name', type: 'string'},
-              {name: 'exist_in_cdl', type: 'string'},
-              {name: 'start_stan', type: 'string'},
-              {name: 'end_stan', type: 'string'},
-              {name: 'uch_id', type: 'string'},
 
-            ]
-            t.linesSource.localdata = json.rows;
-            t.linesSort();
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -927,17 +957,17 @@
         ]
       }
       this.gsVar = this.row.var_gs_var_id;
-      this.$root.$children[0].loadStations();
+      // this.$root.$children[0].loadStations();
 
-      console.log(this.selectedStationsSource.localdata[0]);
     },
 
     mounted() {
       // Применение сохраненных параметров
       this.appendSavedParams();
-      // this.loadLines();
-      this.Preload();
-      this.$refs.linesGrid.updatebounddata('cells');
+      this.loadLinesCodes();
+      this.loadLocoCodes();
+      this.loadLines();
+
     },
   }
 </script>
