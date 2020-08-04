@@ -626,7 +626,7 @@
                     return
                   }
 
-                  let linesCodes = db.transaction("linesCodes", "readonly").objectStore("linesCodes");
+                  //let linesCodes = db.transaction("linesCodes", "readonly").objectStore("linesCodes");
 
                   // Выделенная информация под участок
                   let linesInfo = [];
@@ -677,6 +677,7 @@
       },
 
       addToSelectedGrid(line, lineInfo) {
+        console.log(lineInfo);
         let t = this;
 
         // TODO поиск максимального id
@@ -684,8 +685,6 @@
 
         // Добавление корня
         let obj = {
-          // EmployeeID: parentID,
-
           line_name: line.start_name + " - " + line.end_name,
           children: [],
         }
@@ -698,27 +697,37 @@
 
 
         // Добавление информации по участку
-        for (let item of lokoNameSet) {
+        let i = 0;
+        lokoNameSet.forEach((item) => {
+          console.log(item);
+          console.log(i);
           obj.children.push({
             line_name: item,
             children: []
           })
-          // for (let key in lineInfo) {
-          //   if (lineInfo[key].loko_name === lokoNameSet) {
-          //
-          //   }
-          //
-          //
-          //   let lineName = lineInfo[key].loko_name;
-          //   obj.children.push({
-          //     // EmployeeID: null,
-          //     line_name: lineInfo[key].loko_name,
-          //     tech_spd: lineInfo[key].v_uch,
-          //     line_spd: lineInfo[key].v_uch,
-          //   })
-          //
-          // }
-        }
+
+          for (let key in lineInfo) {
+
+            if (lineInfo[key].loko_name === item) {
+              obj.children[i].children.push({
+                line_name: lineInfo[key].vid_uch,
+                tech_spd: lineInfo[key].v_uch,
+                line_spd: lineInfo[key].v_uch,
+              });
+            }
+
+
+            // let lineName = lineInfo[key].loko_name;
+            // obj.children.push({
+            //   // EmployeeID: null,
+            //   line_name: lineInfo[key].loko_name,
+            //   tech_spd: lineInfo[key].v_uch,
+            //   line_spd: lineInfo[key].v_uch,
+            // })
+          }
+          i++;
+        })
+
         // console.log(obj);
 
         t.selectedStationsSource.localdata.push(obj);
