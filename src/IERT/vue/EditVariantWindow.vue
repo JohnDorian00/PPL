@@ -189,7 +189,7 @@
 
 
         <li>
-          <JqxButton class="button" ref="buttonClear" @click="refreshSelectedLinesGrid" :height="button_height+'px'"
+          <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{ 'display': 'inline-block'}"
           ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -330,6 +330,8 @@
     },
 
     methods: {
+
+
       loadStationsFromIndexedDB() {
         let t = this;
 
@@ -397,17 +399,23 @@
 
       // Конец редактирования строки
       rowEndEdit(e) {
-        e.args.row.tech_spd = e.args.row.line_spd;
+        let row = e.args.row;
+        console.log(row);
+        row.tech_spd = Math.round(row.line_spd / row.v_prop * 1000) * 0.001;
 
-        // TODO change koef potr
+        // TODO считывание 0E-20
+        // koef_potr = Math.round((t_prost  + len / v_uch) / 24 * 1000) * 0.001;
+        //portebnost` = Math.round(train_count * ((t_prost  + len / v_uch) / 24 )*1000) * 0.001;
+
+
       },
 
       // disable non-editable rows
       rowEdit(e) {
-        console.log(e.args.row);
         if (!e.args.row.editable) {
           this.$refs.selectedGrid.endRowEdit(0, true);
-          return
+
+
         }
       },
 
@@ -830,10 +838,10 @@
                     });
 
                     let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
-                    t.linesSource.localdata.splice(index, 1);
+                    console.log("Отсутствует привязка к участку", t.linesSource.localdata.splice(index, 1));
                     t.isLoaded = true;
                     t.refreshLinesGrid();
-                    console.log("Отсутствует привязка к участку", t.selectedRow);
+                    t.refreshSelectedLinesGrid();
                   }
                 }
               }
@@ -881,6 +889,7 @@
 
           // Информация об участке
           for (let key in lineInfo) {
+            console.log(lineInfo);
             if (lineInfo[key].loko_name === item) {
               obj.children[i].children.push({
                 line_name: lineInfo[key].kat_id,
@@ -889,6 +898,10 @@
                 koef_potr: 0,
                 trains_amount: lineInfo[key].train_count,
                 trains_need: 0,
+                len: lineInfo[key].len,
+                v_prop: lineInfo[key].v_prop,
+                t_prost: lineInfo[key].t_prost,
+                t_move_prost: lineInfo[key].t_move_prost,
                 bak: {
                   trains_amount: lineInfo[key].b_train_count,
                   spd: lineInfo[key].b_v_uch,

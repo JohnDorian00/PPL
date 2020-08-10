@@ -817,7 +817,7 @@ License: https://jqwidgets.com/license/
                     filterdatecomparisonoperators: ['equal', 'not equal', 'less than', 'less than or equal', 'greater than', 'greater than or equal', 'null', 'not null'],
                     filterbooleancomparisonoperators: ['equal', 'not equal'],
                     validationstring: "Entered value is not valid",
-                    emptydatastring: "No data to display",
+                    emptydatastring: "",
                     filterselectstring: "Select Filter",
                     loadtext: "Loading...",
                     clearstring: "Clear",

@@ -146,12 +146,10 @@
 
         showModal() {
           this.refreshGrid();
-
           this.$refs.mainWin.open();
         },
 
         hideModal() {
-
           this.$refs.mainWin.hide();
         },
 
@@ -162,7 +160,7 @@
 
             // Удаление станции из списка
             this.stationsSource.localdata.splice(index, 1);
-            this.refresh();
+            this.refreshGrid();
             this.$refs.stationGrid.unselectrow(index);
           }
         },
