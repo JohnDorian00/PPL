@@ -146,7 +146,7 @@
 
         xmlQuery.query('json',
           function (json) {
-            t.stations = json.rows;
+            // t.stations = json.rows;
 
             let openRequest = t.connectDB();
             // Загрузка станций в IndexedDB
@@ -234,7 +234,7 @@
       },
 
       createWindowAddStation(mainWinId) {
-        this.addListWindow({type: 'AddStation', title: "Добавление путей по станциям", parentWindow: this.findWindowInArr(mainWinId)})
+        // this.addListWindow({type: 'AddStation', title: "Добавление путей по станциям", parentWindow: this.findWindowInArr(mainWinId)})
       },
 
       // Изменить опции создания окна

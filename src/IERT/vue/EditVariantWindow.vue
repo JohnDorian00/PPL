@@ -1,4 +1,7 @@
 <template>
+  <div>
+
+  <div>
   <JqxWindow :max-height="1999999"
              :max-width="190000"
              :min-width="937"
@@ -58,7 +61,7 @@
 
                   <div style="height:100%; width:100%; overflow: hidden;">
                     <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
-                    <Preloader v-if="!isLinesLoaded" style="width: 100%; height: 100%"/>
+                    <Preloader v-if="!isLinesLoaded" style="position: relative"/>
                     <JqxGrid v-show="isLinesLoaded" style="position:relative; border: none;" ref="linesGrid"
                              :height="'100%'"
                              :width="'100%'"
@@ -80,7 +83,11 @@
                     </div>
 
                     <div style="height: calc(100% - 110px)">
-                      <Preloader v-if="!isLinesLoaded"/>
+
+
+                      <Preloader v-if="!isLinesLoaded" style="position:relative;"/>
+
+
                       <JqxGrid v-if="isLinesLoaded" style="border: none; position:relative;" ref="stationGrid"
                                :height="'100%'"
                                :width="'100%'"
@@ -98,9 +105,9 @@
                       <div style="display : block; width: 100%">
 
                         <div style="display : inline-block;">
-                          <JqxButton ref="buttonAddStations" @click="createAddStation" :height="button_height+'px'"
+                          <JqxButton ref="buttonAddStations" @click="showModal" :height="button_height+'px'"
                                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                     :theme="theme" style="display : inline-block; margin-left: 5px" :disabled="!isLinesLoaded"
+                                     :theme="theme" style="display : inline-block; margin-left: 5px"
                           ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                           </JqxButton>
                         </div>
@@ -143,7 +150,10 @@
               </div>
 
               <div style="height: 100%; padding: 0;">
-                <Preloader v-if="!isLoaded"/>
+                <div>
+                  <Preloader v-if="!isLoaded"/>
+                </div>
+
                 <jqxTreeGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid"
                              :height="'100%'"
                              :width="'100%'" @rowBeginEdit="rowEdit($event)" @rowEndEdit="rowEndEdit($event)"
@@ -179,7 +189,7 @@
 
 
         <li>
-          <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
+          <JqxButton class="button" ref="buttonClear" @click="refreshSelectedLinesGrid" :height="button_height+'px'"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{ 'display': 'inline-block'}"
           ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -198,6 +208,18 @@
 
     </div>
   </JqxWindow>
+  </div>
+
+  <div>
+  <AddStation ref="modal" :parentWindow="this" :title="'Добавление путей по станциям'"
+              :locStations="locStations" :id="id">
+
+  </AddStation>
+  </div>
+
+  </div>
+
+
 </template>
 
 <script>
@@ -215,6 +237,7 @@
   import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
   import JqxTabs from "@/jqwidgets/jqwidgets-vue/vue_jqxtabs";
   import JqxTreeGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxtreegrid";
+  import AddStation from "@/IERT/vue/windows/AddStation/AddStation";
 
   export default {
     components: {
@@ -230,6 +253,7 @@
       JqxListBox,
       JqxTabs,
       JqxTreeGrid,
+      AddStation,
     },
 
     name: "WorkVariant",
@@ -284,6 +308,7 @@
         deletedStationsStack: [],
         makeLinesListDisableFlag: true,
         deletedLine: null,
+        locStations: this.stations,
       }
     },
 
@@ -294,7 +319,7 @@
       },
 
       isLinesLoaded: function () {
-        this.$refs.buttonAddStations.disabled = !this.isLinesLoaded;
+        // this.$refs.buttonAddStations.disabled = !this.isLinesLoaded;
         this.refreshLinesGrid();
       },
 
@@ -305,6 +330,39 @@
     },
 
     methods: {
+      loadStationsFromIndexedDB() {
+        let t = this;
+
+        let openRequest = t.$parent.connectDB();
+
+        // Загрузка станций в IndexedDB
+        openRequest.onsuccess = function () {
+          let db = openRequest.result;
+          // продолжить работу с базой данных, используя объект db
+          db.onversionchange = function () {
+            db.close();
+            alert("База данных устарела, пожалуста, перезагрузите страницу.")
+          };
+
+          let lines = db.transaction("stations", "readonly").objectStore("stations");
+
+          let transaction = lines.getAll();
+
+          transaction.onsuccess = function () {
+            t.locStations = transaction.result;
+            t.$refs.modal.refreshGrid();
+          }
+          transaction.onerror = function () {
+            console.log("Ошибка загрузки станций из IndexedDB");
+          }
+        }
+      },
+
+      // Показать окно добавления станций
+      showModal() {
+        this.$refs.modal.showModal();
+      },
+
       // Сохранение изменений участков
       saveSelectedLines() {
         console.log(this.$refs.linesGrid.isBindingCompleted());
@@ -353,6 +411,21 @@
         }
       },
 
+      // Сортировка станций по имени по возрастанию
+      stationsSort() {
+        this.stationsSource.localdata.sort(function (a, b) {
+          let nameA = a.name,
+            nameB = b.name;
+
+          if (nameA > nameB)
+            return 1
+          if (nameA < nameB) //сортируем строки по возрастанию
+            return -1
+
+          return 0 // Никакой сортировки
+        })
+      },
+
       // Сортировка участков по exist_in_cdl и по алфавитному порядку (start_name)
       linesSort() {
         this.linesSource.localdata.sort(function (a, b) {
@@ -379,11 +452,11 @@
       refreshAllTables() {
         this.refreshLinesGrid();
         this.refreshStationsGrid();
-        this.$refs.selectedGrid.updateBoundData();
+        this.refreshSelectedLinesGrid();
       },
 
       refreshLinesGrid() {
-        if ((this.$refs.myTabs.selectedItem === 0 || this.$refs.myTabs.selectedItem === "0") && this.isLinesLoaded) {
+        if (this.$refs.linesGrid && (this.$refs.myTabs.selectedItem === 0 || this.$refs.myTabs.selectedItem === "0") && this.isLinesLoaded) {
           // console.log("update lines");
           this.$refs.linesGrid.updatebounddata("cells");
         }
@@ -391,12 +464,17 @@
 
       refreshStationsGrid() {
         // localStorage.getItem("TabIndex") === "1"
-        if ((this.$refs.myTabs.selectedItem === 1 || this.$refs.myTabs.selectedItem === "1") && this.isLinesLoaded) {
+        if (this.$refs.stationGrid && (this.$refs.myTabs.selectedItem === 1 || this.$refs.myTabs.selectedItem === "1") && this.isLinesLoaded) {
           // console.log("update stations");
           this.$refs.stationGrid.updatebounddata("cells");
         }
       },
 
+      refreshSelectedLinesGrid() {
+        if (this.$refs.selectedGrid && this.isLoaded) {
+          this.$refs.selectedGrid.updateBoundData("cells");
+        }
+      },
 
       selectLine(line) {
         let t = this;
@@ -669,7 +747,6 @@
 
       // Поиск участков
       calcUchs(stationsList) {
-
         let t = this, linesList = "";
         t.isLoaded = false;
 
@@ -737,10 +814,10 @@
                   // Удаление строчки из левого грида
                   let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
                   t.linesSource.localdata.splice(index, 1);
-                  t.$refs.linesGrid.clearselection();
+                  // t.$refs.linesGrid.clearselection();
                   t.refreshLinesGrid();
                 }
-                // Если нет привязки, то ->
+                // Если нет привязки, то в правый грид добавляется только название участка
               } else {
                 for (let key in stationsList) {
                   let r = lines.get(stationsList[key]);
@@ -754,15 +831,15 @@
 
                     let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
                     t.linesSource.localdata.splice(index, 1);
-                    t.refreshAllTables();
+                    t.isLoaded = true;
+                    t.refreshLinesGrid();
                     console.log("Отсутствует привязка к участку", t.selectedRow);
                   }
                 }
               }
             }
 
-            t.isLoaded = true;
-            // Выключение грида с участками
+            // Включение грида с участками
             if (localStorage.getItem("TabIndex") === "0") {
               t.$refs.linesGrid.disabled = false;
             }
@@ -824,9 +901,8 @@
         })
 
         t.selectedStationsSource.localdata.push(obj);
-        t.$refs.selectedGrid.updateBoundData();
-
-
+        t.isLoaded = true;
+        t.refreshSelectedLinesGrid();
       },
 
       // Формирование списка участков по пути следования
@@ -885,7 +961,7 @@
         station.oldId = oldId;
 
         this.stationsSource.localdata.push(station);
-
+        this.stationsSort();
         this.refreshStationsGrid();
 
         this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex());
@@ -983,7 +1059,10 @@
 
       // Окно изменения варианта
       createAddStation() {
-        this.$emit('createAddStationWindow', this.id)
+
+        this.isOpenModal = true;
+
+        // this.$emit('createAddStationWindow', this.id)
       },
 
     },
@@ -1050,6 +1129,7 @@
         ]
       }
       this.gsVar = this.row.var_gs_var_id;
+
       // this.$root.$children[0].loadStations();
     },
 
@@ -1059,6 +1139,7 @@
       this.loadLinesCodes();
       this.loadLocoCodes();
       this.loadLines();
+      this.loadStationsFromIndexedDB();
 
     },
   }

@@ -17,7 +17,7 @@
 <style scoped>
   .cssload-loader {
     position: relative;
-    left: calc(50% - 61px);
+    left: calc(50% - 51px);
     top: calc(50% - 170px);
     width: 100px;
     height: 100px;
