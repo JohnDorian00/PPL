@@ -808,7 +808,7 @@ License: https://jqwidgets.com/license/
                     filterapplystring: "Apply",
                     filtercancelstring: "Cancel",
                     filterclearstring: "Clear Filter",
-                    filterstring: "advanced",
+                    filterstring: "Дополнительно",
                     filtersearchstring: "Search:",
                     filterstringcomparisonoperators: ['empty', 'not empty', 'contains', 'contains(match case)',
                        'does not contain', 'does not contain(match case)', 'starts with', 'starts with(match case)',
@@ -1185,7 +1185,7 @@ License: https://jqwidgets.com/license/
             var bottomSizeOffset = 2;
             var rightSizeOffset = 0;
 
-            // right scroll offset. 
+            // right scroll offset.
             if (this.vScrollBar[0].style.visibility != 'hidden') {
                 rightSizeOffset = scrollSize + scrollOffset;
             }
@@ -9240,7 +9240,7 @@ License: https://jqwidgets.com/license/
                         this._pinnedTable[0].style.left = 3 - tablewidth + parseInt(this.element.style.width) + 'px';
                     }
                 }
-                //  
+                //
                 if (this.rowDetails) {
                     for (var i = 0; i < pageSize; i++) {
                         var row = records[i];

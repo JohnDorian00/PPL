@@ -12,7 +12,7 @@
 
     <!--    Верхний бар-->
     <div ref="header" style="position: relative;">
-      <div style="display: inline;">{{title}}</div>
+      <div style="display: inline;">{{title}} ///</div>
       <div style="display: inline; position: absolute; top:0; right: 0;
                   margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
       >
@@ -50,7 +50,7 @@
 
                 <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
                          :width="'100%'" :height="'100%'" :position="'top'" style="border: none;"
-                         :animationType="'none'" :selectionTracker='false' @tabclick="onTabclick($event)">
+                         :animationType="'none'" :selectionTracker='false' @selected="onTabclick($event)">
                   <ul>
                     <li style="margin-left: 10px;">Выбор из списка</li>
                     <li style="margin-right: 10px;">Выбор участка по пути следования</li>
@@ -58,8 +58,9 @@
 
                   <div style="height:100%; width:100%; overflow: hidden;">
                     <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
-                    <Preloader v-if="!isLinesLoaded"/>
-                    <JqxGrid v-show="isLinesLoaded" style="position:relative; border: none;" ref="linesGrid" :height="'100%'"
+                    <Preloader v-if="!isLinesLoaded" style="width: 100%; height: 100%"/>
+                    <JqxGrid v-show="isLinesLoaded" style="position:relative; border: none;" ref="linesGrid"
+                             :height="'100%'"
                              :width="'100%'"
                              :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                              :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
@@ -79,7 +80,8 @@
                     </div>
 
                     <div style="height: calc(100% - 110px)">
-                      <JqxGrid v-if="isLoaded" style="border: none; position:relative;" ref="stationGrid"
+                      <Preloader v-if="!isLinesLoaded"/>
+                      <JqxGrid v-if="isLinesLoaded" style="border: none; position:relative;" ref="stationGrid"
                                :height="'100%'"
                                :width="'100%'"
                                :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
@@ -98,7 +100,7 @@
                         <div style="display : inline-block;">
                           <JqxButton ref="buttonAddStations" @click="createAddStation" :height="button_height+'px'"
                                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                     :theme="theme" style="display : inline-block; margin-left: 5px"
+                                     :theme="theme" style="display : inline-block; margin-left: 5px" :disabled="!isLinesLoaded"
                           ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                           </JqxButton>
                         </div>
@@ -144,13 +146,13 @@
                 <Preloader v-if="!isLoaded"/>
                 <jqxTreeGrid v-if="isLoaded" style="border: none; position:relative;" ref="selectedGrid"
                              :height="'100%'"
-                             :width="'100%'"
+                             :width="'100%'" @rowBeginEdit="rowEdit($event)" @rowEndEdit="rowEndEdit($event)"
                              :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false"
                              :autoheight="false"
                              :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
                              :enabletooltip="true" :columnsautoresize="false" :editable="true"
                              :selectionMode="'custom'" :source="selectedStationsSource"
-                             :theme="theme" :filterable="true" :filterMode="'default'" :sortmode="'columns'"
+                             :theme="theme" :filterable="true" :filterMode="'advanced'" :sortmode="'columns'"
                 >
                 </jqxTreeGrid>
 
@@ -168,7 +170,7 @@
 
         <li>
           <JqxButton ref="createWindowAddStation"
-                     :height="button_height" @click=""
+                     :height="button_height" @click="saveSelectedLines"
                      :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                      :theme="theme" :style="{'display': 'inline-block'} "
           ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -249,19 +251,21 @@
         selectedStationsColumns: [
           {text: 'Название участка', datafield: 'line_name', editable: false},
           {text: 'Тех. скорость, км/ч', datafield: 'tech_spd', editable: false},
-          {text: 'Уч. скорость, км/ч', datafield: 'line_spd',
+          {
+            text: 'Уч. скорость, км/ч', datafield: 'line_spd',
             validation: function (cell, value) {
-              if (value.toString().length < 2) {
-                return { message: "Name should be minimum 4 characters", result: false };
+              if (value.toString().length < 1) {
+                return {message: "Name should be minimum 1 characters", result: false};
               }
               return true;
             }
           },
           {text: 'Коэф. потр.', datafield: 'koef_potr', editable: false},
-          {text: 'Кол-во поездов', datafield: 'trains_amount',
+          {
+            text: 'Кол-во поездов', datafield: 'trains_amount',
             validation: function (cell, value) {
-              if (value.toString().length < 2) {
-                return { message: "Name should be minimum 4 characters", result: false };
+              if (value.toString().length < 1) {
+                return {message: "Name should be minimum 1 characters", result: false};
               }
               return true;
             }
@@ -289,6 +293,11 @@
       isLoaded: function () {
       },
 
+      isLinesLoaded: function () {
+        this.$refs.buttonAddStations.disabled = !this.isLinesLoaded;
+        this.refreshLinesGrid();
+      },
+
       makeLinesListDisableFlag: function () {
         this.$refs.buttonMakeLines.disabled = this.makeLinesListDisableFlag;
       },
@@ -296,6 +305,54 @@
     },
 
     methods: {
+      // Сохранение изменений участков
+      saveSelectedLines() {
+        console.log(this.$refs.linesGrid.isBindingCompleted());
+        console.log(this.$refs.stationGrid.isBindingCompleted());
+        // let t = this;
+        // // t.isLinesLoaded = false;
+        //
+        // // Сохранение участков
+        // let xmlQuery = new XmlQuery({
+        //   url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+        //   querySet: "SAVE_UCH_DATA2"
+        // });
+        //
+        // xmlQuery.clearFilter();
+        // xmlQuery.setFilter("VAR_ID", this.row.var_id, "text");
+        // xmlQuery.setFilter("test", {"1":1, "2":"test"}, "object");
+        // console.log(xmlQuery.getFilter("test"));
+        //
+        // // xmlQuery.query('json',
+        // //   function (json) {
+        // //
+        // //     xmlQuery.destroy();
+        // //   },
+        // //
+        // //   function (ER) {
+        // //     xmlQuery.destroy();
+        // //     console.log("Error save data");
+        // //     console.log(ER);
+        // //   }
+        // // )
+      },
+
+      // Конец редактирования строки
+      rowEndEdit(e) {
+        e.args.row.tech_spd = e.args.row.line_spd;
+
+        // TODO change koef potr
+      },
+
+      // disable non-editable rows
+      rowEdit(e) {
+        console.log(e.args.row);
+        if (!e.args.row.editable) {
+          this.$refs.selectedGrid.endRowEdit(0, true);
+          return
+        }
+      },
+
       // Сортировка участков по exist_in_cdl и по алфавитному порядку (start_name)
       linesSort() {
         this.linesSource.localdata.sort(function (a, b) {
@@ -320,10 +377,26 @@
       },
 
       refreshAllTables() {
-        this.$refs.linesGrid.updatebounddata();
-        this.$refs.stationGrid.updatebounddata();
+        this.refreshLinesGrid();
+        this.refreshStationsGrid();
         this.$refs.selectedGrid.updateBoundData();
       },
+
+      refreshLinesGrid() {
+        if ((this.$refs.myTabs.selectedItem === 0 || this.$refs.myTabs.selectedItem === "0") && this.isLinesLoaded) {
+          // console.log("update lines");
+          this.$refs.linesGrid.updatebounddata("cells");
+        }
+      },
+
+      refreshStationsGrid() {
+        // localStorage.getItem("TabIndex") === "1"
+        if ((this.$refs.myTabs.selectedItem === 1 || this.$refs.myTabs.selectedItem === "1") && this.isLinesLoaded) {
+          // console.log("update stations");
+          this.$refs.stationGrid.updatebounddata("cells");
+        }
+      },
+
 
       selectLine(line) {
         let t = this;
@@ -380,7 +453,6 @@
             ]
             t.linesSource.localdata = json.rows;
             t.linesSort();
-            t.$refs.linesGrid.updatebounddata();
 
             let openRequest = t.$parent.connectDB();
             // Загрузка станций в IndexedDB
@@ -425,6 +497,9 @@
             };
 
             t.isLinesLoaded = true;
+
+            t.refreshLinesGrid();
+
             xmlQuery.destroy();
           },
 
@@ -592,11 +667,17 @@
         }
       },
 
-      // Поиск участков и их добавление в правый грид
+      // Поиск участков
       calcUchs(stationsList) {
+
         let t = this, linesList = "";
         t.isLoaded = false;
-        t.$refs.linesGrid.disabled = true;
+
+        // Выключение грида с участками
+        if (localStorage.getItem("TabIndex") === "0") {
+          t.$refs.linesGrid.disabled = true;
+        }
+
 
         for (let key in stationsList) {
           if (key === "0") {
@@ -622,6 +703,7 @@
             let r = t.$parent.connectDB();
 
             r.onsuccess = function () {
+
               let db = r.result,
                 lines = db.transaction("lines", "readonly").objectStore("lines");
 
@@ -647,16 +729,16 @@
                     linesInfo.push(json.rows[key])
                   }
 
-                  //TODO добавление участков в дерево правого грида
+                  // добавление участков в дерево правого грида
                   t.addToSelectedGrid(line, linesInfo);
 
+                  //TODO добавление участков в дерево правого грида (по группам локомотивов)
+
+                  // Удаление строчки из левого грида
                   let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
                   t.linesSource.localdata.splice(index, 1);
                   t.$refs.linesGrid.clearselection();
-                  t.$refs.linesGrid.updatebounddata();
-
-
-                  //TODO добавление участков в дерево правого грида (по группам локомотивов)
+                  t.refreshLinesGrid();
                 }
                 // Если нет привязки, то ->
               } else {
@@ -680,7 +762,11 @@
             }
 
             t.isLoaded = true;
-            t.$refs.linesGrid.disabled = false;
+            // Выключение грида с участками
+            if (localStorage.getItem("TabIndex") === "0") {
+              t.$refs.linesGrid.disabled = false;
+            }
+
             xmlQuery.destroy();
           },
           function (ER) {
@@ -691,12 +777,9 @@
         )
       },
 
+      // Добавление в правый грид
       addToSelectedGrid(line, lineInfo) {
-        console.log(lineInfo);
         let t = this;
-
-        // TODO поиск максимального id
-          //maxid();
 
         // Добавление корня
         let obj = {
@@ -732,7 +815,8 @@
                 bak: {
                   trains_amount: lineInfo[key].b_train_count,
                   spd: lineInfo[key].b_v_uch,
-                }
+                },
+                editable: true,
               });
             }
           }
@@ -741,8 +825,8 @@
 
         t.selectedStationsSource.localdata.push(obj);
         t.$refs.selectedGrid.updateBoundData();
-        console.log(t.selectedStationsSource.localdata);
-        
+
+
       },
 
       // Формирование списка участков по пути следования
@@ -776,11 +860,13 @@
               t.isLoaded = true;
               return
             }
+
             json.rows.filter(function (item) {
               t.stationsList.push(item.uch_id);
             })
-            t.findLinesInDB();
-            // t.calcUchs();
+
+            t.selectedStationsSource.localdata = [];
+            t.calcUchs(t.stationsList);
             t.isLoaded = true;
             xmlQuery.destroy();
           },
@@ -798,9 +884,9 @@
         // добавить в стек
         station.oldId = oldId;
 
-
         this.stationsSource.localdata.push(station);
-        this.$refs.stationGrid.updatebounddata('cells');
+
+        this.refreshStationsGrid();
 
         this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex());
         // t.$refs.stationGrid.clearselection();
@@ -810,7 +896,7 @@
         }
       },
 
-      // Удаление станции по выделению
+      // Удаление станции
       deleteStation() {
         console.log(this.$children);
         // let station;
@@ -853,8 +939,9 @@
 
       },
 
-      onTabclick: function (event) {
-        localStorage.setItem("TabIndex", event.args.item);
+      onTabclick: function (e) {
+        localStorage.setItem("TabIndex", e.args.item);
+        this.refreshAllTables();
       },
 
       onResize() {
@@ -925,7 +1012,6 @@
 
       this.selectedStationsSource = {
         datafields: [
-          {name: 'EmployeeID', type: 'number'},
 
           {name: 'line_name', type: 'string'},
           {name: 'tech_spd', type: 'string'},
@@ -941,7 +1027,6 @@
           },
         localdata: [
           {
-            "EmployeeID": 1,
             "line_name": "Nancy1",
             "tech_spd": "12",
             "line_spd": "12",
@@ -950,7 +1035,6 @@
             "trains_need": "456",
             "children": [
               {
-                "EmployeeID": 2,
                 "test": "test",
                 "line_name": "Nancy2",
                 "tech_spd": "12",
@@ -958,6 +1042,7 @@
                 "koef_potr": "0",
                 "trains_amount": "123",
                 "trains_need": "456",
+                "editable": true,
               },
             ]
           },
@@ -966,7 +1051,6 @@
       }
       this.gsVar = this.row.var_gs_var_id;
       // this.$root.$children[0].loadStations();
-
     },
 
     mounted() {

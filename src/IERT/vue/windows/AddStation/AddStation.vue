@@ -204,9 +204,9 @@
             this.parentWindow.$parent.addStation(this.station, index);
 
             // Удаление станции из списка
-            this.stations.splice(i, 1);
+            this.stations.splice(index, 1);
             this.$refs.stationGrid.updatebounddata('cells');
-            this.$refs.stationGrid.unselectrow(i);
+            this.$refs.stationGrid.unselectrow(index);
           }
         },
 
