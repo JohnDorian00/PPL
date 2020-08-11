@@ -86,16 +86,16 @@
                         <div style="height: calc(100% - 110px)">
 
 
-                          <Preloader v-if="!isLinesLoaded" style="position:relative;"/>
+<!--                       v-if="isLinesLoaded"   <Preloader v-if="!isLinesLoaded" style="position:relative;"/>-->
 
 
-                          <JqxGrid v-if="isLinesLoaded" style="border: none; position:relative;" ref="stationGrid"
+                          <JqxGrid  style="border: none; position:relative;" ref="stationGrid"
                                    :height="'100%'"
-                                   :width="'100%'"
+                                   :width="'100%'" :enablehover="false"
                                    :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
                                    :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                                    :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                                   :selectionmode="'multiplerowsextended'" :source="stationsSource"
+                                   :selectionmode="'singlerow'" :source="stationsSource"
                                    :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
                                    @rowselect="deleteStationToModal($event)"
                           >
@@ -332,8 +332,6 @@ export default {
   },
 
   methods: {
-
-
     loadStationsFromIndexedDB() {
       let t = this;
 
@@ -403,13 +401,14 @@ export default {
     rowEndEdit(e) {
       let row = e.args.row;
       console.log(row);
-      row.tech_spd = Math.round(row.line_spd / row.v_prop * 1000) * 0.001;
 
-      // TODO считывание 0E-20
-      // koef_potr = Math.round((t_prost  + len / v_uch) / 24 * 1000) * 0.001;
-      //portebnost` = Math.round(train_count * ((t_prost  + len / v_uch) / 24 )*1000) * 0.001;
+      if (row.editable) {
+        row.tech_spd = Math.round(row.line_spd / row.v_prop * 1000) * 0.001;
 
-
+        // TODO считывание 0E-20
+        // koef_potr = Math.round((t_prost  + len / v_uch) / 24 * 1000) * 0.001;
+        //portebnost` = Math.round(train_count * ((t_prost  + len / v_uch) / 24 )*1000) * 0.001;
+      }
     },
 
     // disable non-editable rows
@@ -466,7 +465,7 @@ export default {
     },
 
     refreshLinesGrid() {
-      if (this.$refs.linesGrid && (this.$refs.myTabs.selectedItem === 0 || this.$refs.myTabs.selectedItem === "0") && this.isLinesLoaded) {
+      if (this.$refs.linesGrid && (this.$refs.myTabs.selectedItem === 0 || this.$refs.myTabs.selectedItem === "0")) {
         // console.log("update lines");
         this.$refs.linesGrid.updatebounddata("cells");
       }
@@ -474,14 +473,14 @@ export default {
 
     refreshStationsGrid() {
       // localStorage.getItem("TabIndex") === "1"
-      if (this.$refs.stationGrid && (this.$refs.myTabs.selectedItem === 1 || this.$refs.myTabs.selectedItem === "1") && this.isLinesLoaded) {
+      if (this.$refs.stationGrid && (this.$refs.myTabs.selectedItem === 1 || this.$refs.myTabs.selectedItem === "1")) {
         // console.log("update stations");
         this.$refs.stationGrid.updatebounddata("cells");
       }
     },
 
     refreshSelectedLinesGrid() {
-      if (this.$refs.selectedGrid && this.isLoaded) {
+      if (this.$refs.selectedGrid) {
         this.$refs.selectedGrid.updateBoundData("cells");
       }
     },
@@ -498,9 +497,9 @@ export default {
 
     unselectStationGrid() {
       let t = this;
-      t.stationsSource.localdata.filter((item, index) => {
-        t.$refs.stationGrid.unselectrow(index);
-      });
+      setTimeout( function () {
+          t.$refs.stationGrid.clearselection();
+      }, 1 )
     },
 
     clearLines() {
@@ -760,7 +759,7 @@ export default {
       t.isLoaded = false;
 
       // Выключение грида с участками
-      if (localStorage.getItem("TabIndex") === "0") {
+      if (t.$refs.myTabs.selectedItem === 0 || t.$refs.myTabs.selectedItem === "0") {
         t.$refs.linesGrid.disabled = true;
       }
 
@@ -791,12 +790,14 @@ export default {
           r.onsuccess = function () {
 
             let db = r.result,
-              lines = db.transaction("lines", "readonly").objectStore("lines");
-
+                lines = db.transaction("lines", "readonly").objectStore("lines"),
+                linesCodes = db.transaction("linesCodes", "readonly").objectStore("linesCodes");
             if (json.rowsAffected > 0) {
               let request = lines.get(json.rows[0].uch_id);
 
               request.onsuccess = function () {
+
+
 
                 // Выделенный участок
                 let line = request.result;
@@ -849,7 +850,7 @@ export default {
           }
 
           // Включение грида с участками
-          if (localStorage.getItem("TabIndex") === "0") {
+          if (t.$refs.myTabs.selectedItem === 0 || t.$refs.myTabs.selectedItem === "0") {
             t.$refs.linesGrid.disabled = false;
           }
 
@@ -866,6 +867,8 @@ export default {
     // Добавление в правый грид
     addToSelectedGrid(line, lineInfo) {
       let t = this;
+
+      console.log(line, lineInfo);
 
       // Добавление корня
       let obj = {
@@ -889,27 +892,27 @@ export default {
         })
 
         // Информация об участке
-        for (let key in lineInfo) {
-          if (lineInfo[key].loko_name === item) {
-            obj.children[i].children.push({
-              line_name: lineInfo[key].kat_id,
-              tech_spd: lineInfo[key].v_uch,
-              line_spd: lineInfo[key].v_uch,
-              koef_potr: 0,
-              trains_amount: lineInfo[key].train_count,
-              trains_need: 0,
-              len: lineInfo[key].len,
-              v_prop: lineInfo[key].v_prop,
-              t_prost: lineInfo[key].t_prost,
-              t_move_prost: lineInfo[key].t_move_prost,
-              bak: {
-                trains_amount: lineInfo[key].b_train_count,
-                spd: lineInfo[key].b_v_uch,
-              },
-              editable: true,
-            });
-          }
-        }
+        // for (let key in lineInfo) {
+        //   if (lineInfo[key].loko_name === item) {
+        //     obj.children[i].children.push({
+        //       line_name: lineInfo[key].kat_id,
+        //       tech_spd: lineInfo[key].v_uch,
+        //       line_spd: lineInfo[key].v_uch,
+        //       koef_potr: 0,
+        //       trains_amount: lineInfo[key].train_count,
+        //       trains_need: 0,
+        //       len: lineInfo[key].len,
+        //       v_prop: lineInfo[key].v_prop,
+        //       t_prost: lineInfo[key].t_prost,
+        //       t_move_prost: lineInfo[key].t_move_prost,
+        //       bak: {
+        //         trains_amount: lineInfo[key].b_train_count,
+        //         spd: lineInfo[key].b_v_uch,
+        //       },
+        //       editable: true,
+        //     });
+        //   }
+        // }
         i++;
       })
 
@@ -972,18 +975,16 @@ export default {
       let row = this.deleteStation(index)[0];
       this.$refs.modal.addElem(row);
 
-      // TODO снять выделение
       this.unselectStationGrid();
     },
 
     // Добавление станции
     addStation(row) {
-      console.log(row);
       this.stationsSource.localdata.push(row);
       this.stationsSort();
       this.refreshStationsGrid();
 
-      this.$refs.stationGrid ? this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex()) : null;
+      // this.$refs.stationGrid ? this.$refs.stationGrid.unselectrow(this.$refs.stationGrid.getselectedrowindex()) : null;
 
       if (this.stationsSource.localdata.length > 1) {
         this.makeLinesListDisableFlag = false;
@@ -1093,6 +1094,10 @@ export default {
       ],
       localdata: []
     };
+
+    this.linesSource = {
+      localdata: []
+    }
 
     this.selectedStationsSource = {
       datafields: [

@@ -168,13 +168,16 @@ export default {
       this.$refs.mainWin.hide();
     },
 
+    unselectGrid() {
+      let t = this;
+      setTimeout( function () {
+        t.$refs.stationGrid.clearselection();
+      }, 1 )
+    },
 
     onRowselect(e) {
       this.delElem(e.args);
-
-      // TODO убрать выделение
-      this.$refs.stationGrid.clearselection();
-
+      this.unselectGrid();
     },
 
     // Сортировка станций по имени по возрастанию
