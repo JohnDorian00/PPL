@@ -33,7 +33,7 @@
           </div>
 
           <div
-            style="display: inline-block; width: calc(100% - 200px - 10px); height: 100%; position: relative; float: right; ">
+              style="display: inline-block; width: calc(100% - 200px - 10px); height: 100%; position: relative; float: right; ">
             <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
                      :width="'100%'"
                      :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
@@ -112,12 +112,7 @@ export default {
       isLoaded: true,
       button_height: 30,
       listBoxSource: [0, 1, 2, 3, 4, 5, 6],
-      dragArea: {
-        left: 0,
-        top: 32,
-        width: document.documentElement.clientWidth,
-        height: document.documentElement.clientHeight - 75
-      },
+
       elementSize: {
         mainContent: {width: 690, height: 659},
         rowsHeightHeader: {leftPanel: 35, mainContent: 645}
@@ -170,9 +165,9 @@ export default {
 
     unselectGrid() {
       let t = this;
-      setTimeout( function () {
+      setTimeout(function () {
         t.$refs.stationGrid.clearselection();
-      }, 1 )
+      }, 1)
     },
 
     onRowselect(e) {
@@ -184,7 +179,7 @@ export default {
     stationsSort() {
       this.stationsSource.localdata.sort(function (a, b) {
         let nameA = a.name,
-          nameB = b.name;
+            nameB = b.name;
 
         if (nameA > nameB)
           return 1

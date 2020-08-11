@@ -36,7 +36,7 @@
 
       <!--      Таблица-->
       <div
-        style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
+          style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
         <Preloader v-if="!isLoaded"></Preloader>
         <JqxGrid v-show="isLoaded" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
                  :source="dataAdapter" :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
@@ -183,17 +183,17 @@ export default {
       xmlQuery.setFilter("VAR_ID", this.GridSelector.var_id, "text");
 
       xmlQuery.query('json',
-        function () {
-          xmlQuery.destroy();
-          t.$root.$children[0].refreshAllMainWindows();
-          t.isLoaded = true;
-        },
-        function (ER) {
-          xmlQuery.destroy();
-          t.isLoaded = true;
-          console.log("Error update data");
-          console.log("ERROR = ", ER);
-        }
+          function () {
+            xmlQuery.destroy();
+            t.$root.$children[0].refreshAllMainWindows();
+            t.isLoaded = true;
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            t.isLoaded = true;
+            console.log("Error update data");
+            console.log("ERROR = ", ER);
+          }
       );
     },
 

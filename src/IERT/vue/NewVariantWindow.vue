@@ -33,7 +33,7 @@
 
       <!--      Верхняя часть окна-->
       <div
-        style="border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;  background-color: rgba(255,0,0,0); width: 100%;">
+          style="border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;  background-color: rgba(255,0,0,0); width: 100%;">
         <div style="text-align: center; margin: 10px">Название нового варианта расчета &nbsp;&nbsp;
           <JqxInput :theme="theme" :minLength="1" v-model="nameGS"
                     :placeHolder="''">
@@ -195,22 +195,22 @@ export default {
 
       xmlQuery.query('json',
 
-        function (json) {
-          t.listBoxSourceGenscheme = {};
-          json.rows.filter(function (item) {
-            t.listBoxSourceGenscheme[item.var_id] = item.name;
-          })
-          t.$refs.listBox.source = t.listBoxSourceGenscheme;
-          xmlQuery.destroy();
-          t.isLoaded = true;
-        },
+          function (json) {
+            t.listBoxSourceGenscheme = {};
+            json.rows.filter(function (item) {
+              t.listBoxSourceGenscheme[item.var_id] = item.name;
+            })
+            t.$refs.listBox.source = t.listBoxSourceGenscheme;
+            xmlQuery.destroy();
+            t.isLoaded = true;
+          },
 
-        function (ER) {
-          xmlQuery.destroy();
-          t.isLoaded = true;
-          console.log("Error update data");
-          console.log(ER);
-        }
+          function (ER) {
+            xmlQuery.destroy();
+            t.isLoaded = true;
+            console.log("Error update data");
+            console.log(ER);
+          }
       )
     },
 
@@ -249,18 +249,18 @@ export default {
       xmlQuery.setFilter("GS_DESC", this.descGS, "text");
 
       xmlQuery.query('json',
-        function (json) {
-          t.idNewVariant = json.rows[0].var_id;
-          xmlQuery.destroy();
-          t.$root.$children[0].refreshAllMainWindows();
-          t.isLoaded = true;
-        },
-        function (ER) {
-          xmlQuery.destroy();
-          t.isLoaded = true;
-          console.log("Error update data");
-          console.log("ERROR = ", ER);
-        }
+          function (json) {
+            t.idNewVariant = json.rows[0].var_id;
+            xmlQuery.destroy();
+            t.$root.$children[0].refreshAllMainWindows();
+            t.isLoaded = true;
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            t.isLoaded = true;
+            console.log("Error update data");
+            console.log("ERROR = ", ER);
+          }
       );
     },
 

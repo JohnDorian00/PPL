@@ -1,6 +1,6 @@
 <template>
   <div
-    v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%',
+      v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%',
      'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
     <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}">
       <ul>
@@ -145,59 +145,59 @@ export default {
       xmlQuery.setFilter("YEAR", 0, "text");
 
       xmlQuery.query('json',
-        function (json) {
-          // t.stations = json.rows;
+          function (json) {
+            // t.stations = json.rows;
 
-          let openRequest = t.connectDB();
-          // Загрузка станций в IndexedDB
-          openRequest.onsuccess = function () {
-            let db = openRequest.result;
-            // продолжить работу с базой данных, используя объект db
-            db.onversionchange = function () {
-              db.close();
-              alert("База данных устарела, пожалуста, перезагрузите страницу.")
-            };
-            let transaction = db.transaction("stations", "readwrite");
-            let stations = transaction.objectStore("stations");
-            stations.clear();
+            let openRequest = t.connectDB();
+            // Загрузка станций в IndexedDB
+            openRequest.onsuccess = function () {
+              let db = openRequest.result;
+              // продолжить работу с базой данных, используя объект db
+              db.onversionchange = function () {
+                db.close();
+                alert("База данных устарела, пожалуста, перезагрузите страницу.")
+              };
+              let transaction = db.transaction("stations", "readwrite");
+              let stations = transaction.objectStore("stations");
+              stations.clear();
 
-            let obj;
+              let obj;
 
-            for (let i = 0; i < json.rows.length; i++) {
-              obj = {
-                dor_kod: json.rows[i].dor_kod,
-                esr: json.rows[i].esr,
-                mnem: json.rows[i].mnem,
-                name: json.rows[i].name,
-                sname: json.rows[i].sname,
-                stan_id: json.rows[i].stan_id,
+              for (let i = 0; i < json.rows.length; i++) {
+                obj = {
+                  dor_kod: json.rows[i].dor_kod,
+                  esr: json.rows[i].esr,
+                  mnem: json.rows[i].mnem,
+                  name: json.rows[i].name,
+                  sname: json.rows[i].sname,
+                  stan_id: json.rows[i].stan_id,
+                }
+                stations.put(obj);
               }
-              stations.put(obj);
-            }
-            transaction.oncomplete = function () {
-              console.log("Станции обновлены");
-            };
-            transaction.onerror = function () {
-              if (event.target.error.name === "ConstraintError") {
-                console.log("Станция с таким id уже существует, ", obj); // обрабатываем ошибку
-                event.preventDefault(); // предотвращаем отмену транзакции
-                event.stopPropagation(); // предотвращаем всплытие ошибки
-              } else {
-                // транзакция будет отменена
-                // обработать ошибку в transaction.onabort
-                console.log("Ошибка обновления станций, ", event.target);
+              transaction.oncomplete = function () {
+                console.log("Станции обновлены");
+              };
+              transaction.onerror = function () {
+                if (event.target.error.name === "ConstraintError") {
+                  console.log("Станция с таким id уже существует, ", obj); // обрабатываем ошибку
+                  event.preventDefault(); // предотвращаем отмену транзакции
+                  event.stopPropagation(); // предотвращаем всплытие ошибки
+                } else {
+                  // транзакция будет отменена
+                  // обработать ошибку в transaction.onabort
+                  console.log("Ошибка обновления станций, ", event.target);
+                }
               }
-            }
-          };
+            };
 
-          t.isLoaded = true;
-          xmlQuery.destroy();
-        },
-        function (ER) {
-          xmlQuery.destroy();
-          console.log("Error update data");
-          console.log(ER);
-        }
+            t.isLoaded = true;
+            xmlQuery.destroy();
+          },
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error update data");
+            console.log(ER);
+          }
       )
     },
 
@@ -224,10 +224,10 @@ export default {
     createWindowEditVariant(id, row) {
       if (row !== -1) {
         this.addListWindow(
-          {
-            type: 'EditVariantWindow', title: "Работа с вариантом " + row.var_name + ", " +
-              row.var_year + " г.", row: row,
-          });
+            {
+              type: 'EditVariantWindow', title: "Работа с вариантом " + row.var_name + ", " +
+                  row.var_year + " г.", row: row,
+            });
       } else {
         console.log("Не выбран пункт в таблице, ошибка изменения варианта");
       }
@@ -282,7 +282,7 @@ export default {
       this.windows.push(option);
       this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
         tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
-          .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
+            .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
       });
       // this.windows[0].type = "WorkVariant";
     }

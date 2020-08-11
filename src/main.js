@@ -12,8 +12,8 @@ Vue.component("columns", Columns);
 Vue.component("rows", Rows);
 
 new Vue({
-  el: "#app",
-  render: function (render) {
-    return render(App);
-  }
+    el: "#app",
+    render: function (render) {
+        return render(App);
+    }
 })
