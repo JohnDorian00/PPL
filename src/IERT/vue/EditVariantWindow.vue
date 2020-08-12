@@ -159,6 +159,7 @@
                                  ref="selectedGrid"
                                  :height="'100%'"
                                  :width="'100%'" @rowBeginEdit="rowEdit($event)" @rowEndEdit="rowEndEdit($event)"
+                                 @rowClick="onSelectGridClick($event)"  @rowDoubleClick="onSelectGridDClick($event)"
                                  :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false"
                                  :autoheight="false"
                                  :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
@@ -227,7 +228,6 @@
     <div>
       <AddStation ref="modal" :parentWindow="this" :title="'Добавление путей по станциям'"
                   :locStations="locStations" :id="id" @station-deleted="addStation">
-
       </AddStation>
     </div>
 
@@ -345,6 +345,27 @@ export default {
   },
 
   methods: {
+    onSelectGridDClick(e) {
+      let row = e.args.row;
+
+      console.log(row);
+      if (row.level === 0) {
+        this.selectedStationsSource.localdata.splice(row.uid, 1);
+        this.refreshSelectedLinesGrid();
+      }
+    },
+
+    onSelectGridClick(e) {
+      let row = e.args.row, t = this;
+
+      if (!row.expanded) {
+        this.$refs.selectedGrid.expandRow(e.args.key);
+      }
+      else {
+        this.$refs.selectedGrid.collapseRow(e.args.key);
+      }
+    },
+
     test() {
       this.isLoco = !this.isLoco;
       // this.$refs.selectedGrid.render();
@@ -419,9 +440,8 @@ export default {
     // Конец редактирования строки
     rowEndEdit(e) {
       let row = e.args.row;
-      console.log(row);
 
-      if (row.editable) {
+      if (row && row.editable) {
         row.tech_spd = Math.round(row.line_spd / row.v_prop * 1000) * 0.001;
 
         // TODO считывание 0E-20
@@ -432,7 +452,7 @@ export default {
 
     // disable non-editable rows
     rowEdit(e) {
-      if (!e.args.row.editable) {
+      if (e.args.row && !e.args.row.editable) {
         this.$refs.selectedGrid.endRowEdit(0, true);
       }
     },
@@ -1019,6 +1039,8 @@ export default {
         stationObj = {
           line_name: lineCode.line.start_name + " - " + lineCode.line.end_name,
           root: true,
+          line: lineCode.line,
+          uch_id: lineCode.uch_id,
           editable: false,
           children: secondChildrens,
         }
@@ -1030,7 +1052,7 @@ export default {
       })
       t.refreshSelectedLinesGrid();
 
-      // По локомотивам
+      // TODO По локомотивам
 
 
       t.isLoaded = true;
@@ -1075,7 +1097,6 @@ export default {
 
             t.selectedStationsSource.localdata = [];
             t.calcUchs(t.stationsList);
-            t.isLoaded = true;
             xmlQuery.destroy();
           },
           function (ER) {
