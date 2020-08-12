@@ -817,6 +817,10 @@ export default {
                     linesArr = [],
                     locoArr = [];
 
+                stationsList.forEach(function (item) {
+                  linesSet.add(item);
+                })
+
                 json.rows.forEach(function (item, i, arr) {
                   linesSet.add(item.uch_id);
                   locoSet.add(item.kod_gr);
@@ -829,7 +833,7 @@ export default {
 
                 });
 
-                linesCodesTR.oncomplete = function (){
+                linesCodesTR.oncomplete = function () {
 
                   let linesTR = db.transaction("lines", "readonly"),
                       lines = linesTR.objectStore("lines");
@@ -864,10 +868,24 @@ export default {
                       // t.linesSource.localdata.splice(index, 1);
                       // t.unselectLinesGrid();
                       // t.refreshLinesGrid();
+
+                      // Включение грида с участками
+                      if (t.$refs.myTabs.selectedItem === 0 || t.$refs.myTabs.selectedItem === "0") {
+                        t.$refs.linesGrid.disabled = false;
+                      }
                     }
+                    locoCodesTR.onerror = function () {
+                      console.log(event.target);
+                    }
+                  }
+                  linesTR.onerror = function () {
+                    console.log(event.target);
                   }
                 }
 
+                linesCodesTR.onerror = function () {
+                  console.log(event.target);
+                }
 
 
                 // // Удаление строчки из левого грида
@@ -931,12 +949,6 @@ export default {
                 //   }
               }
             }
-
-            // Включение грида с участками
-            if (t.$refs.myTabs.selectedItem === 0 || t.$refs.myTabs.selectedItem === "0") {
-              t.$refs.linesGrid.disabled = false;
-            }
-
             xmlQuery.destroy();
           },
           function (ER) {
@@ -960,62 +972,69 @@ export default {
     addToSelectedGrid(lines, lineInfo, locos) {
       let t = this;
 
-      console.log(lines, lineInfo, locos);
+      console.log(lines);
+      console.log(lineInfo);
+      console.log(locos);
+
+      let stationObj,
+          locoObjs = [];
+
 
       // По участкам
-      lines.forEach(function (lineCode){
+      lines.forEach(function (lineCode) {
+        stationObj = {};
+        let secondChildrens = [],
+            thirdChildrens = [];
+
+        // Set loco_name of 1 elem
+        let lokoNameSet = new Set();
+        lineInfo.filter((item) => {
+          if (item.uch_id === lineCode.uch_id) {
+            // console.log("added to loco set ", item.loko_name);
+            lokoNameSet.add(item.loko_name);
+          }
+        })
+
+        secondChildrens = [];
+        lokoNameSet.forEach(function (locoName) {
+          thirdChildrens = [];
+          lineInfo.filter((item) => {
+            if (item.uch_id === lineCode.uch_id && item.loko_name === locoName) {
+              thirdChildrens.push({
+                line_name: item.kat_id_name,
+                tech_spd: 0,
+                line_spd: item.v_uch,
+                koef_potr: 0,
+                trains_amount: item.train_count,
+                trains_need: 0,
+                lineInfo: item,
+                editable: true
+              })
+            }
+          })
+          secondChildrens.push({line_name: locoName, editable: false, children: thirdChildrens});
+        })
+
+
+        stationObj = {
+          line_name: lineCode.line.start_name + " - " + lineCode.line.end_name,
+          root: true,
+          editable: false,
+          children: secondChildrens,
+        }
+
+        console.log(stationObj);
+
+        t.selectedStationsSource.localdata.push(stationObj);
 
       })
+      t.refreshSelectedLinesGrid();
 
-      // // Добавление корня
-      // let obj = {
-      //   line_name: line.start_name + " - " + line.end_name,
-      //   children: [],
-      // }
-      //
-      // // Поиск уникальных имен локомотивов
-      // let lokoNameSet = new Set();
-      // lineInfo.filter((item) => {
-      //   lokoNameSet.add(item.loko_name);
-      // })
-      //
-      // // Добавление информации по участку
-      // let i = 0;
-      // lokoNameSet.forEach((item) => {
-      //   // Добавление локомотивов участка
-      //   obj.children.push({
-      //     line_name: item,
-      //     children: []
-      //   })
-      //
-      //   // Информация об участке
-      //   // for (let key in lineInfo) {
-      //   //   if (lineInfo[key].loko_name === item) {
-      //   //     obj.children[i].children.push({
-      //   //       line_name: lineInfo[key].kat_id,
-      //   //       tech_spd: lineInfo[key].v_uch,
-      //   //       line_spd: lineInfo[key].v_uch,
-      //   //       koef_potr: 0,
-      //   //       trains_amount: lineInfo[key].train_count,
-      //   //       trains_need: 0,
-      //   //       len: lineInfo[key].len,
-      //   //       v_prop: lineInfo[key].v_prop,
-      //   //       t_prost: lineInfo[key].t_prost,
-      //   //       t_move_prost: lineInfo[key].t_move_prost,
-      //   //       bak: {
-      //   //         trains_amount: lineInfo[key].b_train_count,
-      //   //         spd: lineInfo[key].b_v_uch,
-      //   //       },
-      //   //       editable: true,
-      //   //     });
-      //   //   }
-      //   // }
-      //   i++;
-      // })
-      //
-      // t.selectedStationsSource.localdata.push(obj);
-      // t.isLoaded = true;
-      // t.refreshSelectedLinesGrid();
+      // По локомотивам
+
+
+      t.isLoaded = true;
+
     },
 
     // Формирование списка участков по пути следования
