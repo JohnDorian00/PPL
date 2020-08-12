@@ -309,7 +309,16 @@ export default {
           }
         },
         {text: 'Потребность лок.', datafield: 'trains_need', editable: false},
+        {
+          text: 'Сброс', cellsAlign: 'center', width: 150, align: "center", columnType: 'none', editable: false, sortable: false, dataField: null,
+          cellsRenderer: (row, column, value) => {
 
+            if (this.$refs.selectedGrid.getRow(row).level === 2) {
+              return "<button data-row='" + row + "' class='viewButtons'>View</button><button style='display: none; margin-left: 5px;' data-row='" + row + "' class='cancelButtons'>Cancel</button>";
+            }
+            // return "<div id='rowbutton"+ row +"' data-row='" + row + "' class='viewButtons'>View</div>";
+          }
+        }
       ],
 
       linesDataAdapter: new jqx.dataAdapter(this.linesSource),
@@ -1333,6 +1342,11 @@ export default {
     this.loadLocoCodes();
     this.loadLines();
     this.loadStationsFromIndexedDB();
+
+    this.selectedStationsSource.localdata.forEach(function (item) {
+      console.log(item);
+    })
+
   },
 }
 </script>
