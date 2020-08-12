@@ -310,13 +310,11 @@ export default {
         },
         {text: 'Потребность лок.', datafield: 'trains_need', editable: false},
         {
-          text: 'Сброс', cellsAlign: 'center', width: 150, align: "center", columnType: 'none', editable: false, sortable: false, dataField: null,
+          text: 'Сброс', cellsAlign: 'center', width: 150, align: "center", columnType: 'none', editable: false, sortable: false, dataField: null, disabled: false,
           cellsRenderer: (row, column, value) => {
-
-            if (this.$refs.selectedGrid.getRow(row).level === 2) {
-              return "<button data-row='" + row + "' class='viewButtons'>View</button><button style='display: none; margin-left: 5px;' data-row='" + row + "' class='cancelButtons'>Cancel</button>";
+            if (this.$refs.selectedGrid && this.$refs.selectedGrid.getRow(row).level === 2) {
+              return "<button id='rowButton"+row+"'>Сброс</button>";
             }
-            // return "<div id='rowbutton"+ row +"' data-row='" + row + "' class='viewButtons'>View</div>";
           }
         }
       ],
@@ -340,7 +338,7 @@ export default {
         saveOnSelectionChange: true,
         cancelOnEsc: true,
         saveOnEnter: true,
-        editOnDoubleClick: false,
+        editOnDoubleClick: true,
         editOnF2: false
       },
     }
@@ -378,7 +376,7 @@ export default {
       let row = e.args.row, t = this;
 
       if (row.level === 2){
-        this.$refs.selectedGrid.beginRowEdit(row.uid);
+        // this.$refs.selectedGrid.beginRowEdit(row.uid);
       }
       else {
         if (!row.expanded) {
@@ -392,6 +390,7 @@ export default {
 
     },
 
+    // Смена правого тригрид (участок/локомотив)
     test() {
       this.isLoco = !this.isLoco;
       // this.$refs.selectedGrid.render();
@@ -909,12 +908,6 @@ export default {
                     locoCodesTR.oncomplete = function () {
                       t.addToSelectedGrid(linesArr, json.rows, locoArr);
 
-                      // // Удаление строчки из левого грида
-                      // let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
-                      // t.linesSource.localdata.splice(index, 1);
-                      // t.unselectLinesGrid();
-                      // t.refreshLinesGrid();
-
                       // Включение грида с участками
                       if (t.$refs.myTabs.selectedItem === 0 || t.$refs.myTabs.selectedItem === "0") {
                         t.$refs.linesGrid.disabled = false;
@@ -1014,6 +1007,17 @@ export default {
       }
     },
 
+    deleteLine(uch_id) {
+      let t = this;
+      // Удаление строчки из левого грида
+      let index = t.linesSource.localdata.findIndex((item) => {
+        return item.uch_id === uch_id;
+      });
+      t.linesSource.localdata.splice(index, 1);
+      t.unselectLinesGrid();
+      t.refreshLinesGrid();
+    },
+
     // Добавление в правый грид
     addToSelectedGrid(lines, lineInfo, locos) {
       let t = this;
@@ -1071,9 +1075,9 @@ export default {
           children: secondChildrens,
         }
 
-        console.log(stationObj);
-
         t.selectedStationsSource.localdata.push(stationObj);
+
+        t.deleteLine(lineCode.uch_id);
 
       })
       t.refreshSelectedLinesGrid();
