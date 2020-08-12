@@ -203,10 +203,10 @@
 
             <li>
               <JqxButton ref="createWindowAddStation"
-                         :height="button_height" @click="linesSort"
+                         :height="button_height" @click="changeTreeGrid"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                          :theme="theme" :style="{'display': 'inline-block'} "
-              ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              ><span class="nobr">Смена грида&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </JqxButton>
             </li>
 
@@ -406,7 +406,7 @@ export default {
     },
 
     // Смена правого тригрид (участок/локомотив)
-    test() {
+    changeTreeGrid() {
       this.isLoco = !this.isLoco;
       // this.$refs.selectedGrid.render();
       console.log(this.isLoco);
@@ -453,6 +453,7 @@ export default {
 
     },
 
+    // Вычисление значений строки по формуле
     calcRow(row) {
       if (row && row.editable) {
         row.tech_spd = (Math.round(row.line_spd / row.lineInfo.v_prop * 1000) * 0.001).toFixed(1);
@@ -461,7 +462,6 @@ export default {
       }
       return row
     },
-
 
     // Конец редактирования строки
     rowEndEdit(e) {
@@ -517,7 +517,6 @@ export default {
               return -1
           }
         }
-
         return 0 // Никакой сортировки
       })
     },
@@ -877,7 +876,15 @@ export default {
                   let lineCodesR = linesCodes.get(item.kat_id);
 
                   lineCodesR.onsuccess = function () {
-                    item.kat_id_name = lineCodesR.result.sname_vid;
+                    try {
+                      item.kat_id_name = lineCodesR.result.sname_vid;
+                    } catch (e) {
+                      item.kat_id_name = NaN;
+                      console.log("Не найдена расшифровка кода дороги для ", item );
+                    }
+                  }
+                  lineCodesR.onerror = function () {
+                    console.log("Ошибка чтения lineCode", item);
                   }
 
                 });
@@ -972,6 +979,9 @@ export default {
       let index = t.linesSource.localdata.findIndex((item) => {
         return item.uch_id === uch_id;
       });
+
+      if (index === -1) return
+
       t.linesSource.localdata.splice(index, 1);
       t.unselectLinesGrid();
       t.refreshLinesGrid();
@@ -1100,7 +1110,6 @@ export default {
       let index = e.args.rowindex;
       let row = this.deleteStation(index)[0];
       this.$refs.modal.addElem(row);
-
       this.unselectStationGrid();
     },
 
@@ -1121,7 +1130,7 @@ export default {
     deleteStation(index) {
       let deletedRow = this.stationsSource.localdata.splice(index, 1);
       this.stationsSort();
-      this.refreshStationsGrid();
+      // this.refreshStationsGrid();
 
       if (this.stationsSource.localdata.length < 2) {
         this.makeLinesListDisableFlag = true;
@@ -1132,12 +1141,15 @@ export default {
 
     // Очистка списка станций
     clearStations() {
-      this.stationsSource.localdata = [];
-      this.refreshAllTables();
+      let t = this;
+      for (let i=this.stationsSource.localdata.length-1; i>=0; i--) {
+        let tmp = {args: {}};
+        tmp.args.rowindex = i;
+        t.deleteStationToModal(tmp);
+      }
+      t.refreshStationsGrid();
       this.makeLinesListDisableFlag = true;
 
-      // this.selectedStationsSource.localdata = [];
-      // this.$refs.selectedGrid.updatebounddata('cells');
     },
 
     appendSavedParams() {
@@ -1280,27 +1292,26 @@ export default {
             root: 'children'
           },
       localdata: [
-        {
-          "line_name": "Nancy1",
-          "tech_spd": "12",
-          "line_spd": "12",
-          "koef_potr": "0",
-          "trains_amount": "123",
-          "trains_need": "456",
-          "children": [
-            {
-              "test": "test",
-              "line_name": "Nancy2",
-              "tech_spd": "12",
-              "line_spd": "12",
-              "koef_potr": "0",
-              "trains_amount": "123",
-              "trains_need": "456",
-              "editable": true,
-            },
-          ]
-        },
-
+        // {
+        //   "line_name": "Nancy1",
+        //   "tech_spd": "12",
+        //   "line_spd": "12",
+        //   "koef_potr": "0",
+        //   "trains_amount": "123",
+        //   "trains_need": "456",
+        //   "children": [
+        //     {
+        //       "test": "test",
+        //       "line_name": "Nancy2",
+        //       "tech_spd": "12",
+        //       "line_spd": "12",
+        //       "koef_potr": "0",
+        //       "trains_amount": "123",
+        //       "trains_need": "456",
+        //       "editable": true,
+        //     },
+        //   ]
+        // },
       ]
     }
     this.gsVar = this.row.var_gs_var_id;
@@ -1315,11 +1326,6 @@ export default {
     this.loadLocoCodes();
     this.loadLines();
     this.loadStationsFromIndexedDB();
-
-    this.selectedStationsSource.localdata.forEach(function (item) {
-      console.log(item);
-    })
-
   },
 }
 </script>

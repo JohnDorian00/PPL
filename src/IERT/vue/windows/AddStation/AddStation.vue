@@ -21,19 +21,20 @@
         <!--        white-space:nowrap;-->
 
         <div style="height: calc(100% - 100px);">
-          <div style="display: inline-block; width: 200px; height: 100%; position: relative">
-            <JqxGrid style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
-                     :columnsmenu="false" :pageable="false" :autoheight="false"
-                     :columnsresize="true"
-                     :sortable="true" :altrows="true"
-                     :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"
-                     :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'"
-                     :showfilterrow="true">
-            </JqxGrid>
-          </div>
+
+<!--          <div style="display: inline-block; width: 200px; height: 100%; position: relative">-->
+<!--            <JqxGrid style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"-->
+<!--                     :columnsmenu="false" :pageable="false" :autoheight="false"-->
+<!--                     :columnsresize="true"-->
+<!--                     :sortable="true" :altrows="true"-->
+<!--                     :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"-->
+<!--                     :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'"-->
+<!--                     :showfilterrow="true">-->
+<!--            </JqxGrid>-->
+<!--          </div>-->
 
           <div
-              style="display: inline-block; width: calc(100% - 200px - 10px); height: 100%; position: relative; float: right; ">
+              style="display: inline-block; width: calc(100% - 200px - 10px + 210px); height: 100%; position: relative; float: right; ">
             <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
                      :width="'100%'"
                      :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
