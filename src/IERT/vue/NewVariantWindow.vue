@@ -7,8 +7,9 @@
              :min-height="274"
              :position="{ x: 100, y: 100 }"
              :id="id"
+             @close="closeWindows"
              :theme="theme"
-             :closeButtonSize="0">
+             :ref="'win'">
 
     <!--    Верхний бар-->
     <div ref="header" style="position: relative;">
@@ -16,15 +17,16 @@
       <div style="display: inline; position: absolute; top:0; right: 0;
                   margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
       >
-        <div class="collapse-button">
-          <img class="collapse-button" src="@/style/images/minus.png">
-        </div>
-        <div class="expand-button">
-          <img class="expand-button" src="@/style/images/full-screen.png">
-        </div>
-        <div id="exit-button" class="close-button" @click="closeWindows">
-          <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">
-        </div>
+        <!--        <div class="collapse-button">-->
+        <!--          <img class="collapse-button" src="@/style/images/minus.png">-->
+        <!--        </div>-->
+        <!--        <div class="expand-button">-->
+        <!--          <img class="expand-button" src="@/style/images/full-screen.png">-->
+        <!--        </div>-->
+        <!--        <div id="exit-button" class="close-button" @click="closeWindows">-->
+        <!--          <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">-->
+        <!--        </div>-->
+
       </div>
     </div>
 

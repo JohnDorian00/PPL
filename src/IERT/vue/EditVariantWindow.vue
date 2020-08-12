@@ -10,25 +10,27 @@
                  :position="{ x: 150, y: 150 }"
                  :id="id"
                  :theme="theme"
-                 :closeButtonSize="0"
+                 @close="closeWindows"
                  :keyboard-close-key="NaN"
+                 :ref="'win'"
       >
 
         <!--    Верхний бар-->
         <div ref="header" style="position: relative;">
-          <div style="display: inline;">{{ title }} ///</div>
+          <div style="display: inline;">{{ title }}</div>
           <div style="display: inline; position: absolute; top:0; right: 0;
                   margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
           >
-            <div class="collapse-button">
-              <img class="collapse-button" src="@/style/images/minus.png">
-            </div>
-            <div class="expand-button">
-              <img class="expand-button" src="@/style/images/full-screen.png">
-            </div>
-            <div id="exit-button" class="close-button" @click="closeWindows">
-              <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">
-            </div>
+            <!--            <div class="collapse-button">-->
+            <!--              <img class="collapse-button" src="@/style/images/minus.png">-->
+            <!--            </div>-->
+            <!--            <div class="expand-button">-->
+            <!--              <img class="expand-button" src="@/style/images/full-screen.png">-->
+            <!--            </div>-->
+            <!--            <div id="exit-button" class="close-button" @click="closeWindows">-->
+            <!--              <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">-->
+            <!--            </div>-->
+
           </div>
         </div>
 
@@ -165,7 +167,7 @@
                                  :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
                                  :enabletooltip="true" :columnsautoresize="false" :editable="true"
                                  :selectionMode="'custom'" :source="selectedStationsSource" :editSettings="editSettings"
-                                 :theme="theme" :filterable="false" :filterMode="'advanced'" :sortmode="'columns'"
+                                 :theme="theme" :filterable="true" :filterMode="'advanced'" :sortmode="'columns'"
                     >
                     </jqxTreeGrid>
 
@@ -361,6 +363,14 @@ export default {
     }
   },
 
+  computed: {
+    // геттер вычисляемого значения
+    disableMakeList: function () {
+      console.log(!(!this.makeLinesListDisableFlag && this.isLinesLoaded));
+      return !(!this.makeLinesListDisableFlag && this.isLinesLoaded)
+    }
+  },
+
   // Слушатели переменных
   watch: {
     // Отключение кнопки рефреш во время подгрузки
@@ -372,8 +382,8 @@ export default {
       this.refreshLinesGrid();
     },
 
-    makeLinesListDisableFlag: function () {
-      this.$refs.buttonMakeLines.disabled = this.makeLinesListDisableFlag;
+    disableMakeList: function () {
+      this.$refs.buttonMakeLines.disabled = this.disableMakeList;
     },
 
   },
@@ -848,7 +858,7 @@ export default {
       xmlQuery.query('json',
           function (json) {
 
-            console.log(json.rows);
+            // console.log(json.rows);
 
             let r = t.$parent.connectDB();
 
@@ -880,7 +890,7 @@ export default {
                       item.kat_id_name = lineCodesR.result.sname_vid;
                     } catch (e) {
                       item.kat_id_name = NaN;
-                      console.log("Не найдена расшифровка кода дороги для ", item );
+                      console.log("Не найдена расшифровка кода дороги для ", item);
                     }
                   }
                   lineCodesR.onerror = function () {
@@ -991,9 +1001,9 @@ export default {
     addToSelectedGrid(lines, lineInfo, locos) {
       let t = this;
 
-      // console.log(lines);
-      // console.log(lineInfo);
-      // console.log(locos);
+      console.log(lines);
+      console.log(lineInfo);
+      console.log(locos);
 
       let stationObj,
           locoObjs = [];
@@ -1130,7 +1140,7 @@ export default {
     deleteStation(index) {
       let deletedRow = this.stationsSource.localdata.splice(index, 1);
       this.stationsSort();
-      // this.refreshStationsGrid();
+      this.refreshStationsGrid();
 
       if (this.stationsSource.localdata.length < 2) {
         this.makeLinesListDisableFlag = true;
@@ -1142,7 +1152,7 @@ export default {
     // Очистка списка станций
     clearStations() {
       let t = this;
-      for (let i=this.stationsSource.localdata.length-1; i>=0; i--) {
+      for (let i = this.stationsSource.localdata.length - 1; i >= 0; i--) {
         let tmp = {args: {}};
         tmp.args.rowindex = i;
         t.deleteStationToModal(tmp);
@@ -1327,6 +1337,11 @@ export default {
     this.loadLines();
     this.loadStationsFromIndexedDB();
   },
+
+  beforeDestroy() {
+    this.$refs.win.destroy();
+    //todo destroy all elems
+  }
 }
 </script>
 

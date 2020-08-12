@@ -6,9 +6,10 @@
              :position="{ x: 50, y: 50 }"
              :id="id"
              :theme="theme"
-             :closeButtonSize="0"
              :sourceOut="sourceOut"
              :keyboard-close-key="NaN"
+             @close="closeWindows"
+             ref="win"
   >
 
     <!--    Верхний бар-->
@@ -17,15 +18,16 @@
       <div style="display: inline; position: absolute; top:0; right: 0;
                   margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;"
       >
-        <div class="collapse-button">
-          <img class="collapse-button" src="@/style/images/minus.png">
-        </div>
-        <div class="expand-button">
-          <img class="expand-button" src="@/style/images/full-screen.png">
-        </div>
-        <div id="exit-button" class="close-button">
-          <img class="close-button" src="@/style/images/closing.png">
-        </div>
+        <!--        <div class="collapse-button">-->
+        <!--          <img class="collapse-button" src="@/style/images/minus.png">-->
+        <!--        </div>-->
+        <!--        <div class="expand-button">-->
+        <!--          <img class="expand-button" src="@/style/images/full-screen.png">-->
+        <!--        </div>-->
+        <!--        <div id="exit-button" class="close-button">-->
+        <!--          <img class="close-button" src="@/style/images/closing.png">-->
+        <!--        </div>-->
+
       </div>
     </div>
     <!--      Контент-->
@@ -260,7 +262,6 @@ export default {
   mounted() {
     // FLEXBOX
     // this.$refs.Rows.updateHeight();
-
 
   },
 

@@ -253,11 +253,12 @@ export default {
 
     removeWindow(id) {
       console.log("Window with id = " + id + " closed");
-      this.findWindowInArr(id).close();
+      // this.findWindowInArr(id).close();
       this.$refs.TollBar.destroyTool(this.id[id]);
       this.windows.splice(this.id[id], 1)
       this.id = {};
       this.windows.forEach((value, index) => this.id[value.id] = index)
+      console.log(this.windows);
     },
 
     updateSizeApp: function () {
