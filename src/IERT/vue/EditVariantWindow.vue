@@ -164,7 +164,7 @@
                                  :autoheight="false"
                                  :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
                                  :enabletooltip="true" :columnsautoresize="false" :editable="true"
-                                 :selectionMode="'custom'" :source="selectedStationsSource"
+                                 :selectionMode="'custom'" :source="selectedStationsSource" :editSettings="editSettings"
                                  :theme="theme" :filterable="false" :filterMode="'advanced'" :sortmode="'columns'"
                     >
                     </jqxTreeGrid>
@@ -309,6 +309,7 @@ export default {
           }
         },
         {text: 'Потребность лок.', datafield: 'trains_need', editable: false},
+
       ],
 
       linesDataAdapter: new jqx.dataAdapter(this.linesSource),
@@ -324,6 +325,15 @@ export default {
       deletedLine: null,
       locStations: this.stations,
       isLoco: false,
+      editSettings: {
+        saveOnPageChange: true,
+        saveOnBlur: true,
+        saveOnSelectionChange: true,
+        cancelOnEsc: true,
+        saveOnEnter: true,
+        editOnDoubleClick: false,
+        editOnF2: false
+      },
     }
   },
 
@@ -358,12 +368,19 @@ export default {
     onSelectGridClick(e) {
       let row = e.args.row, t = this;
 
-      if (!row.expanded) {
-        this.$refs.selectedGrid.expandRow(e.args.key);
+      if (row.level === 2){
+        this.$refs.selectedGrid.beginRowEdit(row.uid);
       }
       else {
-        this.$refs.selectedGrid.collapseRow(e.args.key);
+        if (!row.expanded) {
+          this.$refs.selectedGrid.expandRow(e.args.key);
+        }
+        else {
+          this.$refs.selectedGrid.collapseRow(e.args.key);
+        }
       }
+
+
     },
 
     test() {
@@ -1207,6 +1224,35 @@ export default {
     onRowselect($event) {
       this.selectedRow = this.linesSource.localdata[$event.args.row.boundindex];
       this.selectLine($event.args.row);
+    },
+
+    rendered: function () {
+      let uglyEditButtons = jqwidgets.createInstance('.editButton', 'jqxButton', { width: 60, height: 24, value: 'Edit' });
+      let flattenEditButtons = flatten(uglyEditButtons);
+      let uglyCancelButtons = jqwidgets.createInstance('.cancelButton', 'jqxButton', { width: 60, height: 24, value: 'Cancel' });
+      let flattenCancelButtons = flatten(uglyCancelButtons);
+      function flatten(arr) {
+        if (arr.length) {
+          return arr.reduce((flat, toFlatten) => {
+            return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+          }, []);
+        }
+      }
+      if (flattenEditButtons) {
+        for (let i = 0; i < flattenEditButtons.length; i++) {
+          flattenEditButtons[i].addEventHandler('click', (event) => {
+            this.editClick(event);
+          });
+        }
+      }
+      if (flattenCancelButtons) {
+        for (let i = 0; i < flattenCancelButtons.length; i++) {
+          flattenCancelButtons[i].addEventHandler('click', (event) => {
+            let rowKey = event.target.getAttribute('data-row');
+            this.$refs.myTreeGrid.endRowEdit(rowKey, true);
+          });
+        }
+      }
     },
   },
 
