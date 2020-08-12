@@ -194,6 +194,15 @@
 
             <li>
               <JqxButton ref="createWindowAddStation"
+                         :height="button_height" @click="saveSelectedLines"
+                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                         :theme="theme" :style="{'display': 'inline-block'} "
+              ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              </JqxButton>
+            </li>
+
+            <li>
+              <JqxButton ref="createWindowAddStation"
                          :height="button_height" @click="test"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                          :theme="theme" :style="{'display': 'inline-block'} "
@@ -438,47 +447,24 @@ export default {
 
     // Сохранение изменений участков
     saveSelectedLines() {
-      console.log(this.$refs.linesGrid.isBindingCompleted());
-      console.log(this.$refs.stationGrid.isBindingCompleted());
-      // let t = this;
-      // // t.isLinesLoaded = false;
-      //
-      // // Сохранение участков
-      // let xmlQuery = new XmlQuery({
-      //   url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
-      //   querySet: "SAVE_UCH_DATA2"
-      // });
-      //
-      // xmlQuery.clearFilter();
-      // xmlQuery.setFilter("VAR_ID", this.row.var_id, "text");
-      // xmlQuery.setFilter("test", {"1":1, "2":"test"}, "object");
-      // console.log(xmlQuery.getFilter("test"));
-      //
-      // // xmlQuery.query('json',
-      // //   function (json) {
-      // //
-      // //     xmlQuery.destroy();
-      // //   },
-      // //
-      // //   function (ER) {
-      // //     xmlQuery.destroy();
-      // //     console.log("Error save data");
-      // //     console.log(ER);
-      // //   }
-      // // )
+      let t = this;
+
+      console.log(this.selectedStationsSource.localdata[0]);
+
+    },
+
+    calcRow(row) {
+      if (row && row.editable) {
+        row.tech_spd = (Math.round(row.line_spd / row.lineInfo.v_prop * 1000) * 0.001).toFixed(1);
+        row.koef_potr = (Math.round((row.lineInfo.t_prost  + row.lineInfo.len / row.line_spd) / 24 * 1000) * 0.001).toFixed(1);
+        row.trains_need = (Math.round(row.trains_amount * ((row.lineInfo.t_prost  + row.lineInfo.len / row.line_spd) / 24 )*1000) * 0.001).toFixed(1);
+      }
     },
 
     // Конец редактирования строки
     rowEndEdit(e) {
       let row = e.args.row;
-
-      if (row && row.editable) {
-        row.tech_spd = Math.round(row.line_spd / row.v_prop * 1000) * 0.001;
-
-        // TODO считывание 0E-20
-        // koef_potr = Math.round((t_prost  + len / v_uch) / 24 * 1000) * 0.001;
-        //portebnost` = Math.round(train_count * ((t_prost  + len / v_uch) / 24 )*1000) * 0.001;
-      }
+      this.calcRow(row);
     },
 
     // disable non-editable rows
@@ -852,6 +838,8 @@ export default {
 
       xmlQuery.query('json',
           function (json) {
+
+        console.log(json.rows);
 
             let r = t.$parent.connectDB();
 
