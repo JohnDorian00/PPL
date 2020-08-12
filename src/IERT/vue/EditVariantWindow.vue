@@ -159,7 +159,7 @@
                                  ref="selectedGrid"
                                  :height="'100%'"
                                  :width="'100%'" @rowBeginEdit="rowEdit($event)" @rowEndEdit="rowEndEdit($event)"
-                                 @rowClick="onSelectGridClick($event)"  @rowDoubleClick="onSelectGridDClick($event)"
+                                 @rowClick="onSelectGridClick($event)" @rowDoubleClick="onSelectGridDClick($event)"
                                  :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false"
                                  :autoheight="false"
                                  :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
@@ -310,10 +310,18 @@ export default {
         },
         {text: 'Потребность лок.', datafield: 'trains_need', editable: false},
         {
-          text: 'Сброс', cellsAlign: 'center', width: 150, align: "center", columnType: 'none', editable: false, sortable: false, dataField: null, disabled: false,
+          text: 'Сброс',
+          cellsAlign: 'center',
+          width: 150,
+          align: "center",
+          columnType: 'none',
+          editable: false,
+          sortable: false,
+          dataField: null,
+          disabled: false,
           cellsRenderer: (row, column, value) => {
             if (this.$refs.selectedGrid && this.$refs.selectedGrid.getRow(row).level === 2) {
-              return "<button id='rowButton"+row+"'>Сброс</button>";
+              return "<button id='rowButton" + row + "'>Сброс</button>";
             }
           }
         }
@@ -365,9 +373,9 @@ export default {
     onSelectGridDClick(e) {
       let row = e.args.row;
 
-      console.log(row);
       if (row.level === 0) {
-        this.selectedStationsSource.localdata.splice(row.uid, 1);
+        let deletedRow = this.selectedStationsSource.localdata.splice(row.uid, 1)[0];
+        this.addLine(deletedRow.line);
         this.refreshSelectedLinesGrid();
       }
     },
@@ -375,14 +383,12 @@ export default {
     onSelectGridClick(e) {
       let row = e.args.row, t = this;
 
-      if (row.level === 2){
+      if (row.level === 2) {
         // this.$refs.selectedGrid.beginRowEdit(row.uid);
-      }
-      else {
+      } else {
         if (!row.expanded) {
           this.$refs.selectedGrid.expandRow(e.args.key);
-        }
-        else {
+        } else {
           this.$refs.selectedGrid.collapseRow(e.args.key);
         }
       }
@@ -926,66 +932,13 @@ export default {
                   console.log(event.target);
                 }
 
-
-                // // Удаление строчки из левого грида
-                // let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
-                // t.linesSource.localdata.splice(index, 1);
-                // t.unselectLinesGrid();
-                // t.refreshLinesGrid();
-
-                //   let request = lines.get(json.rows[0].uch_id);
-                //
-                //   request.onsuccess = function () {
-                //
-                //     // Выделенный участок
-                //     let line = request.result;
-                //
-                //     if (!line) {
-                //       console.log("Отсутствует список участков в IndexedDB или запись не найдена");
-                //       return
-                //     }
-                //
-                //     //let linesCodes = db.transaction("linesCodes", "readonly").objectStore("linesCodes");
-                //
-                //     // Выделенная информация под участок
-                //     let linesInfo = [];
-                //     for (let key in json.rows) {
-                //       // console.log(json.rows[key].kod_gr);  kod_gr  kat_id
-                //       linesInfo.push(json.rows[key]);
-                //     }
-                //
-                //
-                //
-                //     // добавление участков в дерево правого грида
-                //     t.addToSelectedGrid(line, linesInfo);
-                //
-                //     //TODO добавление участков в дерево правого грида (по группам локомотивов)
-                //
-                //     // Удаление строчки из левого грида
-                //     let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
-                //     t.linesSource.localdata.splice(index, 1);
-                //     t.unselectLinesGrid();
-                //     t.refreshLinesGrid();
-                //   }
-                //   // Если нет привязки, то в правый грид добавляется только название участка
-                // } else {
-                //   for (let key in stationsList) {
-                //     let r = lines.get(stationsList[key]);
-                //
-                //     r.onsuccess = function () {
-                //       let line = r.result;
-                //       t.selectedStationsSource.localdata.push({
-                //         line_name: line.start_name + " - " + line.end_name,
-                //         children: [],
-                //       });
-                //
-                //       let index = t.linesSource.localdata.findIndex((item) => item.uch_id == line.uch_id);
-                //       console.log("Отсутствует привязка к участку", t.linesSource.localdata.splice(index, 1)[0]);
-                //       t.isLoaded = true;
-                //       t.refreshLinesGrid();
-                //       t.refreshSelectedLinesGrid();
-                //     }
-                //   }
+              } else {
+                console.log("Нет привязок к станции");
+                t.isLoaded = true;
+                // Включение грида с участками
+                if (t.$refs.myTabs.selectedItem === 0 || t.$refs.myTabs.selectedItem === "0") {
+                  t.$refs.linesGrid.disabled = false;
+                }
               }
             }
             xmlQuery.destroy();
@@ -1005,6 +958,14 @@ export default {
           t.$refs.linesGrid.clearselection();
         }, 1)
       }
+    },
+
+    addLine(line) {
+      let t = this;
+      t.linesSource.localdata.push(line);
+      t.linesSort();
+      t.unselectLinesGrid();
+      t.refreshLinesGrid();
     },
 
     deleteLine(uch_id) {
@@ -1240,10 +1201,19 @@ export default {
     },
 
     rendered: function () {
-      let uglyEditButtons = jqwidgets.createInstance('.editButton', 'jqxButton', { width: 60, height: 24, value: 'Edit' });
+      let uglyEditButtons = jqwidgets.createInstance('.editButton', 'jqxButton', {
+        width: 60,
+        height: 24,
+        value: 'Edit'
+      });
       let flattenEditButtons = flatten(uglyEditButtons);
-      let uglyCancelButtons = jqwidgets.createInstance('.cancelButton', 'jqxButton', { width: 60, height: 24, value: 'Cancel' });
+      let uglyCancelButtons = jqwidgets.createInstance('.cancelButton', 'jqxButton', {
+        width: 60,
+        height: 24,
+        value: 'Cancel'
+      });
       let flattenCancelButtons = flatten(uglyCancelButtons);
+
       function flatten(arr) {
         if (arr.length) {
           return arr.reduce((flat, toFlatten) => {
@@ -1251,6 +1221,7 @@ export default {
           }, []);
         }
       }
+
       if (flattenEditButtons) {
         for (let i = 0; i < flattenEditButtons.length; i++) {
           flattenEditButtons[i].addEventHandler('click', (event) => {
