@@ -203,7 +203,7 @@
 
             <li>
               <JqxButton ref="createWindowAddStation"
-                         :height="button_height" @click="test"
+                         :height="button_height" @click="linesSort"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                          :theme="theme" :style="{'display': 'inline-block'} "
               ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -456,10 +456,12 @@ export default {
     calcRow(row) {
       if (row && row.editable) {
         row.tech_spd = (Math.round(row.line_spd / row.lineInfo.v_prop * 1000) * 0.001).toFixed(1);
-        row.koef_potr = (Math.round((row.lineInfo.t_prost  + row.lineInfo.len / row.line_spd) / 24 * 1000) * 0.001).toFixed(1);
-        row.trains_need = (Math.round(row.trains_amount * ((row.lineInfo.t_prost  + row.lineInfo.len / row.line_spd) / 24 )*1000) * 0.001).toFixed(1);
+        row.koef_potr = (Math.round((row.lineInfo.t_prost + row.lineInfo.len / row.line_spd) / 24 * 1000) * 0.001).toFixed(3);
+        row.trains_need = (Math.round(row.trains_amount * ((row.lineInfo.t_prost + row.lineInfo.len / row.line_spd) / 24) * 1000) * 0.001).toFixed(3);
       }
+      return row
     },
+
 
     // Конец редактирования строки
     rowEndEdit(e) {
@@ -494,6 +496,8 @@ export default {
       this.linesSource.localdata.sort(function (a, b) {
         let nameA = a.start_name,
             nameB = b.start_name,
+            endNameA = a.end_name,
+            endNameB = b.end_name,
             existInCDLA = a.exist_in_cdl,
             existInCDLB = b.exist_in_cdl;
 
@@ -506,6 +510,12 @@ export default {
             return 1
           if (nameA < nameB) //сортируем строки по возрастанию
             return -1
+          if (nameA === nameB) {
+            if (endNameA > endNameB)
+              return 1
+            if (endNameA < endNameB)
+              return -1
+          }
         }
 
         return 0 // Никакой сортировки
@@ -839,7 +849,7 @@ export default {
       xmlQuery.query('json',
           function (json) {
 
-        console.log(json.rows);
+            console.log(json.rows);
 
             let r = t.$parent.connectDB();
 
@@ -971,9 +981,9 @@ export default {
     addToSelectedGrid(lines, lineInfo, locos) {
       let t = this;
 
-      console.log(lines);
-      console.log(lineInfo);
-      console.log(locos);
+      // console.log(lines);
+      // console.log(lineInfo);
+      // console.log(locos);
 
       let stationObj,
           locoObjs = [];
@@ -999,7 +1009,7 @@ export default {
           thirdChildrens = [];
           lineInfo.filter((item) => {
             if (item.uch_id === lineCode.uch_id && item.loko_name === locoName) {
-              thirdChildrens.push({
+              thirdChildrens.push(t.calcRow({
                 line_name: item.kat_id_name,
                 tech_spd: 0,
                 line_spd: item.v_uch,
@@ -1008,7 +1018,7 @@ export default {
                 trains_need: 0,
                 lineInfo: item,
                 editable: true
-              })
+              }))
             }
           })
           secondChildrens.push({line_name: locoName, editable: false, children: thirdChildrens});
