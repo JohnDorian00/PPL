@@ -73,7 +73,7 @@
                                  :enabletooltip="true" :columnsautoresize="false" :editable="false"
                                  :selectionmode="'singlerow'" :source="linesSource"
                                  :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
-                                 @rowselect="onRowselect"
+                                 @rowdoubleclick="onRowselect($event)"
                         >
 
                         </JqxGrid>
@@ -128,7 +128,7 @@
                           <div style="display : block; width: 100%">
                             <JqxButton @click="makeLinesList" ref="buttonMakeLines" :height="button_height+'px'"
                                        :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                       :theme="theme" style="margin-left: 5px;" :disabled="true"
+                                       :theme="theme" style="margin-left: 5px;" :disabled="false"
                             ><span
                                 class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                             </JqxButton>
@@ -163,7 +163,7 @@
                                  :width="'100%'" @rowBeginEdit="rowEdit($event)" @rowEndEdit="rowEndEdit($event)"
                                  @rowClick="onSelectGridClick($event)" @rowDoubleClick="onSelectGridDClick($event)"
                                  :columnsmenu="false" :columns="selectedStationsColumns" :pageable="false"
-                                 :autoheight="false"
+                                 :autoheight="false" :rendered="rendered"
                                  :sortable="true" :altRows="true" :columnsResize="true" :showfilterrow="true"
                                  :enabletooltip="true" :columnsautoresize="false" :editable="true"
                                  :selectionMode="'custom'" :source="selectedStationsSource" :editSettings="editSettings"
@@ -183,6 +183,7 @@
                                  :theme="theme" :filterable="false" :filterMode="'default'" :sortmode="'columns'"
                     >
                     </jqxTreeGrid>
+
                   </div>
                 </JqxExpander>
               </div>
@@ -332,9 +333,9 @@ export default {
           disabled: false,
           cellsRenderer: (row, column, value) => {
             if (this.$refs.selectedGrid && this.$refs.selectedGrid.getRow(row).level === 2) {
-              return "<button id='rowButton" + row + "'>Сброс</button>";
+              return "<div style='display: inline-block; margin: 0 auto;' data-row='" + row + "' class='resetButton'></div>";
             }
-          }
+          },
         }
       ],
 
@@ -345,6 +346,7 @@ export default {
       panels: [{size: '50%', min: 327, collapsible: false}, {min: 226, size: '50%', collapsible: false}],
       gsVar: null,
       selectedRow: null,
+      selectedTreeGridRow: null,
       stationsList: [],
       deletedStationsStack: [],
       makeLinesListDisableFlag: true,
@@ -363,11 +365,12 @@ export default {
     }
   },
 
+  // Вычисляемые переменные
   computed: {
     // геттер вычисляемого значения
     disableMakeList: function () {
-      console.log(!(!this.makeLinesListDisableFlag && this.isLinesLoaded));
-      return !(!this.makeLinesListDisableFlag && this.isLinesLoaded)
+      // console.log(!(!this.makeLinesListDisableFlag && this.isLinesLoaded));
+      // return !(!this.makeLinesListDisableFlag && this.isLinesLoaded)
     }
   },
 
@@ -384,11 +387,20 @@ export default {
 
     disableMakeList: function () {
       this.$refs.buttonMakeLines.disabled = this.disableMakeList;
+      this.$refs.buttonMakeLines.disabled = false;
     },
 
   },
 
   methods: {
+    resetRow(e) {
+      let row = this.selectedTreeGridRow;
+      row.line_spd = row.lineInfo.b_v_uch;
+      row.trains_amount = row.lineInfo.b_train_count;
+      this.calcRow(row);
+      if (this.$refs.selectedGrid) this.$refs.selectedGrid.updateRow(row.uid, row);
+    },
+
     onSelectGridDClick(e) {
       let row = e.args.row;
 
@@ -401,6 +413,8 @@ export default {
 
     onSelectGridClick(e) {
       let row = e.args.row, t = this;
+
+      this.selectedTreeGridRow = row;
 
       if (row.level === 2) {
         // this.$refs.selectedGrid.beginRowEdit(row.uid);
@@ -476,6 +490,7 @@ export default {
     // Конец редактирования строки
     rowEndEdit(e) {
       let row = e.args.row;
+      console.log(row);
       this.calcRow(row);
     },
 
@@ -554,6 +569,7 @@ export default {
 
     refreshSelectedLinesGrid() {
       if (this.$refs.selectedGrid) {
+        this.$refs.selectedGrid.save
         this.$refs.selectedGrid.updateBoundData("cells");
       }
     },
@@ -1001,9 +1017,9 @@ export default {
     addToSelectedGrid(lines, lineInfo, locos) {
       let t = this;
 
-      console.log(lines);
-      console.log(lineInfo);
-      console.log(locos);
+      // console.log(lines);
+      // console.log(lineInfo);
+      // console.log(locos);
 
       let stationObj,
           locoObjs = [];
@@ -1216,23 +1232,30 @@ export default {
     },
 
     onRowselect($event) {
+      // console.log($event);
       this.selectedRow = this.linesSource.localdata[$event.args.row.boundindex];
-      this.selectLine($event.args.row);
+      this.selectLine($event.args.row.bounddata);
     },
 
     rendered: function () {
-      let uglyEditButtons = jqwidgets.createInstance('.editButton', 'jqxButton', {
-        width: 60,
-        height: 24,
-        value: 'Edit'
-      });
-      let flattenEditButtons = flatten(uglyEditButtons);
-      let uglyCancelButtons = jqwidgets.createInstance('.cancelButton', 'jqxButton', {
-        width: 60,
-        height: 24,
-        value: 'Cancel'
-      });
-      let flattenCancelButtons = flatten(uglyCancelButtons);
+      if ($(".resetButton").length > 0) {
+        let uglyEditButtons = jqwidgets.createInstance('.resetButton', 'jqxButton', {
+          width: 85,
+          // height: 24,
+          value: 'Сбросить',
+          theme: this.theme,
+        });
+        let flattenEditButtons = flatten(uglyEditButtons);
+
+        if (flattenEditButtons) {
+          for (let i = 0; i < flattenEditButtons.length; i++) {
+            flattenEditButtons[i].addEventHandler('click', (event) => {
+              this.resetRow(event);
+            });
+          }
+        }
+      }
+
 
       function flatten(arr) {
         if (arr.length) {
@@ -1242,21 +1265,8 @@ export default {
         }
       }
 
-      if (flattenEditButtons) {
-        for (let i = 0; i < flattenEditButtons.length; i++) {
-          flattenEditButtons[i].addEventHandler('click', (event) => {
-            this.editClick(event);
-          });
-        }
-      }
-      if (flattenCancelButtons) {
-        for (let i = 0; i < flattenCancelButtons.length; i++) {
-          flattenCancelButtons[i].addEventHandler('click', (event) => {
-            let rowKey = event.target.getAttribute('data-row');
-            this.$refs.myTreeGrid.endRowEdit(rowKey, true);
-          });
-        }
-      }
+
+
     },
   },
 
