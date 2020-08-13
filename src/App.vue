@@ -2,19 +2,18 @@
   <div
       v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%',
      'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
-    <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}"
-              :show-top-level-arrows="false">
+    <JqxMenu :key="menuKey" ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme"
+              :show-top-level-arrows="false" :popup-z-index="999999">
       <!--      @changeTheme="changeTheme($event)"-->
       <ul>
 
         <li @click="addListWindow({type: 'MainWindow',
-            title: 'Перечень вариантов расчета перспективной потребности локомотивов'})" :style="{
-              'display': 'inline-block', 'height': '25px', 'left':'0px', 'cursor':'pointer', 'text-align':'left'}"
+            title: 'Перечень вариантов расчета перспективной потребности локомотивов'})"
         > Варианты расчетов перспективной потребности
         </li>
 
         <!--        <li @click="changeTheme" style="display: inline-block; text-align: right; right: 0; height: 25px">Change theme</li>-->
-        <li>Смена темы
+        <li style="text-align: center">Смена темы
           <ul>
             <li @click="changeTheme('metrodark')">Тема номер один</li>
             <li @click="changeTheme('ext')">Тема номер два</li>
@@ -73,6 +72,7 @@ export default {
       mainWindowSource: {},
       stations: [],
       station: null,
+      menuKey: JQXLite.generateID(),
     }
   },
 
@@ -104,10 +104,12 @@ export default {
       this.theme = theme;
 
       // Смена темы
+      this.$refs.Menu.minimize();
       this.$refs.Menu.theme = this.theme;
-      this.$refs.Menu.key = JQXLite.generateID();
+      this.menuKey = "menu" + JQXLite.generateID();
 
-      this.$refs.TollBar.theme = this.theme;
+      // this.$refs.TollBar.theme = this.theme;
+      // this.toolbarKey = "toolbar" + JQXLite.generateID();
 
       // Смена темы детей
       this.windows.forEach((item) => {
