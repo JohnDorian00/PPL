@@ -206,7 +206,7 @@
 
             <li>
               <JqxButton ref="createWindowAddStation"
-                         :height="button_height" @click="changeTreeGrid"
+                         :height="button_height" @click="test"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                          :theme="theme" :style="{'display': 'inline-block'} "
               ><span class="nobr">Смена грида&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -283,10 +283,10 @@ export default {
   },
 
   name: "WorkVariant",
-  props: ["id", "title", "closeWindows", "state", "row", "stations"],
+  props: ["id", "title", "closeWindows", "state", "row", "stations", "theme"],
   data() {
     return {
-      theme: appConfig.windowsTheme,
+      // theme: appConfig.windowsTheme,
       isLoaded: true,
       isLinesLoaded: true,
       button_height: 30,
@@ -362,6 +362,7 @@ export default {
         editOnDoubleClick: true,
         editOnF2: false
       },
+      theme2: 'metrodark',
     }
   },
 
@@ -390,9 +391,21 @@ export default {
       this.$refs.buttonMakeLines.disabled = false;
     },
 
+    theme: function () {
+      console.log(this.theme);
+      this.$refs.win.theme = this.theme;
+    }
+
   },
 
   methods: {
+    test() {
+      appConfig.windowsTheme = 'metrodark';
+      appConfig.theme = 'metrodark';
+      appConfig.menuTheme = 'metrodark';
+      console.log(appConfig);
+    },
+
     resetRow(e) {
       let row = this.selectedTreeGridRow;
       row.line_spd = row.lineInfo.b_v_uch;
@@ -1242,7 +1255,7 @@ export default {
         let uglyEditButtons = jqwidgets.createInstance('.resetButton', 'jqxButton', {
           width: 85,
           // height: 24,
-          value: 'Сбросить',
+          value: 'Сбросить&nbsp;&nbsp;',
           theme: this.theme,
         });
         let flattenEditButtons = flatten(uglyEditButtons);
@@ -1264,7 +1277,6 @@ export default {
           }, []);
         }
       }
-
 
 
     },

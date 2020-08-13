@@ -2,7 +2,7 @@ let theme;
 
 (function () {
   theme = localStorage.getItem("theme");
-  if (!theme) theme = "ext";
+  if (!theme) theme = "metrodark";
 })();
 
 export default {

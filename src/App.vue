@@ -2,7 +2,9 @@
   <div
       v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%',
      'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
-    <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}">
+    <JqxMenu ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme" v-bind:style="{'position': 'relative'}"
+              :show-top-level-arrows="false">
+      <!--      @changeTheme="changeTheme($event)"-->
       <ul>
 
         <li @click="addListWindow({type: 'MainWindow',
@@ -10,12 +12,22 @@
               'display': 'inline-block', 'height': '25px', 'left':'0px', 'cursor':'pointer', 'text-align':'left'}"
         > Варианты расчетов перспективной потребности
         </li>
+
+        <!--        <li @click="changeTheme" style="display: inline-block; text-align: right; right: 0; height: 25px">Change theme</li>-->
+        <li>Смена темы
+          <ul>
+            <li @click="changeTheme('metrodark')">Тема номер один</li>
+            <li @click="changeTheme('ext')">Тема номер два</li>
+            <li>3</li>
+          </ul>
+        </li>
+
       </ul>
     </JqxMenu>
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
       <component v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
-                 v-bind:key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
-                 @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource"
+                 :key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
+                 @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource" :theme="window.theme"
                  @workVariantCreateWindow="createWindowEditVariant" :parentWindow="window.parentWindow"
                  @createAddStationWindow="createWindowAddStation" :stations="stations"/>
     </div>
@@ -53,7 +65,7 @@ export default {
   data() {
     return {
       backgroundUrl: backgroundUrl,
-      theme: appConfig.menuTheme,
+      theme: 'metrodark',
       mainDivSize: document.documentElement.clientHeight - 75,
       windows: [],
       id: {},
@@ -88,6 +100,21 @@ export default {
   },
 
   methods: {
+    changeTheme(theme) {
+      this.theme = theme;
+
+      // Смена темы
+      this.$refs.Menu.theme = this.theme;
+      this.$refs.Menu.key = JQXLite.generateID();
+
+      this.$refs.TollBar.theme = this.theme;
+
+      // Смена темы детей
+      this.windows.forEach((item) => {
+        item.id = "win" + JQXLite.generateID();
+        item.theme = this.theme;
+      })
+    },
 
     // Поиск окна в списке окон (по window.id)
     findWindowInArr(id) {
@@ -257,8 +284,7 @@ export default {
       this.$refs.TollBar.destroyTool(this.id[id]);
       this.windows.splice(this.id[id], 1)
       this.id = {};
-      this.windows.forEach((value, index) => this.id[value.id] = index)
-      console.log(this.windows);
+      this.windows.forEach((value, index) => this.id[value.id] = index);
     },
 
     updateSizeApp: function () {
@@ -277,6 +303,7 @@ export default {
         },
         changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state,
         mainWindowRow: -1,
+        theme: this.theme,
       }
       option = this.updateWindowCreateOptions(option, added_options);
       this.id[id] = this.windows.length;

@@ -10,6 +10,7 @@
              :keyboard-close-key="NaN"
              @close="closeWindows"
              ref="win"
+             @changing-theme="changeTheme"
   >
 
     <!--    Верхний бар-->
@@ -123,10 +124,10 @@ export default {
     Rows,
   },
   name: "MainWindow",
-  props: ["id", "title", "closeWindows", "state"],
+  props: ["id", "title", "closeWindows", "state", "theme"],
   data() {
     return {
-      theme: appConfig.windowsTheme,
+      // theme: appConfig.windowsTheme,
       isLoaded: false,
       button_height: 30,
       dataAdapter: new jqx.dataAdapter(this.source),
@@ -142,7 +143,6 @@ export default {
       ],
       isUpdate: false,
       station: null,
-
     }
   },
 
@@ -152,9 +152,16 @@ export default {
     isLoaded: function () {
       this.$refs.buttonRefreshTable.disabled = !(this.isLoaded);
     },
+
+    theme: function () {
+      console.log(this.theme);
+    }
   },
 
   methods: {
+    changeTheme() {
+      console.log(123123123);
+    },
     // Окно изменения варианта
     workVariant() {
       this.$emit('workVariantCreateWindow', this.id, this.GridSelector)
