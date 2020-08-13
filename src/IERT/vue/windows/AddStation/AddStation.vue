@@ -104,12 +104,11 @@ export default {
   name: "AddStation",
 
   // props: ["id", "title", "closeWindows", "parentWindow", "stations"],
-  props: ["id", "parentWindow", "title", "locStations"],
+  props: ["id", "parentWindow", "title", "locStations", "theme"],
 
   data() {
     return {
       modalId: "modal" + this.id,
-      theme: appConfig.windowsTheme,
       isLoaded: true,
       button_height: 30,
       listBoxSource: [0, 1, 2, 3, 4, 5, 6],

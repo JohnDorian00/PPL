@@ -1,6 +1,6 @@
 'use strict';
 
-import $ from "@/vendor/jquery-3.4.1.min"
+import $ from "@/jqwidgets/jquery-3.4.1.min"
 
 const XmlQuery =  (function () {
   let latId = 0, activeQuery = new Map();

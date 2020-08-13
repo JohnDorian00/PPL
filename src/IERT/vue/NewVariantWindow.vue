@@ -131,11 +131,10 @@ export default {
 
   name: "MainWindow",
 
-  props: ["id", "title", "closeWindows", "state", "sourcePP"],
+  props: ["id", "title", "closeWindows", "state", "sourcePP", "theme"],
 
   data() {
     return {
-      theme: appConfig.windowsTheme,
       isLoaded: false,
       button_height: 30,
       listBoxSelected: false,

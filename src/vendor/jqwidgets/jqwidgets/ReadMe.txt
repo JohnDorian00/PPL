@@ -1,1 +1,0 @@
-Please, take a look at the EULA.pdf or https://www.jqwidgets.com/licenseagreement, before using the source code.
