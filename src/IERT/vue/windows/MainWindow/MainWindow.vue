@@ -10,7 +10,6 @@
              :keyboard-close-key="NaN"
              @close="closeWindows"
              ref="win"
-             @changing-theme="changeTheme"
   >
 
     <!--    Верхний бар-->
@@ -155,13 +154,14 @@ export default {
 
     theme: function () {
       console.log(this.theme);
+    },
+
+    id: function () {
+      console.log(this.id);
     }
   },
 
   methods: {
-    changeTheme() {
-      console.log(123123123);
-    },
     // Окно изменения варианта
     workVariant() {
       this.$emit('workVariantCreateWindow', this.id, this.GridSelector)

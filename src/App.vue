@@ -3,7 +3,7 @@
       v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%',
      'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
     <JqxMenu :key="menuKey" ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme"
-              :show-top-level-arrows="false" :popup-z-index="999999">
+             :show-top-level-arrows="false" :popup-z-index="999999">
       <!--      @changeTheme="changeTheme($event)"-->
       <ul>
 
@@ -105,7 +105,7 @@ export default {
   data() {
     return {
       backgroundUrl: backgroundUrl,
-      theme: 'metrodark',
+      theme: 'ext',
       mainDivSize: document.documentElement.clientHeight - 75,
       windows: [],
       id: {},
@@ -125,7 +125,7 @@ export default {
       animationHideDuration: 0,
       animationShowDelay: 0,
       autoOpen: true,
-      showTopLevelArrows: true,
+      showTopLevelArrows: false,
     });
     this.$refs.TollBar.setOptions({
       width: '100%',
@@ -142,6 +142,7 @@ export default {
 
   methods: {
     changeTheme(theme) {
+      // if (!confirm("Несохраненные данные будут потеряны. Вы уверены?")) return
       this.theme = theme;
 
       // Смена темы
@@ -323,6 +324,8 @@ export default {
 
     removeWindow(id) {
       console.log("Window with id = " + id + " closed");
+      console.log(this.windows);
+      console.log(this.id);
       // this.findWindowInArr(id).close();
       this.$refs.TollBar.destroyTool(this.id[id]);
       this.windows.splice(this.id[id], 1)
@@ -351,10 +354,12 @@ export default {
       option = this.updateWindowCreateOptions(option, added_options);
       this.id[id] = this.windows.length;
       this.windows.push(option);
+
       this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
-        tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
+        tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title.substr(0, 60) + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
             .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
       });
+
       // this.windows[0].type = "WorkVariant";
     }
   },

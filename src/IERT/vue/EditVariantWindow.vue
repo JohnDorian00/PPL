@@ -203,17 +203,6 @@
               ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </JqxButton>
             </li>
-
-            <li>
-              <JqxButton ref="createWindowAddStation"
-                         :height="button_height" @click="test"
-                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                         :theme="theme" :style="{'display': 'inline-block'} "
-              ><span class="nobr">Смена грида&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              </JqxButton>
-            </li>
-
-
             <li>
               <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
@@ -239,7 +228,7 @@
 
     <div>
       <AddStation ref="modal" :parentWindow="this" :title="'Добавление путей по станциям'"
-                  :locStations="locStations" :id="id" @station-deleted="addStation">
+                  :locStations="locStations" :id="id" @station-deleted="addStation" :theme="theme">
       </AddStation>
     </div>
 
@@ -362,7 +351,9 @@ export default {
         editOnDoubleClick: true,
         editOnF2: false
       },
-      theme2: 'metrodark',
+      outSource: [],
+      oneRowChanged: false,
+      savedRow: {},
     }
   },
 
@@ -399,14 +390,9 @@ export default {
   },
 
   methods: {
-    test() {
-      appConfig.windowsTheme = 'metrodark';
-      appConfig.theme = 'metrodark';
-      appConfig.menuTheme = 'metrodark';
-      console.log(appConfig);
-    },
-
-    resetRow(e) {
+    resetRow() {
+      console.log("reset row");
+      console.log(this.selectedTreeGridRow);
       let row = this.selectedTreeGridRow;
       row.line_spd = row.lineInfo.b_v_uch;
       row.trains_amount = row.lineInfo.b_train_count;
@@ -482,11 +468,50 @@ export default {
       this.$refs.modal.showModal();
     },
 
+    // Подготовка данных для отправки на сервер
+    prepareSoruceOut() {
+      let outArr = [];
+      this.outSource.forEach(function (item) {
+          outArr.push({
+            'uch_id': item.lineInfo.uch_id,
+            'kod_gr': item.lineInfo.kod_gr,
+            'kat_id': item.lineInfo.kat_id,
+            'v_uch' : item.line_spd,
+            'train_count': item.trains_amount
+          });
+      })
+
+      return JSON.stringify(outArr);
+    },
+
     // Сохранение изменений участков
     saveSelectedLines() {
       let t = this;
 
-      console.log(this.selectedStationsSource.localdata[0]);
+      // Загрузка участков
+      let xmlQuery = new XmlQuery({
+        url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
+        querySet: "SAVE_UCH_DATA"
+      });
+
+      let out = this.prepareSoruceOut();
+
+      xmlQuery.clearFilter();
+      xmlQuery.setFilter("JSON_ARR", out, "text");
+
+      xmlQuery.query('json',
+          function (json) {
+            console.log(json);
+            console.log("Данные успешно сохранены");
+            xmlQuery.destroy();
+          },
+
+          function (ER) {
+            xmlQuery.destroy();
+            console.log("Error save data");
+            console.log(ER);
+          }
+      )
 
     },
 
@@ -503,14 +528,22 @@ export default {
     // Конец редактирования строки
     rowEndEdit(e) {
       let row = e.args.row;
-      console.log(row);
       this.calcRow(row);
+      if (row.line_spd !== this.savedRow.line_spd) {
+        row.changed = true;
+        this.outSource.push(row);
+        // TODO выключение кнопки сохранения, если данные не изменены, подумать на реализацией
+        this.oneRowChanged = true;
+      }
     },
 
     // disable non-editable rows
     rowEdit(e) {
       if (e.args.row && !e.args.row.editable) {
         this.$refs.selectedGrid.endRowEdit(0, true);
+      }
+      else {
+        this.savedRow = {line_spd: e.args.row.line_spd}
       }
     },
 
@@ -582,7 +615,6 @@ export default {
 
     refreshSelectedLinesGrid() {
       if (this.$refs.selectedGrid) {
-        this.$refs.selectedGrid.save
         this.$refs.selectedGrid.updateBoundData("cells");
       }
     },
@@ -902,13 +934,15 @@ export default {
                 let linesSet = new Set(),
                     locoSet = new Set(),
                     linesArr = [],
-                    locoArr = [];
+                    locoArr = [],
+                    lineInfoArr = [];
 
                 stationsList.forEach(function (item) {
                   linesSet.add(item);
                 })
 
                 json.rows.forEach(function (item, i, arr) {
+                  lineInfoArr.push({index: i, info: item});
                   linesSet.add(item.uch_id);
                   locoSet.add(item.kod_gr);
 
@@ -1030,9 +1064,10 @@ export default {
     addToSelectedGrid(lines, lineInfo, locos) {
       let t = this;
 
-      // console.log(lines);
-      // console.log(lineInfo);
-      // console.log(locos);
+      console.log(lines);
+      console.log(lineInfo);
+      console.log(locos);
+
 
       let stationObj,
           locoObjs = [];
@@ -1048,16 +1083,19 @@ export default {
         let lokoNameSet = new Set();
         lineInfo.filter((item) => {
           if (item.uch_id === lineCode.uch_id) {
-            // console.log("added to loco set ", item.loko_name);
+            // console.log("added to loco set ", item.info.loko_name);
             lokoNameSet.add(item.loko_name);
           }
         })
-
         secondChildrens = [];
         lokoNameSet.forEach(function (locoName) {
           thirdChildrens = [];
           lineInfo.filter((item) => {
             if (item.uch_id === lineCode.uch_id && item.loko_name === locoName) {
+
+              // thirdChildrens.push({index: item.index, editable: true});
+
+
               thirdChildrens.push(t.calcRow({
                 line_name: item.kat_id_name,
                 tech_spd: 0,
@@ -1066,8 +1104,10 @@ export default {
                 trains_amount: item.train_count,
                 trains_need: 0,
                 lineInfo: item,
-                editable: true
+                editable: true,
+                changed: false,
               }))
+
             }
           })
           secondChildrens.push({line_name: locoName, editable: false, children: thirdChildrens});
@@ -1250,6 +1290,7 @@ export default {
       this.selectLine($event.args.row.bounddata);
     },
 
+    // TODO сделать нормальную кнопку сброса
     rendered: function () {
       if ($(".resetButton").length > 0) {
         let uglyEditButtons = jqwidgets.createInstance('.resetButton', 'jqxButton', {
@@ -1258,15 +1299,25 @@ export default {
           value: 'Сбросить&nbsp;&nbsp;',
           theme: this.theme,
         });
-        let flattenEditButtons = flatten(uglyEditButtons);
 
-        if (flattenEditButtons) {
-          for (let i = 0; i < flattenEditButtons.length; i++) {
-            flattenEditButtons[i].addEventHandler('click', (event) => {
-              this.resetRow(event);
-            });
-          }
-        }
+
+        // uglyEditButtons.addEventHandler('click', (event) => {
+        //         console.log('click reset button');
+        //         this.resetRow(event);
+        // });
+
+
+        // let flattenEditButtons = flatten(uglyEditButtons);
+
+
+        // if (flattenEditButtons) {
+        //   for (let i = 0; i < flattenEditButtons.length; i++) {
+        //     flattenEditButtons[i].addEventHandler('click', (event) => {
+        //       console.log('click reset button');
+        //       this.resetRow(event);
+        //     });
+        //   }
+        // }
       }
 
 
