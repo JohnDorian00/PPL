@@ -356,7 +356,7 @@ export default {
       this.windows.push(option);
 
       this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
-        tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title.substr(0, 60) + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
+        tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title.substr(0, 10) + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
             .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
       });
 

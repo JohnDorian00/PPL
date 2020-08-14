@@ -390,6 +390,13 @@ export default {
   },
 
   methods: {
+    // Добавить измененную строку в sourceOut, если ее там еще нет
+    addRowToSourceOut(row) {
+      if (!this.outSource.includes(row)) {
+        this.outSource.push(row);
+      }
+    },
+
     resetRow() {
       console.log("reset row");
       console.log(this.selectedTreeGridRow);
@@ -398,6 +405,7 @@ export default {
       row.trains_amount = row.lineInfo.b_train_count;
       this.calcRow(row);
       if (this.$refs.selectedGrid) this.$refs.selectedGrid.updateRow(row.uid, row);
+      this.addRowToSourceOut(row);
     },
 
     onSelectGridDClick(e) {
@@ -471,6 +479,7 @@ export default {
     // Подготовка данных для отправки на сервер
     prepareSoruceOut() {
       let outArr = [];
+      console.log(this.outSource);
       this.outSource.forEach(function (item) {
           outArr.push({
             'uch_id': item.lineInfo.uch_id,
@@ -528,12 +537,14 @@ export default {
     // Конец редактирования строки
     rowEndEdit(e) {
       let row = e.args.row;
-      this.calcRow(row);
-      if (row.line_spd !== this.savedRow.line_spd) {
-        row.changed = true;
-        this.outSource.push(row);
-        // TODO выключение кнопки сохранения, если данные не изменены, подумать на реализацией
-        this.oneRowChanged = true;
+      if (this.savedRow && row) {
+        this.calcRow(row);
+        if ((row.line_spd !== this.savedRow.line_spd)) {
+          row.changed = true;
+          this.addRowToSourceOut(row);
+          // TODO выключение кнопки сохранения, если данные не изменены, подумать на реализацией
+          this.oneRowChanged = true;
+        }
       }
     },
 
@@ -543,7 +554,9 @@ export default {
         this.$refs.selectedGrid.endRowEdit(0, true);
       }
       else {
-        this.savedRow = {line_spd: e.args.row.line_spd}
+        if (e.args.row) {
+          this.savedRow = {line_spd: e.args.row.line_spd}
+        }
       }
     },
 
@@ -698,7 +711,11 @@ export default {
                   end_name: json.rows[i].end_name,
                   exist_in_cdl: json.rows[i].exist_in_cdl,
                 }
-                lines.add(obj);
+                let addT = lines.add(obj);
+
+                addT.onerror = function () {
+                  console.log("Ошибка добавления участка в db, ", obj);
+                }
               }
               transaction.oncomplete = function () {
                 console.log("Участки обновлены");
@@ -967,11 +984,18 @@ export default {
                   let linesTR = db.transaction("lines", "readonly"),
                       lines = linesTR.objectStore("lines");
 
+                  console.log(linesSet);
+
                   linesSet.forEach(function (item) {
                     let linesR = lines.get(item);
+                    console.log(item);
 
                     linesR.onsuccess = function () {
+                      console.log(linesR);
                       linesArr.push({uch_id: item, line: linesR.result});
+                    }
+                    linesR.onerror = function () {
+                      console.log("Не удалось найти линию по айди, ", item);
                     }
 
                   })
@@ -1112,7 +1136,6 @@ export default {
           })
           secondChildrens.push({line_name: locoName, editable: false, children: thirdChildrens});
         })
-
 
         stationObj = {
           line_name: lineCode.line.start_name + " - " + lineCode.line.end_name,
@@ -1290,7 +1313,7 @@ export default {
       this.selectLine($event.args.row.bounddata);
     },
 
-    // TODO сделать нормальную кнопку сброса
+    // Рендер кнопок сброса
     rendered: function () {
       if ($(".resetButton").length > 0) {
         let uglyEditButtons = jqwidgets.createInstance('.resetButton', 'jqxButton', {
@@ -1300,24 +1323,19 @@ export default {
           theme: this.theme,
         });
 
+        let flattenEditButtons = [];
+        if (!Array.isArray(uglyEditButtons)) {
+          uglyEditButtons = [uglyEditButtons];
+        }
 
-        // uglyEditButtons.addEventHandler('click', (event) => {
-        //         console.log('click reset button');
-        //         this.resetRow(event);
-        // });
+        flattenEditButtons = flatten(uglyEditButtons);
 
-
-        // let flattenEditButtons = flatten(uglyEditButtons);
-
-
-        // if (flattenEditButtons) {
-        //   for (let i = 0; i < flattenEditButtons.length; i++) {
-        //     flattenEditButtons[i].addEventHandler('click', (event) => {
-        //       console.log('click reset button');
-        //       this.resetRow(event);
-        //     });
-        //   }
-        // }
+        flattenEditButtons.forEach((item) => {
+          item.addEventHandler('click', (event) => {
+                    console.log('click reset button');
+                    this.resetRow(event);
+            });
+        })
       }
 
 

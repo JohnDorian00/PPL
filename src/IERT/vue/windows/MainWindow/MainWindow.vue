@@ -175,7 +175,7 @@ export default {
     // Удаление варианта из бд
     deleteVariant() {
       let t = this
-
+debugger
       if (!this.GridSelector.var_id) {
         console.log("Не выбрана строка в таблице для удаления");
         return
@@ -193,6 +193,7 @@ export default {
 
       xmlQuery.query('json',
           function () {
+            console.log("Удален вариант ", this.GridSelector.var_id);
             xmlQuery.destroy();
             t.$root.$children[0].refreshAllMainWindows();
             t.isLoaded = true;
@@ -200,7 +201,7 @@ export default {
           function (ER) {
             xmlQuery.destroy();
             t.isLoaded = true;
-            console.log("Error update data");
+            console.log("Не удалось удалить вариант, ", this.GridSelector.var_id);
             console.log("ERROR = ", ER);
           }
       );
