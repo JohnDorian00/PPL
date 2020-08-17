@@ -203,13 +203,13 @@
               ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </JqxButton>
             </li>
-<!--            <li>-->
-<!--              <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"-->
-<!--                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
-<!--                         :theme="theme" :style="{ 'display': 'inline-block'}"-->
-<!--              ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
-<!--              </JqxButton>-->
-<!--            </li>-->
+            <li>
+              <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
+                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                         :theme="theme" :style="{ 'display': 'inline-block'}"
+              ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              </JqxButton>
+            </li>
             <li class="last">
               <JqxButton class="button" ref="buttonClose" @click="closeWindows" :width="120"
                          :height="button_height+'px'"
@@ -293,14 +293,20 @@ export default {
         {
           text: 'Уч. скорость, км/ч', datafield: 'line_spd',
           validation: function (cell, value) {
+            return true
             let isDigitFlag = true;
             if (value.toString().length < 1) {
               return {message: "Поле должно содерджать хотя бы 1 символ", result: false};
             }
 
+            // Формат " (/!обязательно/одна или более цифра) (точка) (ноль или более цифр)"
             let regexp = /^\d+\.*\d*$/;
 
-            // console.log(value.match(regexp));
+            if (value.match(regexp) === null) {
+              return {message: "Введено не числовое значение", result: false}
+            }
+
+            console.log();
 
             // for (let key in value) {
             //   if (value[key])
@@ -315,6 +321,7 @@ export default {
         {
           text: 'Кол-во поездов', datafield: 'trains_amount',
           validation: function (cell, value) {
+            return true
             if (value.toString().length < 1) {
               return {message: "Name should be minimum 1 characters", result: false};
             }
@@ -403,21 +410,10 @@ export default {
   methods: {
     // Добавить измененную строку в sourceOut, если ее там еще нет
     addRowToSourceOut(row) {
-      // let isBeenInSourceOut = this.outSource.findIndex((v) => {
-      //   return v.lineInfo.uch_id === row.lineInfo.uch_id;
-      // })
-      //
-      // if (isBeenInSourceOut === -1) {
-      //   console.log("Stroke not include, adding, ", this.outSource.includes(row));
-      //   this.outSource.push(row);
-      // }
-
       if (!this.outSource.includes(row)) {
         console.log("Adding row to outSource");
         this.outSource.push(row);
       }
-
-
     },
 
     resetRow() {
@@ -433,11 +429,9 @@ export default {
       }
     },
 
-    onSelectGridDClick(e) {
-      let row = e.args.row;
-
+    deleteLineFromSelectedGrid(row) {
       if (row.level === 0) {
-        // Поиск и удаление всех дорог по удаляемому участку
+        // Поиск и удаление всех дорог по удаляемому участку из outSource
         row.children.forEach((item) => {
           item.children.forEach(line => {
             let isBeenInSourceOut = this.outSource.findIndex((v) => {
@@ -450,9 +444,16 @@ export default {
         })
 
         let deletedRow = this.selectedStationsSource.localdata.splice(row.uid, 1)[0];
+        console.log(row);
+        console.log(deletedRow);
         this.addLine(deletedRow.line);
         this.refreshSelectedLinesGrid();
       }
+    },
+
+    onSelectGridDClick(e) {
+      let row = e.args.row;
+      this.deleteLineFromSelectedGrid(row);
     },
 
     onSelectGridClick(e) {
@@ -519,7 +520,6 @@ export default {
 
       if (this.outSource.length > 0) {
         this.outSource.forEach(function (item) {
-          console.log(item);
           outArr.push({
             'uch_id': item.lineInfo.uch_id,
             'kod_gr': item.lineInfo.kod_gr,
@@ -576,12 +576,23 @@ export default {
       return row
     },
 
+    isDigit(string) {
+      // Формат " (/!обязательно/одна или более цифра) (точка) (ноль или более цифр)"
+      let regexp = /^\d+\.*\d*$/;
+      return string.match(regexp) !== null;
+    },
+
     // Конец редактирования строки
     rowEndEdit(e) {
       let row = e.args.row;
-      if (this.savedRow && row) {
+      if (this.savedRow && row && row.level === 2) {
+        // Reset значений, если введены неформатные данные (формат указан в isDigit)
+        if (!this.isDigit(row.line_spd) || !this.isDigit(row.trains_amount)) {
+          if (!this.isDigit(row.line_spd)) row.line_spd = this.savedRow.line_spd;
+          if (!this.isDigit(row.trains_amount)) row.trains_amount = this.savedRow.trains_amount;
+        }
         this.calcRow(row);
-        if ((row.line_spd !== this.savedRow.line_spd)) {
+        if ((row.line_spd != this.savedRow.line_spd) || (row.trains_amount != this.savedRow.trains_amount) ) {
           row.changed = true;
           this.addRowToSourceOut(row);
           // TODO выключение кнопки сохранения, если данные не изменены, подумать на реализацией
@@ -597,7 +608,7 @@ export default {
       }
       else {
         if (e.args.row) {
-          this.savedRow = {line_spd: e.args.row.line_spd}
+          this.savedRow = {line_spd: e.args.row.line_spd, trains_amount: e.args.row.trains_amount}
         }
       }
     },
@@ -692,8 +703,21 @@ export default {
     },
 
     clearLines() {
-      this.selectedStationsSource.localdata = [];
-      this.refreshAllTables();
+      let rows = this.$refs.selectedGrid.getRows();
+      if (rows.length === 0) return ;
+      this.isLoaded = false;
+      setTimeout(() => {
+
+        for (let key in rows) {
+          rows[key].uid = 0;
+          let deletedRow = this.selectedStationsSource.localdata.splice(rows[key].uid, 1)[0];
+          this.addLine(deletedRow.line);
+
+        }
+        this.refreshSelectedLinesGrid();
+        this.outSource = [];
+        this.isLoaded = true;
+      }, 0)
     },
 
     // Загрузка участков в IndexedDB
