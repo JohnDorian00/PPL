@@ -293,9 +293,21 @@ export default {
         {
           text: 'Уч. скорость, км/ч', datafield: 'line_spd',
           validation: function (cell, value) {
+            let isDigitFlag = true;
             if (value.toString().length < 1) {
-              return {message: "Name should be minimum 1 characters", result: false};
+              return {message: "Поле должно содерджать хотя бы 1 символ", result: false};
             }
+
+            let regexp = /^\d+\.*\d*$/;
+
+            // console.log(value.match(regexp));
+
+            // for (let key in value) {
+            //   if (value[key])
+            //   console.log(key, value[key]);
+            // }
+
+
             return true;
           }
         },
@@ -391,26 +403,52 @@ export default {
   methods: {
     // Добавить измененную строку в sourceOut, если ее там еще нет
     addRowToSourceOut(row) {
+      // let isBeenInSourceOut = this.outSource.findIndex((v) => {
+      //   return v.lineInfo.uch_id === row.lineInfo.uch_id;
+      // })
+      //
+      // if (isBeenInSourceOut === -1) {
+      //   console.log("Stroke not include, adding, ", this.outSource.includes(row));
+      //   this.outSource.push(row);
+      // }
+
       if (!this.outSource.includes(row)) {
+        console.log("Adding row to outSource");
         this.outSource.push(row);
       }
+
+
     },
 
     resetRow() {
-      console.log("reset row");
-      console.log(this.selectedTreeGridRow);
       let row = this.selectedTreeGridRow;
-      row.line_spd = row.lineInfo.b_v_uch;
-      row.trains_amount = row.lineInfo.b_train_count;
-      this.calcRow(row);
-      if (this.$refs.selectedGrid) this.$refs.selectedGrid.updateRow(row.uid, row);
-      this.addRowToSourceOut(row);
+
+      if (row.line_spd !== row.lineInfo.b_v_uch || row.trains_amount !== row.lineInfo.b_train_count) {
+        row.line_spd = row.lineInfo.b_v_uch;
+        row.trains_amount = row.lineInfo.b_train_count;
+        this.calcRow(row);
+        if (this.$refs.selectedGrid) this.$refs.selectedGrid.updateRow(row.uid, row);
+        this.addRowToSourceOut(row);
+        console.log("reset row", row);
+      }
     },
 
     onSelectGridDClick(e) {
       let row = e.args.row;
 
       if (row.level === 0) {
+        // Поиск и удаление всех дорог по удаляемому участку
+        row.children.forEach((item) => {
+          item.children.forEach(line => {
+            let isBeenInSourceOut = this.outSource.findIndex((v) => {
+              return v.lineInfo.uch_id === line.lineInfo.uch_id;
+            })
+            if (isBeenInSourceOut !== -1) {
+              this.outSource.splice(isBeenInSourceOut, 1)
+            }
+          })
+        })
+
         let deletedRow = this.selectedStationsSource.localdata.splice(row.uid, 1)[0];
         this.addLine(deletedRow.line);
         this.refreshSelectedLinesGrid();
@@ -478,8 +516,10 @@ export default {
     // Подготовка данных для отправки на сервер
     prepareSoruceOut() {
       let outArr = [];
-      console.log(this.outSource);
-      this.outSource.forEach(function (item) {
+
+      if (this.outSource.length > 0) {
+        this.outSource.forEach(function (item) {
+          console.log(item);
           outArr.push({
             'uch_id': item.lineInfo.uch_id,
             'kod_gr': item.lineInfo.kod_gr,
@@ -487,9 +527,11 @@ export default {
             'v_uch' : item.line_spd,
             'train_count': item.trains_amount
           });
-      })
-
-      return JSON.stringify(outArr);
+        })
+        console.log("Строки для сохранения: ", this.outSource);
+        this.outSource = [];
+        return JSON.stringify(outArr);
+      }
     },
 
     // Сохранение изменений участков
@@ -504,12 +546,13 @@ export default {
 
       let out = this.prepareSoruceOut();
 
+      if (!out) return
+
       xmlQuery.clearFilter();
       xmlQuery.setFilter("JSON_ARR", out, "text");
 
       xmlQuery.query('json',
-          function (json) {
-            console.log(json);
+          function () {
             console.log("Данные успешно сохранены");
             xmlQuery.destroy();
           },
@@ -713,7 +756,7 @@ export default {
                 let addT = lines.add(obj);
 
                 addT.onerror = function () {
-                  console.log("Ошибка добавления участка в db, ", obj);
+                  // console.log("Ошибка добавления участка в db, ", obj);
                 }
               }
               transaction.oncomplete = function () {
@@ -721,7 +764,7 @@ export default {
               };
               transaction.onerror = function () {
                 if (event.target.error.name === "ConstraintError") {
-                  console.log("Станция с таким id уже существует, ", obj); // обрабатываем ошибку
+                  // console.log("Станция с таким id уже существует, ", obj); // обрабатываем ошибку
                   event.preventDefault(); // предотвращаем отмену транзакции
                   event.stopPropagation(); // предотвращаем всплытие ошибки
                 } else {
@@ -983,14 +1026,14 @@ export default {
                   let linesTR = db.transaction("lines", "readonly"),
                       lines = linesTR.objectStore("lines");
 
-                  console.log(linesSet);
+                  // console.log(linesSet);
 
                   linesSet.forEach(function (item) {
                     let linesR = lines.get(item);
-                    console.log(item);
+                    // console.log(item);
 
                     linesR.onsuccess = function () {
-                      console.log(linesR);
+                      // console.log(linesR);
                       linesArr.push({uch_id: item, line: linesR.result});
                     }
                     linesR.onerror = function () {
@@ -1087,9 +1130,9 @@ export default {
     addToSelectedGrid(lines, lineInfo, locos) {
       let t = this;
 
-      console.log(lines);
-      console.log(lineInfo);
-      console.log(locos);
+      // console.log(lines);
+      // console.log(lineInfo);
+      // console.log(locos);
 
 
       let stationObj,
@@ -1331,7 +1374,7 @@ export default {
 
         flattenEditButtons.forEach((item) => {
           item.addEventHandler('click', (event) => {
-                    console.log('click reset button');
+                    // console.log('click reset button');
                     this.resetRow(event);
             });
         })
