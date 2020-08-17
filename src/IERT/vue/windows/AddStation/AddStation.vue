@@ -51,14 +51,14 @@
 
         <div style="width: 100%; display : block;">
           <ul class="btn-group" :height="button_height">
-            <li>
-              <JqxButton class="button" ref="buttonAdd" :height="button_height" @click="delElem"
-                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                         :theme="theme" :style="{'display': 'inline-block'} "
-              ><span class="nobr">Добавить&nbsp;&nbsp;&nbsp;</span>
-              </JqxButton>
+<!--            <li>-->
+<!--              <JqxButton class="button" ref="buttonAdd" :height="button_height" @click="delElem"-->
+<!--                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
+<!--                         :theme="theme" :style="{'display': 'inline-block'} "-->
+<!--              ><span class="nobr">Добавить&nbsp;&nbsp;&nbsp;</span>-->
+<!--              </JqxButton>-->
 
-            </li>
+<!--            </li>-->
             <li class="last">
               <JqxButton class="button" ref="closeButton" @click="hideModal" :width="120" :height="button_height+'px'"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"

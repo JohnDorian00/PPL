@@ -175,13 +175,15 @@ export default {
     // Удаление варианта из бд
     deleteVariant() {
       let t = this
-debugger
+
+      console.log(this.GridSelector);
+
       if (!this.GridSelector.var_id) {
         console.log("Не выбрана строка в таблице для удаления");
         return
       }
 
-      // t.isLoaded = false;
+      t.isLoaded = false;
 
       let xmlQuery = new XmlQuery({
         url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",

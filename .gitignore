@@ -11,3 +11,4 @@ yarn-error.log
 *.njsproj
 *.sln
 src/IERT/vue/test
+src/test.xml

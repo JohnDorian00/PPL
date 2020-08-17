@@ -128,7 +128,7 @@
                           <div style="display : block; width: 100%">
                             <JqxButton @click="makeLinesList" ref="buttonMakeLines" :height="button_height+'px'"
                                        :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                       :theme="theme" style="margin-left: 5px;" :disabled="false"
+                                       :theme="theme" style="margin-left: 5px;" :disabled="true"
                             ><span
                                 class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                             </JqxButton>
@@ -203,13 +203,13 @@
               ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </JqxButton>
             </li>
-            <li>
-              <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
-                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                         :theme="theme" :style="{ 'display': 'inline-block'}"
-              ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              </JqxButton>
-            </li>
+<!--            <li>-->
+<!--              <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"-->
+<!--                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
+<!--                         :theme="theme" :style="{ 'display': 'inline-block'}"-->
+<!--              ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
+<!--              </JqxButton>-->
+<!--            </li>-->
             <li class="last">
               <JqxButton class="button" ref="buttonClose" @click="closeWindows" :width="120"
                          :height="button_height+'px'"
@@ -362,7 +362,7 @@ export default {
     // геттер вычисляемого значения
     disableMakeList: function () {
       // console.log(!(!this.makeLinesListDisableFlag && this.isLinesLoaded));
-      // return !(!this.makeLinesListDisableFlag && this.isLinesLoaded)
+      return !(!this.makeLinesListDisableFlag && this.isLinesLoaded)
     }
   },
 
@@ -379,7 +379,6 @@ export default {
 
     disableMakeList: function () {
       this.$refs.buttonMakeLines.disabled = this.disableMakeList;
-      this.$refs.buttonMakeLines.disabled = false;
     },
 
     theme: function () {
@@ -698,7 +697,7 @@ export default {
               };
               let transaction = db.transaction("lines", "readwrite");
               let lines = transaction.objectStore("lines");
-              lines.clear();
+              // lines.clear();
 
               let obj;
 
