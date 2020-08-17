@@ -174,13 +174,14 @@ export default {
 
     // Удаление варианта из бд
     deleteVariant() {
-      let t = this
-
-      console.log(this.GridSelector);
+      let t = this, variant;
 
       if (!this.GridSelector.var_id) {
         console.log("Не выбрана строка в таблице для удаления");
         return
+      }
+      else {
+        variant = this.GridSelector.var_id;
       }
 
       t.isLoaded = false;
@@ -191,11 +192,11 @@ export default {
       });
 
       xmlQuery.clearFilter();
-      xmlQuery.setFilter("VAR_ID", this.GridSelector.var_id, "text");
+      xmlQuery.setFilter("VAR_ID", variant, "text");
 
       xmlQuery.query('json',
           function () {
-            console.log("Удален вариант ", this.GridSelector.var_id);
+            console.log("Удален вариант ", variant);
             xmlQuery.destroy();
             t.$root.$children[0].refreshAllMainWindows();
             t.isLoaded = true;

@@ -204,7 +204,7 @@
               </JqxButton>
             </li>
             <li>
-              <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
+              <JqxButton class="button" ref="buttonClear" @click="test" :height="button_height+'px'"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                          :theme="theme" :style="{ 'display': 'inline-block'}"
               ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -354,7 +354,6 @@ export default {
       panels: [{size: '50%', min: 327, collapsible: false}, {min: 226, size: '50%', collapsible: false}],
       gsVar: null,
       selectedRow: null,
-      selectedTreeGridRow: null,
       stationsList: [],
       deletedStationsStack: [],
       makeLinesListDisableFlag: true,
@@ -408,6 +407,10 @@ export default {
   },
 
   methods: {
+    test() {
+      console.log(this.$refs.selectedGrid.getRows());
+    },
+
     // Добавить измененную строку в sourceOut, если ее там еще нет
     addRowToSourceOut(row) {
       if (!this.outSource.includes(row)) {
@@ -416,9 +419,28 @@ export default {
       }
     },
 
-    resetRow() {
-      let row = this.selectedTreeGridRow;
+    findLineInSelectedGrid(uid) {
+      let source = this.selectedStationsSource.localdata;
 
+      for (let line in source) {
+        for (let loco in source[line].children) {
+          for (let uch in source[line].children[loco].children) {
+            if (source[line].children[loco].children[uch].uid === uid) return source[line].children[loco].children[uch]
+          }
+        }
+      }
+      return undefined
+    },
+
+    resetRow(e) {
+      let lineUid = e.currentTarget.parentElement.parentElement.dataset.key;
+
+      let row = this.findLineInSelectedGrid(lineUid);
+
+      if (!row) {
+        console.log("Не удалось сбросить строку, ", row, lineUid);
+      }
+      
       if (row.line_spd !== row.lineInfo.b_v_uch || row.trains_amount !== row.lineInfo.b_train_count) {
         row.line_spd = row.lineInfo.b_v_uch;
         row.trains_amount = row.lineInfo.b_train_count;
@@ -458,8 +480,6 @@ export default {
 
     onSelectGridClick(e) {
       let row = e.args.row, t = this;
-
-      this.selectedTreeGridRow = row;
 
       if (row.level === 2) {
         // this.$refs.selectedGrid.beginRowEdit(row.uid);
@@ -1380,31 +1400,74 @@ export default {
     },
 
     // Рендер кнопок сброса
-    rendered: function () {
+    rendered() {
+      let t = this;
+
       if ($(".resetButton").length > 0) {
-        let uglyEditButtons = jqwidgets.createInstance('.resetButton', 'jqxButton', {
-          width: 85,
-          // height: 24,
-          value: 'Сбросить&nbsp;&nbsp;',
-          theme: this.theme,
-        });
 
-        let flattenEditButtons = [];
-        if (!Array.isArray(uglyEditButtons)) {
-          uglyEditButtons = [uglyEditButtons];
-        }
-
-        flattenEditButtons = flatten(uglyEditButtons);
-
-        flattenEditButtons.forEach((item) => {
-          item.addEventHandler('click', (event) => {
-                    // console.log('click reset button');
-                    this.resetRow(event);
+        jqwidgets.createInstance('.resetButton', 'jqxButton', {
+              width: 85,
+              // height: 24,
+              value: 'Сбросить&nbsp;&nbsp;',
+              theme: this.theme,
             });
-        })
+
+        $(".resetButton").click(function(e){
+          t.resetRow(e);
+        });
       }
 
 
+        // $(".resetButton").forEach(item => {
+        //   item.addEventListener("click", event => {
+        //     console.log(1232131);
+        //   })
+        // })
+
+      //   // console.log($(".resetButton"));
+      //   let uglyEditButtons = jqwidgets.createInstance('.resetButton', 'jqxButton', {
+      //     width: 85,
+      //     // height: 24,
+      //     value: 'Сбросить&nbsp;&nbsp;',
+      //     theme: this.theme,
+      //   });
+      //
+      //   console.log(uglyEditButtons);
+      //
+      //   let flattenEditButtons = [];
+      //   if (!Array.isArray(uglyEditButtons)) {
+      //     uglyEditButtons = [uglyEditButtons];
+      //   }
+      //   uglyEditButtons.forEach(item => {
+      //     item.this = this;
+      //   })
+      //
+      //   flattenEditButtons = flatten(uglyEditButtons);
+      //
+      //   console.log(flattenEditButtons);
+      //
+      //
+      //   // if (!Array.isArray(toFlatten)) {
+      //   //   toFlatten.addEventHandler('click', event => {
+      //   //     console.log(toFlatten);
+      //   //     console.log(flat);
+      //   //     toFlatten.this.resetRow(event);
+      //   //   });
+      //   // }
+      //
+      //   // console.log(flattenEditButtons);
+      //
+      //   // flattenEditButtons.forEach((item) => {
+      //   //
+      //   //   console.log("addEventHandler, ", item);
+      //   //   item.addEventHandler('click', event => {
+      //   //             // console.log('click reset button');
+      //   //             this.resetRow(event);
+      //   //     });
+      //   // })
+
+
+      // Добавление кнопок в массив, привязка слушателей
       function flatten(arr) {
         if (arr.length) {
           return arr.reduce((flat, toFlatten) => {
