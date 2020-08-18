@@ -2815,7 +2815,7 @@ of the horizontal scrollbar.*/
 }
 /* This class is applied to the splitter when it's dragged to it's max left/right boundary */
 .jqx-splitter-splitbar-invalid {
-    background: #FF0000 !important;
+    background: #0379bf !important;
 }
 /* This class is added to split bar's collapse button when the splitter is with vectical orientation. */
 .jqx-splitter-collapse-button-horizontal {

@@ -39,15 +39,15 @@
 
           <!--      Таблица-->
           <div
-              style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
+              style="background-color: rgb(87,61,49); width: 100%; position: relative; top: 0; margin-right: 60px;
+               height: calc(100% - 76px);">
             <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="30" @resize="onResize"
                          :panels="panels">
 
               <div>
-                <JqxExpander style="border: none;" ref="feedExpander" :theme="theme"
-                             :width="'100%'" :height="'calc(100% - 25px)'"
+                <JqxExpander style="border: none; left: 0px;" ref="feedExpander" :theme="theme"
+                             :width="'calc(100% + 2px)'" :height="'calc(100% - 34px)'"
                              :toggleMode="'none'" :showArrow="false">
-
                   <div class="jqx-hideborder" style="width: 100%; text-align: center">
                     Выберите участки для расчета
                   </div>
@@ -152,7 +152,7 @@
                     Выбранные участки
                   </div>
 
-                  <div style="height: 100%; padding: 0;">
+                  <div style="height: 100%; padding: 0 0 50px;">
                     <div>
                       <Preloader v-if="!isLoaded"/>
                     </div>
@@ -204,7 +204,7 @@
               </JqxButton>
             </li>
             <li>
-              <JqxButton class="button" ref="buttonClear" @click="test" :height="button_height+'px'"
+              <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
                          :theme="theme" :style="{ 'display': 'inline-block'}"
               ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -351,7 +351,7 @@ export default {
       stationsDataAdapter: new jqx.dataAdapter(this.stationsSource),
       selectedStationsDataAdapter: new jqx.dataAdapter(this.selectedStationsSource),
 
-      panels: [{size: '50%', min: 327, collapsible: false}, {min: 226, size: '50%', collapsible: false}],
+      panels: [{size: '50%', min: 344, collapsible: false}, {min: 226, size: '50%', collapsible: false}],
       gsVar: null,
       selectedRow: null,
       stationsList: [],
@@ -440,7 +440,7 @@ export default {
       if (!row) {
         console.log("Не удалось сбросить строку, ", row, lineUid);
       }
-      
+
       if (row.line_spd !== row.lineInfo.b_v_uch || row.trains_amount !== row.lineInfo.b_train_count) {
         row.line_spd = row.lineInfo.b_v_uch;
         row.trains_amount = row.lineInfo.b_train_count;

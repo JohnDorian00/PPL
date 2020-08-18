@@ -12,7 +12,6 @@
         > Варианты расчетов перспективной потребности
         </li>
 
-        <!--        <li @click="changeTheme" style="display: inline-block; text-align: right; right: 0; height: 25px">Change theme</li>-->
         <li style="text-align: center">Смена темы
           <ul>
             <li @click="changeTheme('android')">android</li>
@@ -69,7 +68,7 @@
                  :key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
                  @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource" :theme="window.theme"
                  @workVariantCreateWindow="createWindowEditVariant" :parentWindow="window.parentWindow"
-                 @createAddStationWindow="createWindowAddStation" :stations="stations"/>
+                 :stations="stations"/>
     </div>
     <!--    @RowSelect="RowSelect"-->
     <JqxToolbar ref="TollBar" :theme="theme"/>
@@ -105,7 +104,7 @@ export default {
   data() {
     return {
       backgroundUrl: backgroundUrl,
-      theme: 'ext',
+      theme: 'light',
       mainDivSize: document.documentElement.clientHeight - 75,
       windows: [],
       id: {},
@@ -141,19 +140,18 @@ export default {
   },
 
   methods: {
+    // Смена темы
     changeTheme(theme) {
       // if (!confirm("Несохраненные данные будут потеряны. Вы уверены?")) return
       this.theme = theme;
 
-      // Смена темы
       this.$refs.Menu.minimize();
       this.$refs.Menu.theme = this.theme;
       this.menuKey = "menu" + JQXLite.generateID();
 
       this.$refs.TollBar.theme = this.theme;
-      // this.toolbarKey = "toolbar" + JQXLite.generateID();
 
-      // Смена темы детей
+      // Смена темы окон-детей
       this.windows.forEach((item) => {
         item.id = "win" + JQXLite.generateID();
         item.theme = this.theme;
@@ -304,10 +302,6 @@ export default {
       }
     },
 
-    createWindowAddStation(mainWinId) {
-      // this.addListWindow({type: 'AddStation', title: "Добавление путей по станциям", parentWindow: this.findWindowInArr(mainWinId)})
-    },
-
     // Изменить опции создания окна
     updateWindowCreateOptions(old_options, added_options) {
       if (added_options && added_options !== 0) {
@@ -345,7 +339,10 @@ export default {
         close: () => {
           vue.removeWindow(id)
         },
-        changePosition: () => vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state,
+        changePosition: () => {
+          console.log("asd");
+          vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state;
+        },
         mainWindowRow: -1,
         theme: this.theme,
       }
@@ -354,8 +351,15 @@ export default {
       this.windows.push(option);
 
       this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
-        tool.html('<div class="toolbar-main-button-style"><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title.substr(0, 10) + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
-            .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
+
+        tool.jqxToggleButton({  toggled: true, theme: this.theme});
+        tool.text(option.id);
+        tool.append('<img class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
+        tool.css("cursor", "pointer").find('img').on("click", option.close);
+
+
+        // tool.html('<div class="toolbar-main-button-style "><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title.substr(0, 10) + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
+        //     .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
       });
 
       // this.windows[0].type = "WorkVariant";

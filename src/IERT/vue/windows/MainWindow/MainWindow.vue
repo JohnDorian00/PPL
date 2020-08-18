@@ -271,8 +271,6 @@ export default {
   },
 
   mounted() {
-    // FLEXBOX
-    // this.$refs.Rows.updateHeight();
 
   },
 

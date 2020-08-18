@@ -83,3 +83,6 @@
 {
     background-color: #cacaca;
 }
+.jqx-splitter-splitbar-invalid-summer {
+    background: #fe5815 !important;
+}
