@@ -21,21 +21,9 @@
         <!--        white-space:nowrap;-->
 
         <div style="height: calc(100% - 100px);">
-
-<!--          <div style="display: inline-block; width: 200px; height: 100%; position: relative">-->
-<!--            <JqxGrid style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"-->
-<!--                     :columnsmenu="false" :pageable="false" :autoheight="false"-->
-<!--                     :columnsresize="true"-->
-<!--                     :sortable="true" :altrows="true"-->
-<!--                     :enabletooltip="true" :columnsautoresize="true" :editable="false" :selectionmode="'singlerow'"-->
-<!--                     :theme="theme" :filterable="true" :filtermode="'excel'" :sortmode="'columns'"-->
-<!--                     :showfilterrow="true">-->
-<!--            </JqxGrid>-->
-<!--          </div>-->
-
           <div
               style="display: inline-block; width: calc(100% - 200px - 10px + 210px); height: 100%; position: relative; float: right; ">
-            <JqxGrid v-if="isLoaded" style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
+            <JqxGrid style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
                      :width="'100%'"
                      :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
                      :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
@@ -51,14 +39,6 @@
 
         <div style="width: 100%; display : block;">
           <ul class="btn-group" :height="button_height">
-<!--            <li>-->
-<!--              <JqxButton class="button" ref="buttonAdd" :height="button_height" @click="delElem"-->
-<!--                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
-<!--                         :theme="theme" :style="{'display': 'inline-block'} "-->
-<!--              ><span class="nobr">Добавить&nbsp;&nbsp;&nbsp;</span>-->
-<!--              </JqxButton>-->
-
-<!--            </li>-->
             <li class="last">
               <JqxButton class="button" ref="closeButton" @click="hideModal" :width="120" :height="button_height+'px'"
                          :textImageRelation="'imageBeforeText'" :textPosition="'left'"
@@ -80,9 +60,7 @@
 
 import JqxWindow from "@/jqwidgets/jqwidgets-vue/vue_jqxwindow";
 import JqxButton from '@/jqwidgets/jqwidgets-vue/vue_jqxbuttons.vue';
-import appConfig from "@/IERT/js/appConfig";
 import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
-import Rows from "@/IERT/vue/tabel/flex-row";
 import Preloader from "@/IERT/vue/Preloader";
 import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
 import JqxInput from "@/jqwidgets/jqwidgets-vue/vue_jqxinput";
@@ -95,7 +73,6 @@ export default {
     JqxButton,
     JqxGrid,
     Preloader,
-    Rows,
     JqxListBox,
     JqxInput,
     JqxForm

@@ -40,7 +40,7 @@
       <div
           style="background-color: rgba(255,0,0,0); width: 100%; position: relative; top: 0; margin-right: 60px; height: calc(100% - 76px)">
         <Preloader v-if="!isLoaded"></Preloader>
-        <JqxGrid v-show="isLoaded" style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
+        <JqxGrid v-else style="position:relative;" ref="myGrid" :height="'100%'" :width="'100%'"
                  :source="dataAdapter" :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                  :columnsresize="true" @rowselect="onRowselect"
                  :sortable="true" :altrows="true"
@@ -110,8 +110,6 @@ import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
 import XmlQuery from "@/IERT/js/xmlQuery";
 import Preloader from "@/IERT/vue/Preloader";
 import globalData from "@/IERT/js/globalData";
-import Rows from "@/IERT/vue/tabel/flex-row";
-import Columns from "@/IERT/vue/tabel/flex-collum";
 
 export default {
   components: {
@@ -119,8 +117,6 @@ export default {
     JqxButton,
     JqxGrid,
     Preloader,
-    Columns,
-    Rows,
   },
   name: "MainWindow",
   props: ["id", "title", "closeWindows", "state", "theme"],

@@ -110,7 +110,6 @@ import JqxButton from '@/jqwidgets/jqwidgets-vue/vue_jqxbuttons.vue';
 import appConfig from "@/IERT/js/appConfig";
 import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
 import XmlQuery from "@/IERT/js/xmlQuery";
-import Rows from "@/IERT/vue/tabel/flex-row";
 import Preloader from "@/IERT/vue/Preloader";
 import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
 import JqxInput from "@/jqwidgets/jqwidgets-vue/vue_jqxinput";
@@ -123,7 +122,6 @@ export default {
     JqxButton,
     JqxGrid,
     Preloader,
-    Rows,
     JqxListBox,
     JqxInput,
     JqxForm

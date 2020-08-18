@@ -64,7 +64,7 @@
       </ul>
     </JqxMenu>
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
-      <component v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
+      <component ref="win" v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
                  :key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
                  @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource" :theme="window.theme"
                  @workVariantCreateWindow="createWindowEditVariant" :parentWindow="window.parentWindow"
@@ -155,7 +155,7 @@ export default {
       this.menuKey = "menu" + JQXLite.generateID();
 
       this.$refs.TollBar.theme = this.theme;
-      
+
       // Смена темы окон-детей
       this.windows.forEach((item, index) => {
         item.id = "win" + JQXLite.generateID();
@@ -164,10 +164,16 @@ export default {
         item.close =  () => {
           this.removeWindow(item.id)
         },
-        this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
+        item.changePosition = () => {
+          this.minimizeWindow(item.id);
+        },
+
+
+        this.$refs.TollBar.addTool('custom', 'last', true, (type, tool) => {
           tool.jqxToggleButton({toggled: true, theme: this.theme});
-          tool.text(item.id);
+          tool.text(item.title);
           tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
+          tool.on('click', item.changePosition);
           tool.css("cursor", "pointer").find('img').on("click", {id: item.id}, item.close);
         });
       })
@@ -331,9 +337,46 @@ export default {
       return old_options
     },
 
+    minimizeWindow(id) {
+      let window = this.windows[this.id[id]];
+
+      for (let key in this.$refs.win) {
+        if (this.$refs.win[key].id === id) {
+          let vueWindow = this.$refs.win[key].$children[0];
+
+          if (window.state) {
+            // Сохранение параметров окна
+            window.minSaved = {};
+            window.minSaved.minWidth = vueWindow.minWidth;
+            window.minSaved.minHeight = vueWindow.minHeight;
+            window.minSaved.width = vueWindow.width;
+            window.minSaved.height = vueWindow.height;
+
+            vueWindow.minWidth = 0;
+            vueWindow.minHeight = 0;
+            vueWindow.width = 0;
+            vueWindow.height = 0;
+            vueWindow.position = {x:-1000, y:0};
+
+            window.state = false;
+          }
+          else {
+            // Вернуть окну значения ширины и высоты
+            if (window.minSaved.minWidth) vueWindow.minWidth = window.minSaved.minWidth;
+            if (window.minSaved.minHeight) vueWindow.minHeight = window.minSaved.minHeight;
+            if (window.minSaved.width) vueWindow.width = window.minSaved.width;
+            if (window.minSaved.height) vueWindow.height = window.minSaved.height;
+
+            vueWindow.position = {x:50, y:50};
+
+            window.state = true;
+          }
+        }
+      }
+    },
+
     removeWindow(id) {
       console.log("Window with id = " + id + " closed");
-      // this.findWindowInArr(id).close();
       this.$refs.TollBar.destroyTool(this.id[id]);
       this.windows.splice(this.id[id], 1)
       this.id = {};
@@ -352,12 +395,10 @@ export default {
         title: 'Прогресс ' + ++this.count,
         state: true,
         close: () => {
-          // if (id.data.id) id = id.data.id;
-          vue.removeWindow(id)
+          vue.removeWindow(id);
         },
         changePosition: () => {
-          console.log("asd");
-          vue.windows[vue.id[id]].state = !vue.windows[vue.id[id]].state;
+          vue.minimizeWindow(id);
         },
         mainWindowRow: -1,
         theme: this.theme,
@@ -366,19 +407,14 @@ export default {
       this.id[id] = this.windows.length;
       this.windows.push(option);
 
-      this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
+      this.$refs.TollBar.addTool('custom', 'last', true, (type, tool) => {
 
         tool.jqxToggleButton({toggled: true, theme: this.theme});
-        tool.text(option.id);
+        tool.text(option.title);
         tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
-        tool.css("cursor", "pointer").find('img').on("click", option.close);
-
-
-        // tool.html('<div class="toolbar-main-button-style "><ul class="list-class-style"><li><div><p class="toolbar-text-style">' + option.title.substr(0, 10) + '</p></div></li><li><img class="toolbar-close-button-style" alt=""/></li></ul></div>')
-        //     .css("cursor", "pointer").on('click', option.changePosition).find('img').on("click", option.close);
+        tool.on('click', option.changePosition);
+        // tool.css("cursor", "pointer").find('img').on("click", option.close);
       });
-
-      // this.windows[0].type = "WorkVariant";
     }
   },
 

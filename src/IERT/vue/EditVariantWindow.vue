@@ -65,7 +65,7 @@
                       <div style="height:100%; width:100%; overflow: hidden;">
                         <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
                         <Preloader v-if="!isLinesLoaded" style="position: relative"/>
-                        <JqxGrid v-show="isLinesLoaded" style="position:relative; border: none;" ref="linesGrid"
+                        <JqxGrid v-else style="position:relative; border: none;" ref="linesGrid"
                                  :height="'100%'"
                                  :width="'100%'"
                                  :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
@@ -86,10 +86,6 @@
                         </div>
 
                         <div style="height: calc(100% - 110px)">
-
-
-                          <!--                       v-if="isLinesLoaded"   <Preloader v-if="!isLinesLoaded" style="position:relative;"/>-->
-
 
                           <JqxGrid style="border: none; position:relative;" ref="stationGrid"
                                    :height="'100%'"
@@ -153,11 +149,8 @@
                   </div>
 
                   <div style="height: 100%; padding: 0 0 50px;">
-                    <div>
-                      <Preloader v-if="!isLoaded"/>
-                    </div>
-
-                    <jqxTreeGrid v-show="isLoaded && !isLoco" style="border: none; position:relative;"
+                    <Preloader v-if="!isLoaded"/>
+                    <jqxTreeGrid v-else style="border: none; position:relative;"
                                  ref="selectedGrid"
                                  :height="'100%'"
                                  :width="'100%'" @rowBeginEdit="rowEdit($event)" @rowEndEdit="rowEndEdit($event)"
@@ -243,7 +236,6 @@ import JqxButton from '@/jqwidgets/jqwidgets-vue/vue_jqxbuttons.vue';
 import appConfig from "@/IERT/js/appConfig";
 import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
 import XmlQuery from "@/IERT/js/xmlQuery";
-import Rows from "@/IERT/vue/tabel/flex-row";
 import Preloader from "@/IERT/vue/Preloader";
 import JqxSplitter from "@/jqwidgets/jqwidgets-vue/vue_jqxsplitter";
 import JqxExpander from "@/jqwidgets/jqwidgets-vue/vue_jqxexpander";
@@ -260,7 +252,6 @@ export default {
     JqxButton,
     JqxGrid,
     Preloader,
-    Rows,
     JqxSplitter,
     JqxExpander,
     JqxTree,
