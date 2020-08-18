@@ -85,7 +85,6 @@ import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
 import EditVariantWindow from "@/IERT/vue/EditVariantWindow";
 import AddStation from "@/IERT/vue/windows/AddStation/AddStation";
 import XmlQuery from "@/IERT/js/xmlQuery";
-import toolbarCloseButton from "@/public/img/close_white.png";
 
 
 export default {
@@ -167,8 +166,6 @@ export default {
         item.changePosition = () => {
           this.minimizeWindow(item.id);
         },
-
-
         this.$refs.TollBar.addTool('custom', 'last', true, (type, tool) => {
           tool.jqxToggleButton({toggled: true, theme: this.theme});
           tool.text(item.title);
@@ -346,26 +343,26 @@ export default {
 
           if (window.state) {
             // Сохранение параметров окна
-            window.minSaved = {};
-            window.minSaved.minWidth = vueWindow.minWidth;
-            window.minSaved.minHeight = vueWindow.minHeight;
-            window.minSaved.width = vueWindow.width;
-            window.minSaved.height = vueWindow.height;
+            // window.minSaved = {};
+            // window.minSaved.minWidth = vueWindow.minWidth;
+            // window.minSaved.minHeight = vueWindow.minHeight;
+            // window.minSaved.width = vueWindow.width;
+            // window.minSaved.height = vueWindow.height;
 
-            vueWindow.minWidth = 0;
-            vueWindow.minHeight = 0;
-            vueWindow.width = 0;
-            vueWindow.height = 0;
+            // vueWindow.minWidth = 0;
+            // vueWindow.minHeight = 0;
+            // vueWindow.width = 0;
+            // vueWindow.height = 0;
             vueWindow.position = {x:-1000, y:0};
 
             window.state = false;
           }
           else {
             // Вернуть окну значения ширины и высоты
-            if (window.minSaved.minWidth) vueWindow.minWidth = window.minSaved.minWidth;
-            if (window.minSaved.minHeight) vueWindow.minHeight = window.minSaved.minHeight;
-            if (window.minSaved.width) vueWindow.width = window.minSaved.width;
-            if (window.minSaved.height) vueWindow.height = window.minSaved.height;
+            // if (window.minSaved.minWidth) vueWindow.minWidth = window.minSaved.minWidth;
+            // if (window.minSaved.minHeight) vueWindow.minHeight = window.minSaved.minHeight;
+            // if (window.minSaved.width) vueWindow.width = window.minSaved.width;
+            // if (window.minSaved.height) vueWindow.height = window.minSaved.height;
 
             vueWindow.position = {x:50, y:50};
 
@@ -402,6 +399,7 @@ export default {
         },
         mainWindowRow: -1,
         theme: this.theme,
+        zIndex: this.windows.length,
       }
       option = this.updateWindowCreateOptions(option, added_options);
       this.id[id] = this.windows.length;
@@ -413,7 +411,7 @@ export default {
         tool.text(option.title);
         tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
         tool.on('click', option.changePosition);
-        // tool.css("cursor", "pointer").find('img').on("click", option.close);
+        tool.css("cursor", "pointer").find('img').on("click", option.close);
       });
     }
   },
