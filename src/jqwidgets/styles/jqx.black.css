@@ -161,11 +161,11 @@
 }
 
 .jqx-checkbox-check-checked-black {
-    background: transparent url(images/check_white.png) left top no-repeat;
+    background: transparent url(src/style/images/check_white.png) left top no-repeat;
 }
 
 .jqx-checkbox-check-indeterminate-black {
-    background: transparent url(images/check_indeterminate_white.png) left top no-repeat;
+    background: transparent url(src/style/images/check_indeterminate_white.png) left top no-repeat;
 }
 
 .jqx-grid-black, .jqx-grid-header-black, .jqx-grid-cell-black {
@@ -220,7 +220,7 @@
 }
 
 .jqx-scrollbar-button-state-pressed-black {
-    background: #555 url(images/darkred_gradient.png) left top scroll repeat-x;
+    background: #555 url(src/style/images/darkred_gradient.png) left top scroll repeat-x;
     border: 1px solid #000;
 }
 
@@ -281,37 +281,37 @@
 }
 
 .jqx-grid-column-sortascbutton-black, .jqx-expander-arrow-bottom-black, .jqx-window-collapse-button-black, .jqx-menu-item-arrow-up-black, .jqx-menu-item-arrow-up-selected-black, .jqx-menu-item-arrow-top-up-black, .jqx-icon-arrow-up-black, .jqx-icon-arrow-up-hover-black, .jqx-icon-arrow-up-selected-black {
-    background-image: url('images/icon-up-white.png');
+    background-image: url('src/style/images/icon-up-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-widget-black .jqx-grid-group-expand-black, .jqx-grid-group-expand-black, .jqx-grid-column-menubutton-black, .jqx-grid-column-sortdescbutton-black, .jqx-expander-arrow-top-black, .jqx-window-collapse-button-collapsed-black, .jqx-menu-item-arrow-down-black, .jqx-menu-item-arrow-down-selected-black, .jqx-menu-item-arrow-down-black, .jqx-icon-arrow-down-black, .jqx-icon-arrow-down-hover-black, .jqx-icon-arrow-down-selected-black {
-    background-image: url('images/icon-down-white.png');
+    background-image: url('src/style/images/icon-down-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-tabs-arrow-left-black, .jqx-menu-item-arrow-left-selected-black, .jqx-menu-item-arrow-top-left, .jqx-icon-arrow-left-black, .jqx-icon-arrow-down-left-black, .jqx-icon-arrow-left-selected-black {
-    background-image: url('images/icon-left-white.png');
+    background-image: url('src/style/images/icon-left-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-widget-black .jqx-grid-group-collapse-black, .jqx-grid-group-collapse-black, .jqx-tabs-arrow-right-black, .jqx-menu-item-arrow-right-selected-black, .jqx-menu-item-arrow-top-right-black, .jqx-icon-arrow-right-black, .jqx-icon-arrow-right-hover-black, .jqx-icon-arrow-right-selected-black {
-    background-image: url('images/icon-right-white.png');
+    background-image: url('src/style/images/icon-right-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-window-close-button-black, .jqx-icon-close-black, .jqx-tabs-close-button-black, .jqx-tabs-close-button-hover-black, .jqx-tabs-close-button-selected-black {
-    background-image: url(images/close_white.png);
+    background-image: url(src/style/images/close_white.png);
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-tree-item-arrow-collapse-rtl-black, .jqx-tree-item-arrow-collapse-hover-rtl-black {
-    background-image: url(images/icon-left.png);
+    background-image: url(src/style/images/icon-left.png);
 }
 
 .jqx-listitem-state-group-black {
@@ -354,83 +354,83 @@
 }
 
 .jqx-icon-arrow-first-black {
-    background-image: url('images/icon-first-white.png');
+    background-image: url('src/style/images/icon-first-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-icon-arrow-last-black {
-    background-image: url('images/icon-last-white.png');
+    background-image: url('src/style/images/icon-last-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-black.jqx-grid-cell-selected-black > .jqx-grid-group-expand-black,
 .jqx-grid-cell-black.jqx-grid-cell-hover-black > .jqx-grid-group-expand-black {
-    background-image: url('images/icon-down-white.png');
+    background-image: url('src/style/images/icon-down-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-black.jqx-grid-cell-selected-black > .jqx-grid-group-collapse-black,
 .jqx-grid-cell-black.jqx-grid-cell-hover-black > .jqx-grid-group-collapse-black {
-    background-image: url('images/icon-right-white.png');
+    background-image: url('src/style/images/icon-right-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-black.jqx-grid-cell-selected-black > .jqx-grid-group-collapse-rtl-black,
 .jqx-grid-cell-black.jqx-grid-cell-hover-black > .jqx-grid-group-collapse-rtl-black {
-    background-image: url('images/icon-left-white.png');
+    background-image: url('src/style/images/icon-left-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-black.jqx-grid-cell-selected-black > .jqx-grid-group-expand-rtl-black,
 .jqx-grid-cell-black.jqx-grid-cell-hover-black > .jqx-grid-group-expand-rtl-black {
-    background-image: url('images/icon-down-white.png');
+    background-image: url('src/style/images/icon-down-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-icon-calendar-black, .jqx-icon-calendar-hover-black, .jqx-icon-calendar-pressed-black {
-    background-image: url('images/icon-calendar-white.png');
+    background-image: url('src/style/images/icon-calendar-white.png');
 }
 
 .jqx-icon-time-black, .jqx-icon-time-hover-black, .jqx-icon-time-pressed-black {
-    background-image: url('images/icon-time-white.png');
+    background-image: url('src/style/images/icon-time-white.png');
 }
 
 .jqx-icon-delete-black {
-    background-image: url('images/icon-delete-white.png');
+    background-image: url('src/style/images/icon-delete-white.png');
 }
 
 .jqx-icon-edit-black {
-    background-image: url('images/icon-edit-white.png');
+    background-image: url('src/style/images/icon-edit-white.png');
 }
 
 .jqx-icon-save-black {
-    background-image: url('images/icon-save-white.png');
+    background-image: url('src/style/images/icon-save-white.png');
 }
 
 .jqx-icon-cancel-black {
-    background-image: url('images/icon-cancel-white.png');
+    background-image: url('src/style/images/icon-cancel-white.png');
 }
 
 .jqx-icon-search-black {
-    background-image: url(images/search_white.png);
+    background-image: url(src/style/images/search_white.png);
 }
 
 .jqx-icon-plus-black {
-    background-image: url(images/plus_white.png);
+    background-image: url(src/style/images/plus_white.png);
 }
 
 .jqx-menu-minimized-button-black {
-    background-image: url('images/icon-menu-minimized-white.png');
+    background-image: url('src/style/images/icon-menu-minimized-white.png');
 }
 
 .jqx-editor-toolbar-icon-black {
-    background: url('images/html_editor_white.png') no-repeat;
+    background: url('src/style/images/html_editor_white.png') no-repeat;
 }
 
 .jqx-layout-black {
@@ -438,11 +438,11 @@
 }
 
 .jqx-layout-pseudo-window-pin-icon-black {
-    background-image: url("images/pin-white.png");
+    background-image: url("src/style/images/pin-white.png");
 }
 
 .jqx-layout-pseudo-window-pinned-icon-black {
-    background-image: url("images/pinned-white.png");
+    background-image: url("src/style/images/pinned-white.png");
 }
 
 .jqx-scheduler-month-cell-black, .jqx-scheduler-time-column-black, .jqx-scheduler-toolbar-black {
@@ -463,14 +463,14 @@
     border-style: solid;
     border-width: 0px 0px 0px 1px;
     border-color: transparent;
-    background-image: url('images/icon-menu-small-white.png') !important;
+    background-image: url('src/style/images/icon-menu-small-white.png') !important;
     background-repeat: no-repeat;
     background-position: center;
     cursor: pointer;
 }
 
 .jqx-item-black .jqx-grid-sortasc-icon {
-    background-image: url('images/icon-sort-asc-white.png');
+    background-image: url('src/style/images/icon-sort-asc-white.png');
     background-repeat: no-repeat;
     background-position: left center;
     width: 16px;
@@ -481,7 +481,7 @@
 }
 /*applied to the sort ascending menu item in the Grid's Context Menu*/
 .jqx-item-black .jqx-grid-sortdesc-icon {
-    background-image: url('images/icon-sort-desc-white.png');
+    background-image: url('src/style/images/icon-sort-desc-white.png');
     background-repeat: no-repeat;
     background-position: left center;
     width: 16px;
@@ -492,7 +492,7 @@
 }
 /*applied to the grid menu's sort remove item/*/
 .jqx-item-black .jqx-grid-sortremove-icon {
-    background-image: url('images/icon-sort-remove-white.png');
+    background-image: url('src/style/images/icon-sort-remove-white.png');
     background-repeat: no-repeat;
     background-position: left center;
     width: 16px;

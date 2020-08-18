@@ -76,9 +76,6 @@
 </template>
 
 <script>
-import * as backgroundUrl from "@/public/img/background.jpg"
-import "@/style/jqx.base.css"
-import "@/style/jqx.ext.css"
 import JqxToolbar from "@/jqwidgets/jqwidgets-vue/vue_jqxtoolbar";
 import JqxMenu from "@/jqwidgets/jqwidgets-vue/vue_jqxmenu";
 import JqxButtons from "@/jqwidgets/jqwidgets-vue/vue_jqxbuttons";
@@ -88,6 +85,8 @@ import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
 import EditVariantWindow from "@/IERT/vue/EditVariantWindow";
 import AddStation from "@/IERT/vue/windows/AddStation/AddStation";
 import XmlQuery from "@/IERT/js/xmlQuery";
+import toolbarCloseButton from "@/public/img/close_white.png";
+
 
 export default {
   name: "MainApp",
@@ -103,7 +102,6 @@ export default {
 
   data() {
     return {
-      backgroundUrl: backgroundUrl,
       theme: 'light',
       mainDivSize: document.documentElement.clientHeight - 75,
       windows: [],
@@ -145,16 +143,33 @@ export default {
       // if (!confirm("Несохраненные данные будут потеряны. Вы уверены?")) return
       this.theme = theme;
 
+      // Обнуление
+      this.id = {};
+      let len = this.$refs.TollBar.getTools().length;
+      for (let i=0; i<len; i++) {
+        this.$refs.TollBar.destroyTool(0);
+      }
+
       this.$refs.Menu.minimize();
       this.$refs.Menu.theme = this.theme;
       this.menuKey = "menu" + JQXLite.generateID();
 
       this.$refs.TollBar.theme = this.theme;
-
+      
       // Смена темы окон-детей
-      this.windows.forEach((item) => {
+      this.windows.forEach((item, index) => {
         item.id = "win" + JQXLite.generateID();
+        this.id[item.id] = index;
         item.theme = this.theme;
+        item.close =  () => {
+          this.removeWindow(item.id)
+        },
+        this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
+          tool.jqxToggleButton({toggled: true, theme: this.theme});
+          tool.text(item.id);
+          tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
+          tool.css("cursor", "pointer").find('img').on("click", {id: item.id}, item.close);
+        });
       })
     },
 
@@ -337,6 +352,7 @@ export default {
         title: 'Прогресс ' + ++this.count,
         state: true,
         close: () => {
+          // if (id.data.id) id = id.data.id;
           vue.removeWindow(id)
         },
         changePosition: () => {
@@ -352,9 +368,9 @@ export default {
 
       this.$refs.TollBar.addTool('custom', 'last', false, (type, tool) => {
 
-        tool.jqxToggleButton({  toggled: true, theme: this.theme});
+        tool.jqxToggleButton({toggled: true, theme: this.theme});
         tool.text(option.id);
-        tool.append('<img class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
+        tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
         tool.css("cursor", "pointer").find('img').on("click", option.close);
 
 
@@ -412,13 +428,14 @@ export default {
   height: 16px;
   margin-top: 5px;
   border: none;
-  background-image: url('style/images/close_white.png') !important;
+
+  /*background-image: url(images/close_white.png) !important;*/
 }
 
 .toolbar-close-button-style:hover {
   background-color: black;
   border: none;
-  background-image: url('style/images/close_white.png') !important;
+  /*background-image: url(images/close_white.png) !important;*/
 }
 
 .list-class-style {

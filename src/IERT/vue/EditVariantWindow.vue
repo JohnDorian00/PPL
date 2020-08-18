@@ -275,7 +275,6 @@ export default {
   props: ["id", "title", "closeWindows", "state", "row", "stations", "theme"],
   data() {
     return {
-      // theme: appConfig.windowsTheme,
       isLoaded: true,
       isLinesLoaded: true,
       button_height: 30,

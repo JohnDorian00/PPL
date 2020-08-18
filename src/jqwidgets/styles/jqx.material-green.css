@@ -216,7 +216,7 @@
       border-color: transparent;
       box-shadow:none;
   }
-  
+
     .jqx-button-material-green.jqx-fill-state-focus.outlined,
     .jqx-button-material-green.jqx-fill-state-focus.flat {
         box-shadow: none;
@@ -565,7 +565,7 @@
     color: rgba(0,0,0,.54) !important;
     background-color: transparent;
     border-color: transparent;
-    box-shadow: none;    
+    box-shadow: none;
 }
 
 .jqx-grid-pager-top-material-green .jqx-grid-pager-number-material-green,
@@ -764,7 +764,7 @@
 }
 
 .jqx-checkbox-check-checked-material-green {
-    background: transparent url(images/material_check_white.png) center center no-repeat;
+    background: transparent url(src/style/images/material_check_white.png) center center no-repeat;
 }
 .jqx-checkbox-check-indeterminate-material-green {
     width:14px !important;
@@ -798,13 +798,13 @@
 .jqx-slider-material-green[discrete] .jqx-slider-slider-material-green:active
  {
     transform: scaleX(0);
-    
+
 }
 .jqx-slider-slider-horizontal-material-green {
-    background: #558B2F; 
+    background: #558B2F;
 }
 .jqx-slider-slider-vertical-material-green {
-    background: #558B2F; 
+    background: #558B2F;
 }
 .jqx-slider-tooltip-material-green {
     width: 25px;
@@ -821,11 +821,11 @@
 .jqx-slider-tooltip-material-green.hide {
      transition: transform 0.2s ease;
      transform-origin:50% 100%;
-     transform: scale(0) rotate(45deg); 
+     transform: scale(0) rotate(45deg);
 }
 .jqx-slider-tooltip-material-green.show {
      transition: transform 0.2s ease;
-     transform: scale(1) rotate(45deg); 
+     transform: scale(1) rotate(45deg);
 }
 
 
@@ -840,18 +840,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #558B2F; 
+    background: #558B2F;
     color: #fff;
     font-size:11px;
 }
 .jqx-slider-tooltip-material-green.far, .jqx-slider-tooltip-material-green.far .jqx-fill-state-normal-material-green {
-   border-radius: 0px 15px 15px 15px; 
+   border-radius: 0px 15px 15px 15px;
 }
 .jqx-slider-tooltip-material-green.vertical, .jqx-slider-tooltip-material-green.vertical .jqx-fill-state-normal-material-green {
-   border-radius: 15px 0px 15px 15px; 
+   border-radius: 15px 0px 15px 15px;
 }
 .jqx-slider-tooltip-material-green.vertical.far, .jqx-slider-tooltip-material-green.vertical.far .jqx-fill-state-normal-material-green {
-   border-radius: 15px 15px 15px 0px; 
+   border-radius: 15px 15px 15px 0px;
 }
 .jqx-slider-tooltip-material-green {
     background:transparent;
@@ -901,7 +901,7 @@
 }
 .jqx-slider-button-material-green.jqx-fill-state-normal-material-green,
 .jqx-slider-button-material-green.jqx-fill-state-hover-material-green,
-.jqx-slider-button-material-green.jqx-fill-state-pressed-material-green 
+.jqx-slider-button-material-green.jqx-fill-state-pressed-material-green
 {
     background: transparent !important;
 }
@@ -969,7 +969,7 @@
 .jqx-scheduler-cell-selected-material-green {
       border-color: rgba(85,139,47,0.2) !important;
     background: rgba(85,139,47,0.2) !important;
- 
+
 }
 
 .jqx-grid-cell-material-green .jqx-button-material-green, .jqx-grid-cell-material-green .jqx-button-material-green.jqx-fill-state-hover-material-green, .jqx-grid-cell-material-green .jqx-button-material-green.jqx-fill-state-pressed-material-green {
@@ -991,41 +991,41 @@
 }
 
 .jqx-grid-column-sortascbutton-material-green, .jqx-expander-arrow-bottom-material-green, .jqx-window-collapse-button-material-green, .jqx-menu-item-arrow-up-material-green, .jqx-menu-item-arrow-up-selected-material-green, .jqx-menu-item-arrow-top-up-material-green, .jqx-icon-arrow-up-material-green, .jqx-icon-arrow-up-hover-material-green, .jqx-icon-arrow-up-selected-material-green {
-    background-image: url('images/material-icon-up.png');
+    background-image: url('src/style/images/material-icon-up.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-widget-material-green .jqx-grid-group-expand-material-green, .jqx-grid-group-expand-material-green, .jqx-grid-column-menubutton-material-green, .jqx-grid-column-sortdescbutton-material-green, .jqx-expander-arrow-top-material-green, .jqx-window-collapse-button-collapsed-material-green, .jqx-menu-item-arrow-down-material-green, .jqx-menu-item-arrow-down-selected-material-green, .jqx-menu-item-arrow-down-material-green, .jqx-icon-arrow-down-material-green, .jqx-icon-arrow-down-hover-material-green, .jqx-icon-arrow-down-selected-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-tabs-arrow-left-material-green, .jqx-menu-item-arrow-left-selected-material-green, .jqx-menu-item-arrow-top-left, .jqx-icon-arrow-left-material-green, .jqx-icon-arrow-down-left-material-green, .jqx-icon-arrow-left-selected-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-widget-material-green .jqx-grid-group-collapse-material-green, .jqx-grid-group-collapse-material-green, .jqx-tabs-arrow-right-material-green, .jqx-menu-item-arrow-right-selected-material-green, .jqx-menu-item-arrow-top-right-material-green, .jqx-icon-arrow-right-material-green, .jqx-icon-arrow-right-hover-material-green, .jqx-icon-arrow-right-selected-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-tree-item-arrow-collapse-rtl-material-green, .jqx-tree-item-arrow-collapse-hover-rtl-material-green {
-    background-image: url(images/material-icon-left.png);
+    background-image: url(src/style/images/material-icon-left.png);
 }
 
 .jqx-menu-item-arrow-left-selected-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-menu-item-arrow-right-selected-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -1051,7 +1051,7 @@
 }
 
 .jqx-combobox-material-green .jqx-icon-close-material-green {
-    background-image:url(images/close_white.png)
+    background-image:url(src/style/images/close_white.png)
 }
 .jqx-combobox-material-green, .jqx-input-material-green {
     border-color: #E0E0E0;
@@ -1071,7 +1071,7 @@
     border-color: transparent;
 }
 
-.jqx-combobox-content-focus-material-green, 
+.jqx-combobox-content-focus-material-green,
 .jqx-combobox-state-focus-material-green,
 .jqx-numberinput-focus-material-green {
     outline: none;
@@ -1110,7 +1110,7 @@
 }
 .jqx-input-material-green.jqx-validator-error-element {
     border-color: transparent !important;
-    border-bottom: 1px solid #df2227 !important; 
+    border-bottom: 1px solid #df2227 !important;
 }
 .jqx-input-material-green input,
 .jqx-dropdownlist-state-normal-material-green,
@@ -1126,8 +1126,8 @@
     border-bottom: 1px solid #E0E0E0;
     outline: none;
 }
-.jqx-datetimeinput-material-green .jqx-action-button-material-green, 
-.jqx-datetimeinput-material-green .jqx-action-button-rtl-material-green 
+.jqx-datetimeinput-material-green .jqx-action-button-material-green,
+.jqx-datetimeinput-material-green .jqx-action-button-rtl-material-green
 {
     background-color: transparent;
     border-color: transparent;
@@ -1254,13 +1254,13 @@ input[type="password"] {
 .jqx-expander-header-material-green .jqx-icon-arrow-up {
    transform: rotate(180deg);
    transition: transform 0.2s ease-out;
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
 }
 
 .jqx-tree-item-arrow-collapse-material-green
 {
     transform: rotate(-90deg);
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
     background-repeat: no-repeat;
     background-position: center;
     transition: transform 0.2s ease-out;
@@ -1316,25 +1316,25 @@ input[type="text"].jqx-input-material-green:-ms-input-placeholder, input[type="t
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-expand-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-collapse-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-collapse-rtl-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-expand-rtl-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -1354,7 +1354,7 @@ input[type="text"].jqx-input-material-green:-ms-input-placeholder, input[type="t
 .jqx-tabs-title-selected-top-material-green
  {
     color: #558B2F;
-    font-weight:500;   
+    font-weight:500;
     padding-top:5px;
     padding-bottom:5px;
 }
@@ -1486,91 +1486,91 @@ input[type="text"].jqx-input-material-green:-ms-input-placeholder, input[type="t
     font-size:12px;
 }
 .jqx-grid-column-menubutton-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
 }
 
 .jqx-tabs-close-button-material-green {
-    background-image: url(images/close.png);
+    background-image: url(src/style/images/close.png);
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-tabs-close-button-selected-material-green {
-    background-image: url(images/close.png);
+    background-image: url(src/style/images/close.png);
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-tabs-close-button-hover-material-green {
-    background-image: url(images/close.png);
+    background-image: url(src/style/images/close.png);
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-scrollbar-button-state-pressed-material-green .jqx-icon-arrow-up-selected-material-green {
-    background-image: url('images/material-icon-up.png');
+    background-image: url('src/style/images/material-icon-up.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-scrollbar-button-state-pressed-material-green .jqx-icon-arrow-down-selected-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-scrollbar-button-state-pressed-material-green .jqx-icon-arrow-left-selected-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-scrollbar-button-state-pressed-material-green .jqx-icon-arrow-right-selected-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-expand-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-collapse-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-collapse-rtl-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-cell-material-green.jqx-grid-cell-selected-material-green > .jqx-grid-group-expand-rtl-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-grid-group-collapse-material-green {
-    background-image: url(images/material-icon-right.png);
+    background-image: url(src/style/images/material-icon-right.png);
     background-position: 50% 50%;
     background-repeat: no-repeat;
 }
 
 .jqx-grid-group-collapse-rtl-material-green {
     padding-right: 0px;
-    background-image: url(images/material-icon-left.png);
+    background-image: url(src/style/images/material-icon-left.png);
     background-position: 50% 50%;
     background-repeat: no-repeat;
 }
 
 .jqx-grid-group-expand-material-green, .jqx-grid-group-expand-rtl-material-green {
     padding-right: 0px;
-    background-image: url(images/material-icon-down.png);
+    background-image: url(src/style/images/material-icon-down.png);
     background-position: 50% 50%;
     background-repeat: no-repeat;
 }
@@ -1579,110 +1579,110 @@ input[type="text"].jqx-input-material-green:-ms-input-placeholder, input[type="t
 }
 
 .jqx-icon-arrow-first-material-green {
-    background-image: url('images/material-icon-first.png');
+    background-image: url('src/style/images/material-icon-first.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-icon-arrow-last-material-green {
-    background-image: url('images/material-icon-last.png');
+    background-image: url('src/style/images/material-icon-last.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-icon-arrow-first-hover-material-green {
-    background-image: url('images/material-icon-first.png');
+    background-image: url('src/style/images/material-icon-first.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-icon-arrow-last-hover-material-green {
-    background-image: url('images/material-icon-last.png');
+    background-image: url('src/style/images/material-icon-last.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-icon-arrow-first-selected-material-green {
-    background-image: url('images/material-icon-first.png');
+    background-image: url('src/style/images/material-icon-first.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-icon-arrow-last-selected-material-green {
-    background-image: url('images/material-icon-last.png');
+    background-image: url('src/style/images/material-icon-last.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-fill-state-pressed-material-green .jqx-icon-arrow-first-selected-material-green {
-    background-image: url('images/material-icon-first-white.png');
+    background-image: url('src/style/images/material-icon-first-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-fill-state-pressed-material-green .jqx-icon-arrow-last-selected-material-green {
-    background-image: url('images/material-icon-last-white.png');
+    background-image: url('src/style/images/material-icon-last-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 .jqx-fill-state-pressed-material-green .jqx-icon-arrow-left-selected-material-green {
-    background-image: url('images/material-icon-left-white.png');
+    background-image: url('src/style/images/material-icon-left-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .jqx-fill-state-pressed-material-green .jqx-icon-arrow-right-selected-material-green {
-    background-image: url('images/material-icon-right-white.png');
+    background-image: url('src/style/images/material-icon-right-white.png');
     background-repeat: no-repeat;
     background-position: center;
 }
 .jqx-primary .jqx-icon-arrow-down-material-green, .jqx-warning .jqx-icon-arrow-down-material-green, .jqx-danger .jqx-icon-arrow-down-material-green, .jqx-success .jqx-icon-arrow-down-material-green, .jqx-info .jqx-icon-arrow-down-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
 }
 
 .jqx-primary .jqx-icon-arrow-down-selected-material-green, .jqx-warning .jqx-icon-arrow-down-selected-material-green, .jqx-danger .jqx-icon-arrow-down-selected-material-green, .jqx-success .jqx-icon-arrow-down-selected-material-green, .jqx-info .jqx-icon-arrow-down-selected-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
 }
 
 .jqx-primary .jqx-icon-arrow-down-hover-material-green, .jqx-warning .jqx-icon-arrow-down-hover-material-green, .jqx-danger .jqx-icon-arrow-down-hover-material-green, .jqx-success .jqx-icon-arrow-down-hover-material-green, .jqx-info .jqx-icon-arrow-down-hover-material-green {
-    background-image: url('images/material-icon-down.png');
+    background-image: url('src/style/images/material-icon-down.png');
 }
 
 .jqx-primary .jqx-icon-arrow-up-material-green, .jqx-warning .jqx-icon-arrow-up-material-green, .jqx-danger .jqx-icon-arrow-up-material-green, .jqx-success .jqx-icon-arrow-up-material-green, .jqx-info .jqx-icon-arrow-up-material-green {
-    background-image: url('images/material-icon-up.png');
+    background-image: url('src/style/images/material-icon-up.png');
 }
 
 .jqx-primary .jqx-icon-arrow-up-selected-material-green, .jqx-warning .jqx-icon-arrow-up-selected-material-green, .jqx-danger .jqx-icon-arrow-up-selected-material-green, .jqx-success .jqx-icon-arrow-up-selected-material-green, .jqx-info .jqx-icon-arrow-up-selected-material-green {
-    background-image: url('images/material-icon-up.png');
+    background-image: url('src/style/images/material-icon-up.png');
 }
 
 .jqx-primary .jqx-icon-arrow-up-hover-material-green, .jqx-warning .jqx-icon-arrow-up-hover-material-green, .jqx-danger .jqx-icon-arrow-up-hover-material-green, .jqx-success .jqx-icon-arrow-up-hover-material-green, .jqx-info .jqx-icon-arrow-up-hover-material-green {
-    background-image: url('images/material-icon-up.png');
+    background-image: url('src/style/images/material-icon-up.png');
 }
 
 
 .jqx-primary .jqx-icon-arrow-left-material-green, .jqx-warning .jqx-icon-arrow-left-material-green, .jqx-danger .jqx-icon-arrow-left-material-green, .jqx-success .jqx-icon-arrow-left-material-green, .jqx-info .jqx-icon-arrow-left-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
 }
 
 .jqx-primary .jqx-icon-arrow-left-selected-material-green, .jqx-warning .jqx-icon-arrow-left-selected-material-green, .jqx-danger .jqx-icon-arrow-left-selected-material-green, .jqx-success .jqx-icon-arrow-left-selected-material-green, .jqx-info .jqx-icon-arrow-left-selected-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
 }
 
 .jqx-primary .jqx-icon-arrow-left-hover-material-green, .jqx-warning .jqx-icon-arrow-left-hover-material-green, .jqx-danger .jqx-icon-arrow-left-hover-material-green, .jqx-success .jqx-icon-arrow-left-hover-material-green, .jqx-info .jqx-icon-arrow-left-hover-material-green {
-    background-image: url('images/material-icon-left.png');
+    background-image: url('src/style/images/material-icon-left.png');
 }
 
 .jqx-primary .jqx-icon-arrow-right-material-green, .jqx-warning .jqx-icon-arrow-right-material-green, .jqx-danger .jqx-icon-arrow-right-material-green, .jqx-success .jqx-icon-arrow-right-material-green, .jqx-info .jqx-icon-arrow-right-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
 }
 
 .jqx-primary .jqx-icon-arrow-right-selected-material-green, .jqx-warning .jqx-icon-arrow-right-selected-material-green, .jqx-danger .jqx-icon-arrow-right-selected-material-green, .jqx-success .jqx-icon-arrow-right-selected-material-green, .jqx-info .jqx-icon-arrow-right-selected-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
 }
 
 .jqx-primary .jqx-icon-arrow-right-hover-material-green, .jqx-warning .jqx-icon-arrow-right-hover-material-green, .jqx-danger .jqx-icon-arrow-right-hover-material-green, .jqx-success .jqx-icon-arrow-right-hover-material-green, .jqx-info .jqx-icon-arrow-right-hover-material-green {
-    background-image: url('images/material-icon-right.png');
+    background-image: url('src/style/images/material-icon-right.png');
 }
 
 
@@ -1699,13 +1699,13 @@ input[type="text"].jqx-input-material-green:-ms-input-placeholder, input[type="t
     pointer-events: none;
     border-radius: 0%;
     transform: scaleX(0);
-    background: rgba(85,139,47,0.5); 
+    background: rgba(85,139,47,0.5);
     opacity: 0.25;
 }
 
 
 .outlined .ink, .flat .ink {
-    background: rgba(85,139,47,0.5); 
+    background: rgba(85,139,47,0.5);
     overflow:hidden;
 }
 
@@ -1719,9 +1719,9 @@ input[type="text"].jqx-input-material-green:-ms-input-placeholder, input[type="t
     overflow:visible;
 }
 .jqx-checkbox-material-green .ink,
-.jqx-radiobutton-material-green .ink 
+.jqx-radiobutton-material-green .ink
  {
-    transform: scale(0); 
+    transform: scale(0);
     background: #558B2F;
     border-radius: 50%;
 }
@@ -1776,40 +1776,40 @@ input[type="text"].jqx-input-material-green:-ms-input-placeholder, input[type="t
 
 .jqx-fill-state-pressed-material-green .jqx-icon-delete-material-green
 {
-    background-image: url('images/icon-delete-white.png');
+    background-image: url('src/style/images/icon-delete-white.png');
 }
 .jqx-fill-state-pressed-material-green .jqx-icon-edit-material-green
 {
-    background-image: url('images/icon-edit-white.png');
+    background-image: url('src/style/images/icon-edit-white.png');
 }
 .jqx-fill-state-pressed-material-green .jqx-icon-save-material-green
 {
-    background-image: url('images/icon-save-white.png');
+    background-image: url('src/style/images/icon-save-white.png');
 }
 .jqx-fill-state-pressed-material-green .jqx-icon-cancel-material-green
 {
-    background-image: url('images/icon-cancel-white.png');
+    background-image: url('src/style/images/icon-cancel-white.png');
 }
 .jqx-fill-state-pressed-material-green .jqx-icon-search-material-green
 {
-    background-image: url(images/search_white.png);
+    background-image: url(src/style/images/search_white.png);
 }
 .jqx-fill-state-pressed-material-green .jqx-icon-plus-material-green
 {
-    background-image: url(images/plus_white.png);
+    background-image: url(src/style/images/plus_white.png);
 }
 .jqx-fill-state-pressed-material-green .jqx-menu-minimized-button-material-green {
-   background-image: url('images/icon-menu-minimized-white.png');
+   background-image: url('src/style/images/icon-menu-minimized-white.png');
 }
 .jqx-fill-state-hover-material-green .jqx-editor-toolbar-icon-material-green, .jqx-fill-state-pressed-material-green .jqx-editor-toolbar-icon-material-green {
-    background: url('images/html_editor_white.png') no-repeat;
+    background: url('src/style/images/html_editor_white.png') no-repeat;
 }
 .jqx-fill-state-hover-material-green .jqx-editor-toolbar-icon-fontsize-material-green,
 .jqx-fill-state-pressed-material-green .jqx-editor-toolbar-icon-fontsize-material-green,
 .jqx-fill-state-hover-material-green .jqx-editor-toolbar-icon-forecolor-material-green,
 .jqx-fill-state-pressed-material-green .jqx-editor-toolbar-icon-forecolor-material-green
 {
-        background: url('images/html_editor.png') no-repeat;
+        background: url('src/style/images/html_editor.png') no-repeat;
 }
 .jqx-editor-toolbar-button-material-green {
     border-color: #ddd;

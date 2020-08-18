@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import App from './App.vue'
-import './style/jqx.base.css'
 
 import Rows from "@/IERT/vue/tabel/flex-row";
 import Columns from "@/IERT/vue/tabel/flex-collum";
