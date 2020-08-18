@@ -8,6 +8,7 @@
              :position="{ x: 100, y: 100 }"
              :id="id"
              @close="closeWindows"
+             v-show="state"
              :theme="theme"
              :ref="'win'">
 

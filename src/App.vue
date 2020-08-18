@@ -12,54 +12,57 @@
         > Варианты расчетов перспективной потребности
         </li>
 
-        <li style="text-align: center">Смена темы
-          <ul>
-            <li @click="changeTheme('android')">android</li>
-            <li @click="changeTheme('arctic')">arctic</li>
-            <li @click="changeTheme('base')">base</li>
-            <li @click="changeTheme('black')">black</li>
-            <li @click="changeTheme('blackberry')">blackberry</li>
+        <li>Смена темы
+            <ul style="padding-left: 0; width: 120px;">
+              <div class="changeTheme">
+  <!--            <li @click="changeTheme('android')">android</li>-->
+  <!--            <li @click="changeTheme('arctic')">arctic</li>-->
+              <li @click="changeTheme('base')">base</li>
+  <!--            <li @click="changeTheme('black')">black</li>-->
+  <!--            <li @click="changeTheme('blackberry')">blackberry</li>-->
 
-            <li @click="changeTheme('bootstrap')">bootstrap</li>
-            <li @click="changeTheme('classic')">classic</li>
-            <li @click="changeTheme('dark')">dark</li>
-            <li @click="changeTheme('darkblue')">darkblue</li>
-            <li @click="changeTheme('energyblue')">energyblue</li>
+              <li @click="changeTheme('bootstrap')">bootstrap</li>
+              <li @click="changeTheme('classic')">classic</li>
+              <li @click="changeTheme('dark')">dark</li>
+  <!--            <li @click="changeTheme('darkblue')">darkblue</li>-->
+              <li @click="changeTheme('energyblue')">energyblue</li>
 
-            <li @click="changeTheme('ext')">ext</li>
-            <li @click="changeTheme('flat')">flat</li>
-            <li @click="changeTheme('fresh')">fresh</li>
-            <li @click="changeTheme('glacier')">glacier</li>
-            <li @click="changeTheme('highcontrast')">highcontrast</li>
+              <li @click="changeTheme('ext')">ext</li>
+  <!--            <li @click="changeTheme('flat')">flat</li>-->
+  <!--            <li @click="changeTheme('fresh')">fresh</li>-->
+              <li @click="changeTheme('glacier')">glacier</li>
+              <li @click="changeTheme('highcontrast')">highcontrast</li>
 
-            <li @click="changeTheme('light')">light</li>
-            <li @click="changeTheme('material')">material</li>
-            <li @click="changeTheme('material-green')">material-green</li>
-            <li @click="changeTheme('material-purple')">material-purple</li>
-            <li @click="changeTheme('metro')">metro</li>
+              <li @click="changeTheme('light')">light</li>
+              <li @click="changeTheme('material')">material</li>
+              <li @click="changeTheme('material-green')">material-green</li>
+              <li @click="changeTheme('material-purple')">material-purple</li>
+              <li @click="changeTheme('metro')">metro</li>
 
-            <li @click="changeTheme('metrodark')">metrodark</li>
-            <li @click="changeTheme('mobile')">mobile</li>
-            <li @click="changeTheme('office')">office</li>
-            <li @click="changeTheme('orange')">orange</li>
-            <li @click="changeTheme('shinyblack')">shinyblack</li>
+              <li @click="changeTheme('metrodark')">metrodark</li>
+  <!--            <li @click="changeTheme('mobile')">mobile</li>-->
+              <li @click="changeTheme('office')">office</li>
+  <!--            <li @click="changeTheme('orange')">orange</li>-->
+  <!--            <li @click="changeTheme('shinyblack')">shinyblack</li>-->
 
-            <li @click="changeTheme('summer')">summer</li>
-            <li @click="changeTheme('ui-darkness')">ui-darkness</li>
-            <li @click="changeTheme('ui-le-frog')">ui-le-frog</li>
-            <li @click="changeTheme('ui-lightness')">ui-lightness</li>
-            <li @click="changeTheme('ui-overcast')">ui-overcast</li>
+              <li @click="changeTheme('summer')">summer</li>
+  <!--            <li @click="changeTheme('ui-darkness')">ui-darkness</li>-->
+  <!--            <li @click="changeTheme('ui-le-frog')">ui-le-frog</li>-->
+              <li @click="changeTheme('ui-lightness')">ui-lightness</li>
+  <!--            <li @click="changeTheme('ui-overcast')">ui-overcast</li>-->
 
-            <li @click="changeTheme('ui-redmond')">ui-redmond</li>
-            <li @click="changeTheme('ui-smoothness')">ui-smoothness</li>
-            <li @click="changeTheme('ui-start')">ui-start</li>
-            <li @click="changeTheme('ui-sunny')">ui-sunny</li>
-            <li @click="changeTheme('web')">web</li>
+  <!--            <li @click="changeTheme('ui-redmond')">ui-redmond</li>-->
+  <!--            <li @click="changeTheme('ui-smoothness')">ui-smoothness</li>-->
+  <!--            <li @click="changeTheme('ui-start')">ui-start</li>-->
+  <!--            <li @click="changeTheme('ui-sunny')">ui-sunny</li>-->
+  <!--            <li @click="changeTheme('web')">web</li>-->
 
-            <li @click="changeTheme('windowsphone')">windowsphone</li>
-            <li @click="changeTheme('leaflet')">leaflet</li>
-          </ul>
+  <!--            <li @click="changeTheme('windowsphone')">windowsphone</li>-->
+              <li @click="changeTheme('leaflet')">leaflet</li>
+              </div>
+            </ul>
         </li>
+
 
       </ul>
     </JqxMenu>
@@ -139,7 +142,7 @@ export default {
   methods: {
     // Смена темы
     changeTheme(theme) {
-      // if (!confirm("Несохраненные данные будут потеряны. Вы уверены?")) return
+      if (!confirm("Несохраненные данные будут потеряны, свернутые окна будут закрыты. Вы уверены?")) return
       this.theme = theme;
 
       // Обнуление
@@ -155,25 +158,45 @@ export default {
 
       this.$refs.TollBar.theme = this.theme;
 
-      // Смена темы окон-детей
+      // Смена темы окон
       this.windows.forEach((item, index) => {
+        let wasMinimized = false;
+
+        if (!item.state) {
+          item.state = true;
+          wasMinimized = true;
+          item.DEL = true;
+        }
+
         item.id = "win" + JQXLite.generateID();
         this.id[item.id] = index;
         item.theme = this.theme;
-        item.close =  () => {
+        item.close = () => {
           this.removeWindow(item.id)
-        },
+        };
         item.changePosition = () => {
           this.minimizeWindow(item.id);
-        },
+        };
+
         this.$refs.TollBar.addTool('custom', 'last', true, (type, tool) => {
-          tool.jqxToggleButton({toggled: true, theme: this.theme});
+          tool.jqxToggleButton({toggled: !wasMinimized, theme: this.theme});
           tool.text(item.title);
           tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
           tool.on('click', item.changePosition);
           tool.css("cursor", "pointer").find('img').on("click", {id: item.id}, item.close);
         });
+
+        if (wasMinimized) item.state = false;
+
       })
+      
+      len = this.windows.length;
+      // Закрытие свернутых окон
+      for (let i=0; i<len; i++) {
+        this.windows.forEach(item => {
+          if (item.DEL) item.close();
+        })
+      }
     },
 
     // Поиск окна в списке окон (по window.id)
@@ -342,29 +365,33 @@ export default {
           let vueWindow = this.$refs.win[key].$children[0];
 
           if (window.state) {
-            // Сохранение параметров окна
+            // // Сохранение параметров окна
             // window.minSaved = {};
             // window.minSaved.minWidth = vueWindow.minWidth;
             // window.minSaved.minHeight = vueWindow.minHeight;
             // window.minSaved.width = vueWindow.width;
             // window.minSaved.height = vueWindow.height;
-
+            // window.minSaved.position = vueWindow.position;
+            // window.minSaved.zIndex = vueWindow.zIndex;
+            //
             // vueWindow.minWidth = 0;
             // vueWindow.minHeight = 0;
-            // vueWindow.width = 0;
-            // vueWindow.height = 0;
-            vueWindow.position = {x:-1000, y:0};
+            // vueWindow.width = 500;
+            // vueWindow.height = 500;
+            //
+            // vueWindow.position = {x:-1000000, y:-1000000};
 
             window.state = false;
           }
           else {
-            // Вернуть окну значения ширины и высоты
+            // // Вернуть окну значения ширины и высоты
             // if (window.minSaved.minWidth) vueWindow.minWidth = window.minSaved.minWidth;
             // if (window.minSaved.minHeight) vueWindow.minHeight = window.minSaved.minHeight;
             // if (window.minSaved.width) vueWindow.width = window.minSaved.width;
             // if (window.minSaved.height) vueWindow.height = window.minSaved.height;
-
-            vueWindow.position = {x:50, y:50};
+            //
+            // // Вернуть окну позицию
+            // if (window.minSaved.position) vueWindow.position = window.minSaved.position;
 
             window.state = true;
           }
@@ -462,14 +489,11 @@ export default {
   height: 16px;
   margin-top: 5px;
   border: none;
-
-  /*background-image: url(images/close_white.png) !important;*/
 }
 
 .toolbar-close-button-style:hover {
   background-color: black;
   border: none;
-  /*background-image: url(images/close_white.png) !important;*/
 }
 
 .list-class-style {
@@ -484,6 +508,11 @@ ul.list-class-style li {
   display: inline-block;
   margin: 0 5px;
 }
+
+.changeTheme li {
+  text-align: center;
+}
+
 </style>
 
 

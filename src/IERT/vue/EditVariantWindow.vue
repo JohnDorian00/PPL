@@ -11,6 +11,7 @@
                  :id="id"
                  :theme="theme"
                  @close="closeWindows"
+                 v-show="state"
                  :keyboard-close-key="NaN"
                  :ref="'win'"
       >
