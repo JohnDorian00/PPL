@@ -5,14 +5,15 @@
     <JqxMenu :key="menuKey" ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme"
              :show-top-level-arrows="false" :popup-z-index="999999">
       <!--      @changeTheme="changeTheme($event)"-->
-      <ul>
+      <ul style="display: flex; flex-direction: row;
+              justify-content: space-between;">
 
         <li @click="addListWindow({type: 'MainWindow',
             title: 'Перечень вариантов расчета перспективной потребности локомотивов'})"
         > Варианты расчетов перспективной потребности
         </li>
 
-        <li>Смена темы
+        <li style="margin-right: 50px">Смена темы
             <ul style="padding-left: 0; width: 120px;">
               <div class="changeTheme">
   <!--            <li @click="changeTheme('android')">android</li>-->
@@ -68,7 +69,7 @@
     </JqxMenu>
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
       <component ref="win" v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
-                 :key="window.id" :closeWindows="() => removeWindow(window.id)" :state="window.state"
+                 :key="window.id" :closeWindows="window.closeWindow" :state="window.state"
                  @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource" :theme="window.theme"
                  @workVariantCreateWindow="createWindowEditVariant" :parentWindow="window.parentWindow"
                  :stations="stations"/>
@@ -83,7 +84,7 @@ import JqxToolbar from "@/jqwidgets/jqwidgets-vue/vue_jqxtoolbar";
 import JqxMenu from "@/jqwidgets/jqwidgets-vue/vue_jqxmenu";
 import JqxButtons from "@/jqwidgets/jqwidgets-vue/vue_jqxbuttons";
 import appConfig from "@/IERT/js/appConfig";
-import MainWindow from "@/IERT/vue/windows/MainWindow/MainWindow";
+import MainWindow from "@/IERT/vue/windows/MainWindow";
 import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
 import EditVariantWindow from "@/IERT/vue/EditVariantWindow";
 import AddStation from "@/IERT/vue/windows/AddStation/AddStation";
@@ -171,25 +172,28 @@ export default {
         item.id = "win" + JQXLite.generateID();
         this.id[item.id] = index;
         item.theme = this.theme;
-        item.close = () => {
-          this.removeWindow(item.id)
-        };
+
+        item.closeWindow = (e) => {
+          console.log(e);
+          item.state = e.currentTarget.tagName === "IMG";
+          setTimeout(() => {this.removeWindow(item.id)}, 100);
+        },
         item.changePosition = () => {
           this.minimizeWindow(item.id);
-        };
+        },
 
         this.$refs.TollBar.addTool('custom', 'last', true, (type, tool) => {
           tool.jqxToggleButton({toggled: !wasMinimized, theme: this.theme});
           tool.text(item.title);
           tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
           tool.on('click', item.changePosition);
-          tool.css("cursor", "pointer").find('img').on("click", {id: item.id}, item.close);
+          tool.css("cursor", "pointer").find('img').on("click", {id: item.id}, item.closeWindow);
         });
 
         if (wasMinimized) item.state = false;
 
       })
-      
+
       len = this.windows.length;
       // Закрытие свернутых окон
       for (let i=0; i<len; i++) {
@@ -359,11 +363,9 @@ export default {
 
     minimizeWindow(id) {
       let window = this.windows[this.id[id]];
-
-      for (let key in this.$refs.win) {
-        if (this.$refs.win[key].id === id) {
-          let vueWindow = this.$refs.win[key].$children[0];
-
+      for (let key in this.$children) {
+        if (this.$children[key].id === id) {
+          let vueWindow = this.$children[key].$children[0];
           if (window.state) {
             // // Сохранение параметров окна
             // window.minSaved = {};
@@ -418,8 +420,9 @@ export default {
         type: 'MainWindow',
         title: 'Прогресс ' + ++this.count,
         state: true,
-        close: () => {
-          vue.removeWindow(id);
+        closeWindow: (e) => {
+          option.state = e.currentTarget.tagName === "IMG";
+          setTimeout(() => {vue.removeWindow(id)}, 100);
         },
         changePosition: () => {
           vue.minimizeWindow(id);
@@ -428,6 +431,7 @@ export default {
         theme: this.theme,
         zIndex: this.windows.length,
       }
+
       option = this.updateWindowCreateOptions(option, added_options);
       this.id[id] = this.windows.length;
       this.windows.push(option);
@@ -438,7 +442,7 @@ export default {
         tool.text(option.title);
         tool.append('<img src="./src/public/img/close_white.png" class="toolbar-close-button-style" style="margin: auto auto auto 10px; float: right;" alt=""/>');
         tool.on('click', option.changePosition);
-        tool.css("cursor", "pointer").find('img').on("click", option.close);
+        tool.css("cursor", "pointer").find('img').on("click", option.closeWindow);
       });
     }
   },

@@ -1,10 +1,10 @@
 <template>
-  <transition name="fade">
+  <transition appear name="fade">
     <JqxWindow :max-height="1999999"
                :max-width="190000"
                :min-width="937"
                :min-height="510"
-               :position="{ x: 50, y: 50 }"
+               :position="{ x: 200, y: 200 }"
                :id="id"
                :theme="theme"
                :sourceOut="sourceOut"
@@ -270,7 +270,6 @@ export default {
   },
 
   mounted() {
-
   },
 
 
@@ -350,7 +349,7 @@ ul li.helper {
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .2s;
+  transition: opacity .1s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
   opacity: 0;
