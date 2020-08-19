@@ -143,7 +143,7 @@ export default {
   methods: {
     // Смена темы
     changeTheme(theme) {
-      if (!confirm("Несохраненные данные будут потеряны, свернутые окна будут закрыты. Вы уверены?")) return
+      // if (!confirm("Несохраненные данные будут потеряны, свернутые окна будут закрыты. Вы уверены?")) return
       this.theme = theme;
 
       // Обнуление
@@ -174,8 +174,10 @@ export default {
         item.theme = this.theme;
 
         item.closeWindow = (e) => {
-          console.log(e);
-          item.state = e.currentTarget.tagName === "IMG";
+          if (e.type === "close")
+            item.state = true;
+          else
+            item.state = e.currentTarget.tagName === "IMG";
           setTimeout(() => {this.removeWindow(item.id)}, 100);
         },
         item.changePosition = () => {
@@ -421,7 +423,10 @@ export default {
         title: 'Прогресс ' + ++this.count,
         state: true,
         closeWindow: (e) => {
-          option.state = e.currentTarget.tagName === "IMG";
+          if (e.type === "close")
+            option.state = true;
+          else
+            option.state = e.currentTarget.tagName === "IMG";
           setTimeout(() => {vue.removeWindow(id)}, 100);
         },
         changePosition: () => {

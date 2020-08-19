@@ -1,10 +1,8 @@
 <template>
-  <div style="width: 100%; height: 100%; position: absolute">
-    <div class='cssload-loader'>
-      <div class='cssload-inner cssload-one'></div>
-      <div class='cssload-inner cssload-two'></div>
-      <div class='cssload-inner cssload-three'></div>
-    </div>
+  <div class='cssload-loader'>
+    <div class='cssload-inner cssload-one'></div>
+    <div class='cssload-inner cssload-two'></div>
+    <div class='cssload-inner cssload-three'></div>
   </div>
 </template>
 
@@ -17,11 +15,12 @@ export default {
 <style scoped>
 .cssload-loader {
   position: relative;
-  left: calc(50% - 51px);
-  top: calc(50% - 170px);
-  width: 100px;
-  height: 100px;
-  margin: 130px 0;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 97px;
+  height: 103px;
+  margin: 0 50px 0 0;
   -webkit-perspective: 780px;
   perspective: 780px;
 }
