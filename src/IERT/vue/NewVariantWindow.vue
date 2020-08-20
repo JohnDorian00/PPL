@@ -3,12 +3,12 @@
     <JqxWindow :ref="'win'"
                @close="closeWindows"
                v-show="state"
-               :width="727"
-               :height="403"
+               :width="530"
+               :height="410"
                :max-height="1999999"
                :max-width="190000"
-               :min-width="515"
-               :min-height="274"
+               :min-width="530"
+               :min-height="410"
                :position="{ x: 100, y: 100 }"
                :id="id"
                :theme="theme"
@@ -23,41 +23,63 @@
       <!--      Контент -->
       <div style="display: flex; flex-direction: column">
 
-        <div style="flex: 0 1 auto; display: flex; flex-direction: row;
-         justify-content: space-around; align-items: center; margin-bottom: 5px;">
-          <div>
-          <JqxButton ref="buttonGenscheme"
-                     @click="toggleButton($event)"
-                     :height="button_height+'px'" :width="'250px'" :theme="theme" :textPosition="'center'"
-                     :value="'&nbsp;На основе варианта генсхемы&nbsp;'" :disabled="true" style="margin-right: 2px;"/>
+        <div style="flex: 0 0 auto; display: flex; flex-direction: row; border-color: rgb(221,221,221);
+         justify-content: space-around; align-items: center; margin-bottom: 0; border-style: solid; border-width: 1px;
+         padding: 10px; border-top-right-radius: 4px; border-top-left-radius: 4px;">
+          <div id="buttonGenscheme">
+            <JqxButton ref="buttonGenscheme"
+                       @click="toggleButton($event)"
+                       :height="button_height+'px'" :width="'250px'" :theme="theme" :textPosition="'center'"
+                       :value="'&nbsp;На основе варианта генсхемы&nbsp;'" :disabled="true" style="margin-right: 2px;"/>
           </div>
-          <div>
-          <JqxButton ref="buttonPP"
-                     @click="toggleButton($event)"
-                     :height="button_height+'px'" :width="'250px'" :theme="theme" :textPosition="'center'"
-                     :value="'&nbsp;На основе варианта расчета п.п.&nbsp;'" style="margin-left: 2px"/>
+          <div id="buttonPP">
+            <JqxButton ref="buttonPP"
+                       @click="toggleButton($event)"
+                       :height="button_height+'px'" :width="'250px'" :theme="theme" :textPosition="'center'"
+                       :value="'&nbsp;На основе варианта расчета п.п.&nbsp;'" style="margin-left: 2px;"/>
           </div>
         </div>
 
-        <div style="flex: 3 1 auto; margin-bottom: 5px;">
-          <Preloader v-if="!isLoaded"/>
-          <JqxListBox ref="listBox"
-                      @select="onListBoxSelect"
-                      v-show="isLoaded"  :theme="theme" :height="'100%'" :width="'100%'"
-                      :source="listBoxSourceGenscheme"
-          />
+<!--    position: relative делает скролл по ListBox медленнее (just magic)   -->
+        <div style="flex: 3 0 auto; position: relative; border: rgb(221,221,221) 1px solid;
+         border-bottom: none; border-top: none; height: 0">
+            <Preloader v-if="!isLoaded"/>
+            <JqxListBox v-show="isLoaded" ref="listBox" :scrollBarSize="10"
+                        @select="onListBoxSelect" :theme="theme" :height="'100%'" :width="'100%'"
+                        :source="listBoxSourceGenscheme"
+                        style="border: none"
+            />
         </div>
 
-        <div style="background-color: #c800ff; flex: 1 1 auto; margin-bottom: 5px;">
+        <div style="flex: 2 0 auto; margin-bottom: 10px; display: flex; flex-direction: column;
+                    align-items: center; border-color: rgb(221,221,221); border-style: solid; border-width: 1px;">
 
-        </div>
+          <div style="display: flex; flex-direction: column; justify-content: space-around;
+           width: 100%; height: 100%; align-items: flex-start">
 
-        <div style="background-color: #00ffb7; flex: 1 1 auto; margin-bottom: 10px;">
+            <div style="display: flex; flex-direction: row; width: 100%; align-items: baseline">
+              <div style="flex: 0 0 190px; margin: 0 5px 0 10px; text-align: right">
+                Название нового варианта
+              </div>
+              <div style="flex: 1 1 auto; margin: 0 10px 0 5px;">
+                <JqxInput :theme="theme" :minLength="1" v-model="nameGS" :placeHolder="''" width="100%"/>
+              </div>
+            </div>
 
+            <div style="display: flex; flex-direction: row; width: 100%; align-items: baseline">
+              <div style="flex: 0 0 190px; margin: 0 5px 0 10px;text-align: right">
+                Комментарий
+              </div>
+              <div style="flex: 1 1 auto; margin: 0 10px 0 5px">
+                <JqxInput :theme="theme" v-model="descGS" :minLength="1" :placeHolder="''" width="100%"/>
+              </div>
+            </div>
+
+          </div>
         </div>
 
         <!--      Нижнее меню -->
-        <div style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
+        <div id="lowerMenu" style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
         display: flex; flex-direction: row; align-items: center; justify-content: space-around; height: 50px">
 
           <div style="flex: 1 1 auto; display: flex; flex-direction: row;">
@@ -67,7 +89,6 @@
                          @click="uploadNewVar"
                          :height="button_height+'px'" :disabled="buttonFlag" :theme="theme" :textPosition="'center'"
                          :value="'&nbsp;Создать&nbsp;'" :width="'120px'" style="margin: auto"/>
-
             </div>
             <div style="flex: 1 1 auto"/>
           </div>
@@ -83,79 +104,6 @@
           </div>
         </div>
       </div>
-
-
-<!--      &lt;!&ndash;      Контент&ndash;&gt;-->
-<!--      <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">-->
-
-<!--        &lt;!&ndash;      Верхняя часть окна&ndash;&gt;-->
-<!--        <div-->
-<!--            style="border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;  background-color: rgba(255,0,0,0); width: 100%;">-->
-<!--          <div style="text-align: center; margin: 10px">Название нового варианта расчета &nbsp;&nbsp;-->
-<!--            <JqxInput :theme="theme" :minLength="1" v-model="nameGS"-->
-<!--                      :placeHolder="''" >-->
-<!--            </JqxInput>-->
-<!--          </div>-->
-<!--          <div style="text-align: center; margin: 10px">Комментарий &nbsp;&nbsp;-->
-<!--            <JqxInput :theme="theme" v-model="descGS"-->
-<!--                      :minLength="1"-->
-<!--                      :placeHolder="''">-->
-<!--            </JqxInput>-->
-<!--          </div>-->
-
-<!--        </div>-->
-
-<!--        &lt;!&ndash;      Нижняя часть окна&ndash;&gt;-->
-<!--        <div style="display: inline-block; border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;-->
-<!--         background-color: rgba(255,0,0,0); width: calc(100%); height: calc(100% - 200px); right: 0; position: relative; margin: 10px"-->
-<!--        >-->
-
-
-<!--          <div style="margin: auto; width: 100%; position: relative; display: inline-block; ">-->
-<!--            <JqxButton ref="buttonGenscheme" @click="toggleButton($event)" :height="button_height"-->
-<!--                       :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"-->
-<!--                       :theme="theme" :style="{'display': 'inline-block', 'margin': 'auto'} "-->
-<!--            ><span class="nobr">На основе варианта генсхемы &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
-<!--            </JqxButton>-->
-<!--            <JqxButton ref="buttonPP" @click="toggleButton($event)" :height="button_height"-->
-<!--                       :textImageRelation="'imageBeforeText'" :textPosition="'right'"-->
-<!--                       :theme="theme" style="right: 0; position:absolute;"-->
-<!--                       :style="{'display': 'inline-block', 'margin': 'auto'} "-->
-<!--            ><span class="nobr">На основе варианта расчета п.п. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
-<!--            </JqxButton>-->
-<!--          </div>-->
-
-
-<!--          <div style="margin-right: 25px; height: 100%">-->
-<!--            <Preloader v-if="!isLoaded"/>-->
-<!--            <JqxListBox v-show="isLoaded" ref="listBox" :theme="theme" :height="'100%'" :width="'100%'"-->
-<!--                        @select="onListBoxSelect"-->
-<!--                        :source="listBoxSourceGenscheme" :style="{'display': 'block'}">-->
-<!--            </JqxListBox>-->
-<!--          </div>-->
-
-<!--        </div>-->
-
-<!--        &lt;!&ndash;      Нижнее меню (кнопки)&ndash;&gt;-->
-<!--        <ul class="btn-group" :height="button_height">-->
-<!--          <li>-->
-<!--            <JqxButton ref="createWindowNewVariant" @click="uploadNewVar" :height="button_height"-->
-<!--                       v-bind:disabled="buttonFlag" :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
-<!--                       :theme="theme" :style="{'display': 'inline-block'} "-->
-<!--            ><span class="nobr">Создать&nbsp;&nbsp;&nbsp;</span>-->
-<!--            </JqxButton>-->
-
-<!--          </li>-->
-<!--          <li class="last">-->
-<!--            <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"-->
-<!--                       :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
-<!--                       :theme="theme" style="display: inline-block;"-->
-<!--            ><span class="nobr">Закрыть&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
-<!--            </JqxButton>-->
-<!--          </li>-->
-<!--          <li class="helper"></li>-->
-<!--        </ul>-->
-<!--      </div>-->
     </JqxWindow>
   </transition>
 </template>
@@ -170,7 +118,6 @@ import Preloader from "@/IERT/vue/Preloader";
 import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
 import JqxInput from "@/jqwidgets/jqwidgets-vue/vue_jqxinput";
 import JqxForm from "@/jqwidgets/jqwidgets-vue/vue_jqxform";
-import globalData from "@/IERT/js/globalData";
 
 export default {
   components: {
@@ -195,9 +142,7 @@ export default {
       nameGS: "",
       descGS: "",
       idNewVariant: null,
-
       listBoxSourceGenscheme: {},
-
       listBoxSourcePP: {},
     }
   },
@@ -213,7 +158,11 @@ export default {
     sourcePP: function () {
         if (this.$refs.buttonPP.disabled) {
           this.loadListBoxPP();
-          this.$refs.listBox.source = this.listBoxSourcePP;
+          try {
+            this.$refs.listBox.source = this.listBoxSourcePP;
+          } catch (e) {
+            console.warn("Не удалось обновить список:\n", e);
+          }
         }
     }
   },
@@ -229,6 +178,18 @@ export default {
   },
 
   methods: {
+    disableButtons() {
+      $("#buttonPP").addClass("no-events");
+      $("#buttonGenscheme").addClass("no-events");
+      $("#lowerMenu").addClass("no-events");
+    },
+
+    enableButtons() {
+      $("#buttonPP").removeClass("no-events");
+      $("#buttonGenscheme").removeClass("no-events");
+      $("#lowerMenu").removeClass("no-events");
+    },
+
     // Загрзука списка на основе существующего расчета ПП
     loadListBoxPP() {
       let t = this;
@@ -241,7 +202,9 @@ export default {
     // Загрузка данных с бд
     loadListBoxData() {
       let t = this;
+
       t.isLoaded = false;
+      t.disableButtons();
 
       let xmlQuery = new XmlQuery({
         url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?DefName=PPL_GK_Defs_JS",
@@ -255,14 +218,16 @@ export default {
             json.rows.filter(function (item) {
               t.listBoxSourceGenscheme[item.var_id] = item.name;
             })
-            t.$refs.listBox.source = t.listBoxSourceGenscheme;
             xmlQuery.destroy();
             t.isLoaded = true;
+            t.$refs.listBox.source = t.listBoxSourceGenscheme;
+            t.enableButtons();
           },
 
           function (ER) {
             xmlQuery.destroy();
             t.isLoaded = true;
+            t.enableButtons();
             console.log("Error update data");
             console.log(ER);
           }
@@ -273,6 +238,7 @@ export default {
     uploadNewVar() {
       let t = this
       t.isLoaded = false;
+      t.disableButtons();
 
       let xmlQuery = new XmlQuery({
         url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
@@ -309,10 +275,13 @@ export default {
             xmlQuery.destroy();
             t.$root.$children[0].refreshAllMainWindows();
             t.isLoaded = true;
+            t.enableButtons();
+            t.closeWindows();
           },
           function (ER) {
             xmlQuery.destroy();
             t.isLoaded = true;
+            t.enableButtons();
             console.log("Error update data");
             console.log("ERROR = ", ER);
           }
@@ -352,94 +321,18 @@ export default {
 
   },
 
-  beforeCreate: function () {
-  },
-
-  created() {
-
-  },
-
   mounted() {
     this.loadListBoxData();
   },
-
-
 }
 
 </script>
 
-
 <style scoped>
 
-ul {
-  text-align: justify;
-  /* Лекарство для IE6-7*/
-  text-justify: newspaper;
-}
-
-ul li {
-  display: inline-block;
-  text-align: left;
-  /* эмуляция inline-block для IE6-7*/
-/ / display: inline;
-/ / zoom: 1;
-}
-
-ul li.helper {
-  width: 100%;
-  height: 0;
-  visibility: hidden;
-}
-
-.last {
-  margin-right: 100px
-}
-
-.nobr {
-  white-space: nowrap;
-}
-
-.button {
-  display: inline-block;
-  margin-right: 10px;
-  margin-left: 10px;
-
-}
-
-.btn-group {
-  background-color: rgba(0, 0, 255, 0);
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-}
-
-.collapse-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
-
-.expand-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
-
-.close-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-right: 1px;
-  margin-left: 1px;
+.no-events {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -448,6 +341,5 @@ ul li.helper {
 .fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
   opacity: 0;
 }
-
 
 </style>

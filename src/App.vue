@@ -407,11 +407,13 @@ export default {
         title: 'Прогресс ' + ++this.count,
         state: true,
         closeWindow: (e) => {
-          if (e.type === "close")
+          if (!e)
+            option.state = false;
+          else if (e.type === "close")
             option.state = true;
           else
             option.state = e.currentTarget.tagName === "IMG";
-          setTimeout(() => {vue.removeWindow(id)}, 100);
+          setTimeout(() => {vue.removeWindow(id)}, 200);
         },
         changePosition: () => {
           vue.minimizeWindow(id);

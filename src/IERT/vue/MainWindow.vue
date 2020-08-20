@@ -38,7 +38,7 @@
         <div style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
         display: flex; flex-direction: row; align-items: center; justify-content: space-around; height: 50px">
 
-          <div style="flex: 1 1 auto; display: flex; flex-direction: row; justify-content: space-around">
+          <div id="lowerMenu" style="flex: 1 1 auto; display: flex; flex-direction: row; justify-content: space-around">
             <!--          style all: cursor: pointer; -->
 
             <JqxButton ref="createWindowNewVariant"
@@ -115,6 +115,14 @@ export default {
   },
 
   methods: {
+    disableMenu() {
+      $("#lowerMenu").addClass("no-events");
+    },
+
+    enableMenu() {
+      $("#lowerMenu").removeClass("no-events");
+    },
+
     // Окно изменения варианта
     workVariant() {
       this.$emit('workVariantCreateWindow', this.id, this.GridSelector)
@@ -138,6 +146,7 @@ export default {
       }
 
       t.isLoaded = false;
+      t.disableMenu();
 
       let xmlQuery = new XmlQuery({
         url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
@@ -151,13 +160,14 @@ export default {
           function () {
             console.log("Удален вариант ", variant);
             xmlQuery.destroy();
-            t.$root.$children[0].refreshAllMainWindows();
             t.isLoaded = true;
-
+            t.enableMenu();
+            t.$root.$children[0].refreshAllMainWindows();
           },
           function (ER) {
             xmlQuery.destroy();
             t.isLoaded = true;
+            t.enableMenu();
             console.log("Не удалось удалить вариант, ", this.GridSelector.var_id);
             console.log("ERROR = ", ER);
           }
@@ -168,6 +178,7 @@ export default {
     updateGridFromURL() {
       let t = this;
       t.isLoaded = false;
+      t.disableMenu();
       let xmlQuery = new XmlQuery({
         url: appConfig.host + "/jaxrpc-DBQuest/HTTPQuery?codePage=UTF-8&DefName=PPL_GK_Defs_JS",
         querySet: 'GET_VARS'
@@ -176,6 +187,7 @@ export default {
       xmlQuery.query('json', successQuery, function (ER) {
         xmlQuery.destroy();
         t.isLoaded = true;
+        t.enableMenu();
         console.log("Error update data");
         console.log(ER);
       })
@@ -196,6 +208,7 @@ export default {
         t.$emit("MainWindowTableChange", json.rows);
         xmlQuery.destroy();
         t.isLoaded = true;
+        t.enableMenu();
       }
     },
   },
@@ -227,6 +240,10 @@ export default {
   border-width: 1px;
 }
 
+.no-events {
+  pointer-events: none;
+  opacity: 0.5;
+}
 
 /*Анимация открытия-закрытия-сворачивания окна*/
 .fade-enter-active, .fade-leave-active {

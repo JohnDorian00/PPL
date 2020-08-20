@@ -1036,7 +1036,7 @@ export default {
                       item.kat_id_name = lineCodesR.result.sname_vid;
                     } catch (e) {
                       item.kat_id_name = NaN;
-                      console.log("Не найдена расшифровка кода дороги для ", item);
+                      console.warn("Не найдена расшифровка кода дороги для ", item);
                     }
                   }
                   lineCodesR.onerror = function () {
