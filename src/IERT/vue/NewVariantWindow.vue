@@ -1,110 +1,161 @@
 <template>
   <transition appear name="fade">
-    <JqxWindow :width="727"
+    <JqxWindow :ref="'win'"
+               @close="closeWindows"
+               v-show="state"
+               :width="727"
                :height="403"
                :max-height="1999999"
                :max-width="190000"
-               :min-width="501"
+               :min-width="515"
                :min-height="274"
                :position="{ x: 100, y: 100 }"
                :id="id"
-               @close="closeWindows"
-               v-show="state"
                :theme="theme"
-               :ref="'win'"
                :drag-area="dragArea"
     >
 
       <!--    Верхний бар-->
-      <div ref="header" style="position: relative;">
-        <div style="display: inline;">{{ title }}</div>
-        <div style="display: inline; position: absolute; top:0; right: 0;
-                    margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
-        >
-          <!--        <div class="collapse-button">-->
-          <!--          <img class="collapse-button" src="@/style/images/minus.png">-->
-          <!--        </div>-->
-          <!--        <div class="expand-button">-->
-          <!--          <img class="expand-button" src="@/style/images/full-screen.png">-->
-          <!--        </div>-->
-          <!--        <div id="exit-button" class="close-button" @click="closeWindows">-->
-          <!--          <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">-->
-          <!--        </div>-->
+      <div ref="header">
+        <div>{{ title }}</div>
+      </div>
 
+      <!--      Контент -->
+      <div style="display: flex; flex-direction: column">
+
+        <div style="flex: 0 1 auto; display: flex; flex-direction: row;
+         justify-content: space-around; align-items: center; margin-bottom: 5px;">
+          <div>
+          <JqxButton ref="buttonGenscheme"
+                     @click="toggleButton($event)"
+                     :height="button_height+'px'" :width="'250px'" :theme="theme" :textPosition="'center'"
+                     :value="'&nbsp;На основе варианта генсхемы&nbsp;'" :disabled="true" style="margin-right: 2px;"/>
+          </div>
+          <div>
+          <JqxButton ref="buttonPP"
+                     @click="toggleButton($event)"
+                     :height="button_height+'px'" :width="'250px'" :theme="theme" :textPosition="'center'"
+                     :value="'&nbsp;На основе варианта расчета п.п.&nbsp;'" style="margin-left: 2px"/>
+          </div>
+        </div>
+
+        <div style="flex: 3 1 auto; margin-bottom: 5px;">
+          <Preloader v-if="!isLoaded"/>
+          <JqxListBox ref="listBox"
+                      @select="onListBoxSelect"
+                      v-show="isLoaded"  :theme="theme" :height="'100%'" :width="'100%'"
+                      :source="listBoxSourceGenscheme"
+          />
+        </div>
+
+        <div style="background-color: #c800ff; flex: 1 1 auto; margin-bottom: 5px;">
+
+        </div>
+
+        <div style="background-color: #00ffb7; flex: 1 1 auto; margin-bottom: 10px;">
+
+        </div>
+
+        <!--      Нижнее меню -->
+        <div style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
+        display: flex; flex-direction: row; align-items: center; justify-content: space-around; height: 50px">
+
+          <div style="flex: 1 1 auto; display: flex; flex-direction: row;">
+            <!--          style all: cursor: pointer; -->
+            <div style="flex: 1 1 auto;">
+              <JqxButton ref="createWindowNewVariant"
+                         @click="uploadNewVar"
+                         :height="button_height+'px'" :disabled="buttonFlag" :theme="theme" :textPosition="'center'"
+                         :value="'&nbsp;Создать&nbsp;'" :width="'120px'" style="margin: auto"/>
+
+            </div>
+            <div style="flex: 1 1 auto"/>
+          </div>
+
+          <div style="flex: 1 1 auto; display: flex; flex-direction: row;">
+            <div style="flex: 1 1 auto"/>
+            <div style="flex: 1 1 auto;">
+              <JqxButton ref="closeButton"
+                         @click="closeWindows"
+                         :height="button_height+'px'" :width="'120px'" :theme="theme" :textPosition="'center'"
+                         :value="'&nbsp;Закрыть&nbsp;'" style="margin: auto"/>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!--      Контент-->
-      <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
-        <!--      Верхняя часть окна-->
-        <div
-            style="border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;  background-color: rgba(255,0,0,0); width: 100%;">
-          <div style="text-align: center; margin: 10px">Название нового варианта расчета &nbsp;&nbsp;
-            <JqxInput :theme="theme" :minLength="1" v-model="nameGS"
-                      :placeHolder="''">
-            </JqxInput>
-          </div>
-          <div style="text-align: center; margin: 10px">Комментарий &nbsp;&nbsp;
-            <JqxInput :theme="theme" v-model="descGS"
-                      :minLength="1"
-                      :placeHolder="''">
-            </JqxInput>
-          </div>
+<!--      &lt;!&ndash;      Контент&ndash;&gt;-->
+<!--      <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">-->
 
-        </div>
+<!--        &lt;!&ndash;      Верхняя часть окна&ndash;&gt;-->
+<!--        <div-->
+<!--            style="border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;  background-color: rgba(255,0,0,0); width: 100%;">-->
+<!--          <div style="text-align: center; margin: 10px">Название нового варианта расчета &nbsp;&nbsp;-->
+<!--            <JqxInput :theme="theme" :minLength="1" v-model="nameGS"-->
+<!--                      :placeHolder="''" >-->
+<!--            </JqxInput>-->
+<!--          </div>-->
+<!--          <div style="text-align: center; margin: 10px">Комментарий &nbsp;&nbsp;-->
+<!--            <JqxInput :theme="theme" v-model="descGS"-->
+<!--                      :minLength="1"-->
+<!--                      :placeHolder="''">-->
+<!--            </JqxInput>-->
+<!--          </div>-->
 
-        <!--      Нижняя часть окна-->
-        <div style="display: inline-block; border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;
-         background-color: rgba(255,0,0,0); width: calc(100%); height: calc(100% - 200px); right: 0; position: relative; margin: 10px"
-        >
+<!--        </div>-->
 
-
-          <div style="margin: auto; width: 100%; position: relative; display: inline-block; ">
-            <JqxButton ref="buttonGenscheme" @click="toggleButton($event)" :height="button_height"
-                       :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"
-                       :theme="theme" :style="{'display': 'inline-block', 'margin': 'auto'} "
-            ><span class="nobr">На основе варианта генсхемы &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            </JqxButton>
-            <JqxButton ref="buttonPP" @click="toggleButton($event)" :height="button_height"
-                       :textImageRelation="'imageBeforeText'" :textPosition="'right'"
-                       :theme="theme" style="right: 0; position:absolute;"
-                       :style="{'display': 'inline-block', 'margin': 'auto'} "
-            ><span class="nobr">На основе варианта расчета п.п. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            </JqxButton>
-          </div>
+<!--        &lt;!&ndash;      Нижняя часть окна&ndash;&gt;-->
+<!--        <div style="display: inline-block; border-color: rgba(0,0,0,0); border-style: solid; border-width: 1px;-->
+<!--         background-color: rgba(255,0,0,0); width: calc(100%); height: calc(100% - 200px); right: 0; position: relative; margin: 10px"-->
+<!--        >-->
 
 
-          <div style="margin-right: 25px; height: 100%">
-            <Preloader v-if="!isLoaded"/>
-            <JqxListBox v-show="isLoaded" ref="listBox" :theme="theme" :height="'100%'" :width="'100%'"
-                        @select="onListBoxSelect"
-                        :source="listBoxSourceGenscheme" :style="{'display': 'block'}">
-            </JqxListBox>
-          </div>
+<!--          <div style="margin: auto; width: 100%; position: relative; display: inline-block; ">-->
+<!--            <JqxButton ref="buttonGenscheme" @click="toggleButton($event)" :height="button_height"-->
+<!--                       :textImageRelation="'imageBeforeText'" :textPosition="'left'" :disabled="true"-->
+<!--                       :theme="theme" :style="{'display': 'inline-block', 'margin': 'auto'} "-->
+<!--            ><span class="nobr">На основе варианта генсхемы &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
+<!--            </JqxButton>-->
+<!--            <JqxButton ref="buttonPP" @click="toggleButton($event)" :height="button_height"-->
+<!--                       :textImageRelation="'imageBeforeText'" :textPosition="'right'"-->
+<!--                       :theme="theme" style="right: 0; position:absolute;"-->
+<!--                       :style="{'display': 'inline-block', 'margin': 'auto'} "-->
+<!--            ><span class="nobr">На основе варианта расчета п.п. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
+<!--            </JqxButton>-->
+<!--          </div>-->
 
-        </div>
 
-        <!--      Нижнее меню (кнопки)-->
-        <ul class="btn-group" :height="button_height">
-          <li>
-            <JqxButton ref="createWindowNewVariant" @click="uploadNewVar" :height="button_height"
-                       v-bind:disabled="buttonFlag" :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                       :theme="theme" :style="{'display': 'inline-block'} "
-            ><span class="nobr">Создать&nbsp;&nbsp;&nbsp;</span>
-            </JqxButton>
+<!--          <div style="margin-right: 25px; height: 100%">-->
+<!--            <Preloader v-if="!isLoaded"/>-->
+<!--            <JqxListBox v-show="isLoaded" ref="listBox" :theme="theme" :height="'100%'" :width="'100%'"-->
+<!--                        @select="onListBoxSelect"-->
+<!--                        :source="listBoxSourceGenscheme" :style="{'display': 'block'}">-->
+<!--            </JqxListBox>-->
+<!--          </div>-->
 
-          </li>
-          <li class="last">
-            <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"
-                       :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                       :theme="theme" style="display: inline-block;"
-            ><span class="nobr">Закрыть&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            </JqxButton>
-          </li>
-          <li class="helper"></li>
-        </ul>
-      </div>
+<!--        </div>-->
+
+<!--        &lt;!&ndash;      Нижнее меню (кнопки)&ndash;&gt;-->
+<!--        <ul class="btn-group" :height="button_height">-->
+<!--          <li>-->
+<!--            <JqxButton ref="createWindowNewVariant" @click="uploadNewVar" :height="button_height"-->
+<!--                       v-bind:disabled="buttonFlag" :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
+<!--                       :theme="theme" :style="{'display': 'inline-block'} "-->
+<!--            ><span class="nobr">Создать&nbsp;&nbsp;&nbsp;</span>-->
+<!--            </JqxButton>-->
+
+<!--          </li>-->
+<!--          <li class="last">-->
+<!--            <JqxButton class="button" ref="closeButton" @click="closeWindows" :width="120" :height="button_height+'px'"-->
+<!--                       :textImageRelation="'imageBeforeText'" :textPosition="'left'"-->
+<!--                       :theme="theme" style="display: inline-block;"-->
+<!--            ><span class="nobr">Закрыть&nbsp;&nbsp;&nbsp;&nbsp;</span>-->
+<!--            </JqxButton>-->
+<!--          </li>-->
+<!--          <li class="helper"></li>-->
+<!--        </ul>-->
+<!--      </div>-->
     </JqxWindow>
   </transition>
 </template>
@@ -160,10 +211,10 @@ export default {
 
     // Обновление списка listbox при изменении основного списка записей
     sourcePP: function () {
-      if (this.$refs.buttonPP.disabled) {
-        this.loadListBoxPP();
-        this.$refs.listBox.source = this.listBoxSourcePP;
-      }
+        if (this.$refs.buttonPP.disabled) {
+          this.loadListBoxPP();
+          this.$refs.listBox.source = this.listBoxSourcePP;
+        }
     }
   },
 
@@ -310,8 +361,6 @@ export default {
 
   mounted() {
     this.loadListBoxData();
-    // FLEXBOX
-    // this.$refs.Rows.updateHeight();
   },
 
 

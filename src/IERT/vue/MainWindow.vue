@@ -18,7 +18,7 @@
     >
 
       <!--    Верхний бар-->
-      <div ref="header" style="position: relative;">
+      <div ref="header">
         <div>{{ title }}</div>
       </div>
 
@@ -38,14 +38,13 @@
         <div style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
         display: flex; flex-direction: row; align-items: center; justify-content: space-around; height: 50px">
 
-
           <div style="flex: 1 1 auto; display: flex; flex-direction: row; justify-content: space-around">
             <!--          style all: cursor: pointer; -->
 
             <JqxButton ref="createWindowNewVariant"
                        @click="this.$root.$children[0].createWindowNewVariant"
                        :height="button_height+'px'" :theme="theme" :textPosition="'center'"
-                       :value="'&nbsp;Создать новый вариант&nbsp;'" class="" style="margin: 0 2px 0 4px"/>
+                       :value="'&nbsp;Создать новый вариант&nbsp;'" style="margin: 0 2px 0 4px"/>
 
             <JqxButton ref="workVariant"
                        @click="workVariant"
@@ -64,7 +63,6 @@
           </div>
 
           <div style="flex: 1 1 200px; display: flex; flex-direction: row; justify-content: flex-end">
-
             <div style="flex: 1 1 auto"/>
             <div style="flex: 1 1 auto;">
               <JqxButton ref="closeButton"
@@ -73,7 +71,6 @@
                          :value="'&nbsp;Закрыть&nbsp;'" style="margin: auto"/>
             </div>
           </div>
-
 
         </div>
       </div>
@@ -120,7 +117,6 @@ export default {
   methods: {
     // Окно изменения варианта
     workVariant() {
-      console.log(this.id, this.GridSelector);
       this.$emit('workVariantCreateWindow', this.id, this.GridSelector)
     },
 
