@@ -5,15 +5,16 @@
                v-show="state"
                :max-height="1999999"
                :max-width="190000"
-               :min-width="550"
+               :min-width="700"
                :min-height="200"
-               :width="830"
-               :height="300"
+               :width="1000"
+               :height="500"
                :position="{ x: 200, y: 200 }"
                :id="id"
                :theme="theme"
                :sourceOut="sourceOut"
                :keyboard-close-key="NaN"
+               :drag-area="dragArea"
     >
 
       <!--    Верхний бар-->
@@ -27,7 +28,7 @@
         <div style="background-color: rgba(255,0,0,0); flex: 1 0 auto; margin: 0 2px 10px 0">
           <Preloader v-if="!isLoaded"/>
           <JqxGrid v-else ref="Grid"
-                   @rowselect="onRowselect"
+                   @rowselect="onRowselect" @rowdoubleclick="workVariant"
                    :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false" :columns="columns"
                    :pageable="false" :autoheight="false" :sortmode="'columns'" :filterable="true" :filtermode="'excel'"
                    :columnsresize="true" :sortable="true" :altrows="false" :editable="false" :theme="theme"
@@ -35,46 +36,45 @@
         </div>
         <!--      Нижнее меню -->
         <div style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
-        display: flex; flex-direction: row; align-items: center; justify-content: space-around; height: 40px">
+        display: flex; flex-direction: row; align-items: center; justify-content: space-around; height: 50px">
 
-<!--          style all: cursor: pointer; -->
 
-          <div style="flex: 3 1 auto;">
+          <div style="flex: 1 1 auto; display: flex; flex-direction: row; justify-content: space-around">
+            <!--          style all: cursor: pointer; -->
+
             <JqxButton ref="createWindowNewVariant"
                        @click="this.$root.$children[0].createWindowNewVariant"
                        :height="button_height+'px'" :theme="theme" :textPosition="'center'"
-                       :value="'&nbsp;Создать новый вариант&nbsp;'" style="margin: auto;"/>
-          </div>
+                       :value="'&nbsp;Создать новый вариант&nbsp;'" class="" style="margin: 0 2px 0 4px"/>
 
-          <div class="lowerMenu" >
             <JqxButton ref="workVariant"
                        @click="workVariant"
-                       :height="button_height+'px'" :theme="theme" :textPosition="'center'"
-                       :value="'&nbsp;Изменить&nbsp;'" style="margin: auto"/>
-          </div>
+                       :height="button_height+'px'" :width="'120px'" :theme="theme" :textPosition="'center'"
+                       :value="'&nbsp;Изменить&nbsp;'" style="margin: 0 2px 0"/>
 
-          <div class="lowerMenu" >
             <JqxButton ref="buttonDeleteVariant"
                        @click="deleteVariant"
-                       :height="button_height+'px'" :theme="theme" :textPosition="'center'"
-                       :value="'&nbsp;Удалить&nbsp;'" style="margin: auto"/>
-          </div>
+                       :height="button_height+'px'" :width="'120px'" :theme="theme" :textPosition="'center'"
+                       :value="'&nbsp;Удалить&nbsp;'" style="margin: 0 2px 0"/>
 
-          <div class="lowerMenu" >
             <JqxButton ref="buttonRefreshTable"
                        @click="updateGridFromURL"
-                       :height="button_height+'px'" :theme="theme" :textPosition="'center'"
-                       :value="'&nbsp;Обновить&nbsp;'" style="margin: auto"/>
+                       :height="button_height+'px'" :width="'120px'" :theme="theme" :textPosition="'center'"
+                       :value="'&nbsp;Обновить&nbsp;'" style="margin: 0 4px 0 2px"/>
           </div>
 
-          <div class="lowerMenu" >
-            <div>
-            <JqxButton ref="closeButton"
-                       @click="closeWindows"
-                       :height="button_height+'px'" :theme="theme" :textPosition="'center'"
-                       :value="'&nbsp;Закрыть&nbsp;'" style="margin: auto"/>
+          <div style="flex: 1 1 200px; display: flex; flex-direction: row; justify-content: flex-end">
+
+            <div style="flex: 1 1 auto"/>
+            <div style="flex: 1 1 auto;">
+              <JqxButton ref="closeButton"
+                         @click="closeWindows"
+                         :height="button_height+'px'" :width="'120px'" :theme="theme" :textPosition="'center'"
+                         :value="'&nbsp;Закрыть&nbsp;'" style="margin: auto"/>
             </div>
           </div>
+
+
         </div>
       </div>
     </JqxWindow>
@@ -97,7 +97,7 @@ export default {
     Preloader,
   },
   name: "MainWindow",
-  props: ["id", "title", "closeWindows", "state", "theme"],
+  props: ["id", "title", "closeWindows", "state", "theme", "dragArea"],
   data() {
     return {
       isLoaded: false,
@@ -120,6 +120,7 @@ export default {
   methods: {
     // Окно изменения варианта
     workVariant() {
+      console.log(this.id, this.GridSelector);
       this.$emit('workVariantCreateWindow', this.id, this.GridSelector)
     },
 
@@ -225,8 +226,11 @@ export default {
 <style scoped>
 
 .lowerMenu {
-  flex: 2 1 auto;
+  flex: 1 1 auto;
+  border-style: solid;
+  border-width: 1px;
 }
+
 
 /*Анимация открытия-закрытия-сворачивания окна*/
 .fade-enter-active, .fade-leave-active {

@@ -1,8 +1,6 @@
 <template>
-  <div
-      v-bind:style="{ 'background-image': 'url('  + ')','background-repeat': 'no-repeat', 'width': '100%',
-     'height': '100%', 'top': '0', 'left': '0', 'overflow': 'hidden'}">
-    <JqxMenu :key="menuKey" ref="Menu" style="height: 30px; border-radius: 0;" :theme="theme"
+  <div>
+    <JqxMenu :key="menuKey" ref="Menu" :theme="theme"
              :show-top-level-arrows="false" :popup-z-index="999999">
       <!--      @changeTheme="changeTheme($event)"-->
       <ul style="display: flex; flex-direction: row;
@@ -67,12 +65,13 @@
 
       </ul>
     </JqxMenu>
+
     <div ref="main" :style="{'height': mainDivSize + 'px'}" id="main-page">
       <component ref="win" v-for="window in windows" :is="window.type" :row="window.row" :title="window.title" :id="window.id"
                  :key="window.id" :closeWindows="window.closeWindow" :state="window.state"
                  @MainWindowTableChange="MainWindowTableChange" :sourcePP="mainWindowSource" :theme="window.theme"
                  @workVariantCreateWindow="createWindowEditVariant" :parentWindow="window.parentWindow"
-                 :stations="stations"/>
+                 :stations="stations" :dragArea="dragArea"/>
     </div>
     <!--    @RowSelect="RowSelect"-->
     <JqxToolbar ref="TollBar" :theme="theme"/>
@@ -84,10 +83,10 @@ import JqxToolbar from "@/jqwidgets/jqwidgets-vue/vue_jqxtoolbar";
 import JqxMenu from "@/jqwidgets/jqwidgets-vue/vue_jqxmenu";
 import JqxButtons from "@/jqwidgets/jqwidgets-vue/vue_jqxbuttons";
 import appConfig from "@/IERT/js/appConfig";
-import MainWindow from "@/IERT/vue/windows/MainWindow";
+import MainWindow from "@/IERT/vue/MainWindow";
 import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
 import EditVariantWindow from "@/IERT/vue/EditVariantWindow";
-import AddStation from "@/IERT/vue/windows/AddStation/AddStation";
+import AddStation from "@/IERT/vue/AddStation";
 import XmlQuery from "@/IERT/js/xmlQuery";
 
 
@@ -106,7 +105,7 @@ export default {
   data() {
     return {
       theme: 'light',
-      mainDivSize: document.documentElement.clientHeight - 75,
+      mainDivSize: document.documentElement.clientHeight - 79,
       windows: [],
       id: {},
       count: 0,
@@ -114,30 +113,8 @@ export default {
       stations: [],
       station: null,
       menuKey: JQXLite.generateID(),
+      dragArea: {},
     }
-  },
-
-  mounted() {
-    this.$refs.Menu.setOptions({
-      width: "100%",
-      height: 30,
-      animationShowDuration: 0,
-      animationHideDuration: 0,
-      animationShowDelay: 0,
-      autoOpen: true,
-      showTopLevelArrows: false,
-    });
-    this.$refs.TollBar.setOptions({
-      width: '100%',
-      height: 45,
-      initTools: function (type, index) {
-      }
-    });
-    window.addEventListener('resize', this.updateSizeApp);
-  },
-
-  destroyed() {
-    window.removeEventListener('resize', this.updateSizeApp)
   },
 
   methods: {
@@ -413,6 +390,13 @@ export default {
 
     updateSizeApp: function () {
       this.mainDivSize = document.documentElement.clientHeight - 75;
+
+      this.$set(this.dragArea, 'left', 0);
+      this.$set(this.dragArea, 'top', 34);
+      this.$set(this.dragArea, 'width', document.documentElement.clientWidth);
+      this.$set(this.dragArea, 'height', document.documentElement.clientHeight - 75);
+
+      // this.dragArea =  { left: 0, top: 34, width: document.documentElement.clientWidth, height: this.mainDivSize };
     },
 
     addListWindow: function (added_options) {
@@ -454,7 +438,31 @@ export default {
 
   created() {
     this.loadStations();
-  }
+  },
+
+  mounted() {
+    this.$refs.Menu.setOptions({
+      width: "100%",
+      height: 32,
+      animationShowDuration: 0,
+      animationHideDuration: 0,
+      animationShowDelay: 0,
+      autoOpen: true,
+      showTopLevelArrows: false,
+    });
+    this.$refs.TollBar.setOptions({
+      width: '100%',
+      height: 45,
+      initTools: function (type, index) {
+      }
+    });
+    window.addEventListener('resize', this.updateSizeApp);
+    this.updateSizeApp();
+  },
+
+  destroyed() {
+    window.removeEventListener('resize', this.updateSizeApp)
+  },
 
 }
 </script>

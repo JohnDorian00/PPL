@@ -11,7 +11,9 @@
                @close="closeWindows"
                v-show="state"
                :theme="theme"
-               :ref="'win'">
+               :ref="'win'"
+               :drag-area="dragArea"
+    >
 
       <!--    Верхний бар-->
       <div ref="header" style="position: relative;">
@@ -132,7 +134,7 @@ export default {
 
   name: "MainWindow",
 
-  props: ["id", "title", "closeWindows", "state", "sourcePP", "theme"],
+  props: ["id", "title", "closeWindows", "state", "sourcePP", "theme", "dragArea"],
 
   data() {
     return {

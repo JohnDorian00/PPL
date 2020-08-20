@@ -14,6 +14,7 @@
                      v-show="state"
                      :keyboard-close-key="NaN"
                      :ref="'win'"
+                     :drag-area="dragArea"
           >
 
             <!--    Верхний бар-->
@@ -231,7 +232,7 @@ import JqxPanel from "@/jqwidgets/jqwidgets-vue/vue_jqxpanel";
 import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
 import JqxTabs from "@/jqwidgets/jqwidgets-vue/vue_jqxtabs";
 import JqxTreeGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxtreegrid";
-import AddStation from "@/IERT/vue/windows/AddStation/AddStation";
+import AddStation from "@/IERT/vue/AddStation";
 
 export default {
   components: {
@@ -250,7 +251,7 @@ export default {
   },
 
   name: "WorkVariant",
-  props: ["id", "title", "closeWindows", "state", "row", "stations", "theme"],
+  props: ["id", "title", "closeWindows", "state", "row", "stations", "theme", "dragArea"],
   data() {
     return {
       isLoaded: true,
