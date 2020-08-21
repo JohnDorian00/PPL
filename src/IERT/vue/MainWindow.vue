@@ -32,8 +32,9 @@
                    :height="'100%'" :width="'100%'" :source="dataAdapter" :columnsmenu="false" :columns="columns"
                    :pageable="false" :autoheight="false" :sortmode="'columns'" :filterable="true" :filtermode="'excel'"
                    :columnsresize="true" :sortable="true" :altrows="false" :editable="false" :theme="theme"
-                   :enabletooltip="true" :columnsautoresize="true" :selectionmode="'singlerow'"/>
+                   :enabletooltip="true" :columnsautoresize="true" :selectionmode="'singlerow'" :scrollbarsize="20"/>
         </div>
+
         <!--      Нижнее меню -->
         <div style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
         display: flex; flex-direction: row; align-items: center; justify-content: space-around; height: 50px">

@@ -18,141 +18,118 @@
           >
 
             <!--    Верхний бар-->
-            <div ref="header" style="position: relative;">
-              <div style="display: inline;">{{ title }}</div>
-              <div style="display: inline; position: absolute; top:0; right: 0;
-                      margin-top: 6px; margin-right: 5px; z-index: 99999999999999; cursor: pointer;" @click="closeWindows"
-              >
-                <!--            <div class="collapse-button">-->
-                <!--              <img class="collapse-button" src="@/style/images/minus.png">-->
-                <!--            </div>-->
-                <!--            <div class="expand-button">-->
-                <!--              <img class="expand-button" src="@/style/images/full-screen.png">-->
-                <!--            </div>-->
-                <!--            <div id="exit-button" class="close-button" @click="closeWindows">-->
-                <!--              <img class="close-button" src="@/style/images/closing.png" @click="closeWindows">-->
-                <!--            </div>-->
-
-              </div>
+            <div ref="header">
+              <div>{{ title }}</div>
             </div>
 
-            <!--      Контент-->
-            <div ref="content" style=" top: 0; width: 100%; background-color: rgba(0,0,255,0); ">
 
-              <!--      Таблица-->
-              <div
-                  style="background-color: rgb(87,61,49); width: 100%; position: relative; top: 0; margin-right: 60px;
-                   height: calc(100% - 76px);">
-                <JqxSplitter :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="30" @resize="onResize"
-                             :panels="panels">
+            <div ref="MainContent" style="display: flex; flex-direction: column; padding: 5px; width: 100%; height: 100%">
 
+              <div style="flex: 1 1 auto; margin-bottom: 10px;">
+                <JqxSplitter @resize="onResize" style=""
+                             :width="'100%'" :height="'100%'" :theme="theme" :splitBarSize="30" :panels="panels">
+
+<!--                  Левая часть окна-->
                   <div>
-                    <JqxExpander style="border: none; left: 0px;" ref="feedExpander" :theme="theme"
-                                 :width="'calc(100% + 2px)'" :height="'calc(100% - 34px)'"
-                                 :toggleMode="'none'" :showArrow="false">
-                      <div class="jqx-hideborder" style="width: 100%; text-align: center">
+                    <JqxExpander :theme="theme" :height="'100%'"
+                                 :toggleMode="'none'" :showArrow="false" style="padding: 0;" >
+
+                      <div class="jqx-hideborder" style="text-align: center; width: 100%">
                         Выберите участки для расчета
                       </div>
 
-                      <div style="padding: 0px;">
-
+                      <div style="padding: 0;">
                         <JqxTabs ref="myTabs" :theme="theme" :scrollable="false" :enableScrollAnimation="true"
-                                 :width="'100%'" :height="'100%'" :position="'top'" style="border: none;"
+                                  :position="'top'" style="border: none; padding: 0" height="100%"
                                  :animationType="'none'" :selectionTracker='false' @selected="onTabclick($event)">
+
                           <ul>
                             <li style="margin-left: 10px;">Выбор из списка</li>
                             <li style="margin-right: 10px;">Выбор участка по пути следования</li>
                           </ul>
 
-                          <div style="height:100%; width:100%; overflow: hidden;">
-                            <!--           :source="dataAdapter" @rowselect="onRowselect"    -->
-                            <Preloader v-if="!isLinesLoaded" style="position: relative"/>
-                            <JqxGrid v-else style="position:relative; border: none;" ref="linesGrid"
-                                     :height="'100%'"
-                                     :width="'100%'"
+                          <!--                  Левая вкладка-->
+                          <div style="border: none">
+                            <Preloader v-if="!isLinesLoaded"/>
+                            <JqxGrid v-else style="border: none" ref="linesGrid"
+                                     :scrollbarsize="20" :width="'100%'" :height="'100%'"
                                      :columnsmenu="false" :columns="columns" :pageable="false" :autoheight="false"
                                      :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
                                      :enabletooltip="true" :columnsautoresize="false" :editable="false"
                                      :selectionmode="'singlerow'" :source="linesSource"
                                      :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
-                                     @rowdoubleclick="onRowselect($event)"
-                            >
-
-                            </JqxGrid>
+                                     @rowdoubleclick="onRowselect($event)"/>
                           </div>
 
-                          <div style="height: calc(100%); width:100%; overflow: hidden; position:relative;">
+                          <!--                  Правая вкладка-->
+                          <div >
+                            <div style="display: flex; flex-direction: column; justify-content: space-around;
+                                          width: 100%; height: 100%">
 
-                            <div style="text-align: center; margin: 5px; ">Сформируйте путь следования, вдоль которого будут
-                              выбраны участки
-                            </div>
 
-                            <div style="height: calc(100% - 110px)">
+                              <div style="flex: 3 1 auto;">
+                                <JqxGrid style="border: none; position:relative;" ref="stationGrid"
+                                         :height="'100%'"
+                                         :width="'100%'" :enablehover="false"
+                                         :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
+                                         :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
+                                         :enabletooltip="true" :columnsautoresize="false" :editable="false"
+                                         :selectionmode="'singlerow'" :source="stationsSource"
+                                         :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                                         @rowselect="deleteStationToModal($event)" :scrollbarsize="20"/>
+                              </div>
 
-                              <JqxGrid style="border: none; position:relative;" ref="stationGrid"
-                                       :height="'100%'"
-                                       :width="'100%'" :enablehover="false"
-                                       :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
-                                       :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
-                                       :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                                       :selectionmode="'singlerow'" :source="stationsSource"
-                                       :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
-                                       @rowselect="deleteStationToModal($event)"
-                              >
-                              </JqxGrid>
-                            </div>
-                            <div style="position: absolute; bottom: 0; width: 100%">
+<!--                              Buttons right tab-->
+                              <div style="flex: 0 0 10px; display: flex; flex-direction: column;">
 
-                              <div style="display : block; width: 100%">
+                                <div style="display: flex; flex-direction: row;">
 
-                                <div style="display : inline-block;">
-                                  <JqxButton ref="buttonAddStations" @click="showModal" :height="button_height+'px'"
-                                             :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                             :theme="theme" style="display : inline-block; margin-left: 5px"
-                                  ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                  </JqxButton>
+                                  <div>
+                                    <JqxButton ref="buttonAddStations" @click="showModal" :height="button_height+'px'"
+                                               :textImageRelation="'imageBeforeText'" :textPosition="'left'"
+                                               :theme="theme" style="display : inline-block; margin-left: 5px"
+                                    ><span class="nobr">Добавить станцию&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    </JqxButton>
+                                  </div>
+
+                                  <div>
+                                    <JqxButton @click="clearStations" ref="buttonClearStations" :height="button_height+'px'"
+                                               :textImageRelation="'imageBeforeText'" :textPosition="'center'"
+                                               :theme="theme" style="display : inline-block; margin-right: 8px"
+                                    ><span class="nobr">Очистить станции&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    </JqxButton>
+                                  </div>
+
                                 </div>
 
-                                <div style="display : inline-block; float: right">
-                                  <JqxButton @click="clearStations" ref="buttonClearStations" :height="button_height+'px'"
-                                             :textImageRelation="'imageBeforeText'" :textPosition="'center'"
-                                             :theme="theme" style="display : inline-block; margin-right: 8px"
-                                  ><span class="nobr">Очистить станции&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                  </JqxButton>
+                                <div style="width: 100%">
+                                  <JqxButton @click="makeLinesList" ref="buttonMakeLines" :height="button_height+'px'"
+                                             :textPosition="'center'" style="margin-left: 5px"
+                                             :theme="theme" :disabled="true"
+                                             value="Сформировать список участков"/>
                                 </div>
 
                               </div>
-
-                              <div style="display : block; width: 100%">
-                                <JqxButton @click="makeLinesList" ref="buttonMakeLines" :height="button_height+'px'"
-                                           :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                                           :theme="theme" style="margin-left: 5px;" :disabled="true"
-                                ><span
-                                    class="nobr">Сформировать список участков&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                </JqxButton>
-                              </div>
-
                             </div>
                           </div>
                         </JqxTabs>
                       </div>
-
                     </JqxExpander>
 
                   </div>
-
+<!--                  Правая часть окна-->
                   <div>
-                    <JqxExpander style="border: none;" ref="feedExpander" :theme="theme"
-                                 :width="'100%'" :height="'calc(100% - 37px)'"
+                    <JqxExpander :theme="theme"
+                                 :width="'100%'" :height="'100%'"
                                  :toggleMode="'none'" :showArrow="false">
 
                       <div class="jqx-hideborder" style="width: 100%; text-align: center">
                         Выбранные участки
                       </div>
 
-                      <div style="height: 100%; padding: 0;">
+                      <div style="padding: 0;">
                         <Preloader v-if="!isLoaded"/>
-                        <jqxTreeGrid v-else style="border: none; position:relative;"
+                        <jqxTreeGrid v-else style="border: none;"
                                      ref="selectedGrid"
                                      :height="'100%'"
                                      :width="'100%'" @rowBeginEdit="rowEdit($event)" @rowEndEdit="rowEndEdit($event)"
@@ -163,9 +140,7 @@
                                      :enabletooltip="true" :columnsautoresize="false" :editable="true"
                                      :selectionMode="'custom'" :source="selectedStationsSource" :editSettings="editSettings"
                                      :theme="theme" :filterable="true" :filterMode="'advanced'" :sortmode="'columns'"
-                        >
-                        </jqxTreeGrid>
-
+                                     :scrollBarSize="20"/>
                       </div>
                     </JqxExpander>
                   </div>
@@ -173,37 +148,38 @@
                 </JqxSplitter>
               </div>
 
+              <!--      Нижнее меню -->
+              <div style="border-style: solid; border-width: 1px; border-color: rgb(221,221,221);
+                          display: flex; flex-direction: row; align-items: center; justify-content:
+                          space-around; height: 50px">
 
-              <!--      Нижнее меню (кнопки)-->
-              <ul class="btn-group" :height="button_height">
-
-                <li>
+                <div id="lowerMenu" style="flex: 1 1 auto; display: flex; flex-direction: row; justify-content: space-around">
+                  <!--          style all: cursor: pointer; -->
                   <JqxButton ref="createWindowAddStation"
-                             :height="button_height" @click="saveSelectedLines"
-                             :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                             :theme="theme" :style="{'display': 'inline-block'} "
-                  ><span class="nobr">Сохранить&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                  </JqxButton>
-                </li>
-                <li>
-                  <JqxButton class="button" ref="buttonClear" @click="clearLines" :height="button_height+'px'"
-                             :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                             :theme="theme" :style="{ 'display': 'inline-block'}"
-                  ><span class="nobr">Очистить выбранные участки&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                  </JqxButton>
-                </li>
-                <li class="last">
-                  <JqxButton class="button" ref="buttonClose" @click="closeWindows" :width="120"
-                             :height="button_height+'px'"
-                             :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                             :theme="theme" :style="{ 'display': 'inline-block'}"
-                  ><span class="nobr">Закрыть&nbsp;&nbsp;</span>
-                  </JqxButton>
-                </li>
+                             @click="saveSelectedLines"
+                             :textPosition="'center'"
+                             :theme="theme" :height="button_height+'px'" :value="'&nbsp;Сохранить&nbsp;'"
+                             style="margin: 0 2px 0 4px" :width="'120px'"/>
 
-                <li class="helper"></li>
-              </ul>
+                  <JqxButton ref="buttonClear"
+                             @click="clearLines"
+                             :textPosition="'center'"
+                             :theme="theme" :height="button_height+'px'" :value="'&nbsp;Очистить выбранные участки&nbsp;'"
+                             style="margin: 0 2px 0" :width="'220px'"/>
+                </div>
 
+                <div style="flex: 1 1 200px; display: flex; flex-direction: row; justify-content: flex-end">
+                  <div style="flex: 2 1 auto"/>
+                  <div style="flex: 1 1 auto;">
+
+                    <JqxButton ref="buttonClose"
+                               @click="closeWindows"
+                               :textPosition="'center'" :width="'120px'"
+                               :theme="theme" :height="button_height+'px'" :value="'&nbsp;Закрыть&nbsp;'"
+                               style="margin: 0 4px 0 2px"/>
+                  </div>
+                </div>
+              </div>
             </div>
           </JqxWindow>
         </transition>
@@ -211,7 +187,8 @@
 
       <div>
         <AddStation ref="modal" :parentWindow="this" :title="'Добавление путей по станциям'"
-                    :locStations="locStations" :id="id" @station-deleted="addStation" :theme="theme">
+                    :locStations="locStations" :id="id" @station-deleted="addStation" :theme="theme"
+                    :dragArea="dragArea">
         </AddStation>
       </div>
 
@@ -385,10 +362,6 @@ export default {
   },
 
   methods: {
-    test() {
-      console.log(this.$refs.selectedGrid.getRows());
-    },
-
     // Добавить измененную строку в sourceOut, если ее там еще нет
     addRowToSourceOut(row) {
       if (!this.outSource.includes(row)) {
@@ -1558,82 +1531,9 @@ export default {
 
 
 <style scoped>
-.jqx-expander-content {
-  height: 100% !important;
-}
-
-ul {
-  text-align: justify;
-  /* Лекарство для IE6-7*/
-  text-justify: newspaper;
-}
-
-ul li {
-  display: inline-block;
-  text-align: left;
-  /* эмуляция inline-block для IE6-7*/
-/ / display: inline;
-/ / zoom: 1;
-}
-
-ul li.helper {
-  width: 100%;
-  height: 0;
-  visibility: hidden;
-}
-
-.last {
-  margin-right: 100px
-}
-
-.nobr {
-  white-space: nowrap;
-}
-
-.button {
-  display: inline-block;
-  margin-right: 10px;
-  margin-left: 10px;
-
-}
-
-.btn-group {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-}
-
-.collapse-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
-
-.expand-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
-
-.close-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity .1s;
+  transition: opacity .2s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active до версии 2.1.8 */ {
   opacity: 0;

@@ -23,6 +23,7 @@
       <!--      Контент -->
       <div style="display: flex; flex-direction: column">
 
+<!--        Кнопки переключения грида -->
         <div style="flex: 0 0 auto; display: flex; flex-direction: row; border-color: rgb(221,221,221);
          justify-content: space-around; align-items: center; margin-bottom: 0; border-style: solid; border-width: 1px;
          padding: 10px; border-top-right-radius: 4px; border-top-left-radius: 4px;">
@@ -40,6 +41,7 @@
           </div>
         </div>
 
+<!--        Таблица -->
 <!--    position: relative делает скролл по ListBox медленнее (just magic)   -->
         <div style="flex: 3 0 auto; position: relative; border: rgb(221,221,221) 1px solid;
          border-bottom: none; border-top: none; height: 0">
@@ -51,6 +53,7 @@
             />
         </div>
 
+<!--        Инпуты -->
         <div style="flex: 2 0 auto; margin-bottom: 10px; display: flex; flex-direction: column;
                     align-items: center; border-color: rgb(221,221,221); border-style: solid; border-width: 1px;">
 
@@ -112,7 +115,6 @@
 import JqxWindow from "@/jqwidgets/jqwidgets-vue/vue_jqxwindow";
 import JqxButton from '@/jqwidgets/jqwidgets-vue/vue_jqxbuttons.vue';
 import appConfig from "@/IERT/js/appConfig";
-import JqxGrid from "@/jqwidgets/jqwidgets-vue/vue_jqxgrid.vue";
 import XmlQuery from "@/IERT/js/xmlQuery";
 import Preloader from "@/IERT/vue/Preloader";
 import JqxListBox from "@/jqwidgets/jqwidgets-vue/vue_jqxlistbox";
@@ -123,7 +125,6 @@ export default {
   components: {
     JqxWindow,
     JqxButton,
-    JqxGrid,
     Preloader,
     JqxListBox,
     JqxInput,

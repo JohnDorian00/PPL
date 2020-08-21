@@ -14,50 +14,24 @@
         <li style="margin-right: 50px">Смена темы
             <ul style="padding-left: 0; width: 120px;">
               <div class="changeTheme">
-  <!--            <li @click="changeTheme('android')">android</li>-->
-  <!--            <li @click="changeTheme('arctic')">arctic</li>-->
-              <li @click="changeTheme('base')">base</li>
-  <!--            <li @click="changeTheme('black')">black</li>-->
-  <!--            <li @click="changeTheme('blackberry')">blackberry</li>-->
-
-              <li @click="changeTheme('bootstrap')">bootstrap</li>
-              <li @click="changeTheme('classic')">classic</li>
-              <li @click="changeTheme('dark')">dark</li>
-  <!--            <li @click="changeTheme('darkblue')">darkblue</li>-->
-              <li @click="changeTheme('energyblue')">energyblue</li>
-
-              <li @click="changeTheme('ext')">ext</li>
-  <!--            <li @click="changeTheme('flat')">flat</li>-->
-  <!--            <li @click="changeTheme('fresh')">fresh</li>-->
-              <li @click="changeTheme('glacier')">glacier</li>
-              <li @click="changeTheme('highcontrast')">highcontrast</li>
-
-              <li @click="changeTheme('light')">light</li>
-              <li @click="changeTheme('material')">material</li>
-              <li @click="changeTheme('material-green')">material-green</li>
-              <li @click="changeTheme('material-purple')">material-purple</li>
-              <li @click="changeTheme('metro')">metro</li>
-
-              <li @click="changeTheme('metrodark')">metrodark</li>
-  <!--            <li @click="changeTheme('mobile')">mobile</li>-->
-              <li @click="changeTheme('office')">office</li>
-  <!--            <li @click="changeTheme('orange')">orange</li>-->
-  <!--            <li @click="changeTheme('shinyblack')">shinyblack</li>-->
-
-              <li @click="changeTheme('summer')">summer</li>
-  <!--            <li @click="changeTheme('ui-darkness')">ui-darkness</li>-->
-  <!--            <li @click="changeTheme('ui-le-frog')">ui-le-frog</li>-->
-              <li @click="changeTheme('ui-lightness')">ui-lightness</li>
-  <!--            <li @click="changeTheme('ui-overcast')">ui-overcast</li>-->
-
-  <!--            <li @click="changeTheme('ui-redmond')">ui-redmond</li>-->
-  <!--            <li @click="changeTheme('ui-smoothness')">ui-smoothness</li>-->
-  <!--            <li @click="changeTheme('ui-start')">ui-start</li>-->
-  <!--            <li @click="changeTheme('ui-sunny')">ui-sunny</li>-->
-  <!--            <li @click="changeTheme('web')">web</li>-->
-
-  <!--            <li @click="changeTheme('windowsphone')">windowsphone</li>-->
-              <li @click="changeTheme('leaflet')">leaflet</li>
+                <li @click="changeTheme('base')">base</li>
+                <li @click="changeTheme('bootstrap')">bootstrap</li>
+                <li @click="changeTheme('classic')">classic</li>
+                <li @click="changeTheme('dark')">dark</li>
+                <li @click="changeTheme('energyblue')">energyblue</li>
+                <li @click="changeTheme('ext')">ext</li>
+                <li @click="changeTheme('glacier')">glacier</li>
+                <li @click="changeTheme('highcontrast')">highcontrast</li>
+                <li @click="changeTheme('light')">light</li>
+                <li @click="changeTheme('material')">material</li>
+                <li @click="changeTheme('material-green')">material-green</li>
+                <li @click="changeTheme('material-purple')">material-purple</li>
+                <li @click="changeTheme('metro')">metro</li>
+                <li @click="changeTheme('metrodark')">metrodark</li>
+                <li @click="changeTheme('office')">office</li>
+                <li @click="changeTheme('summer')">summer</li>
+                <li @click="changeTheme('ui-lightness')">ui-lightness</li>
+                <li @click="changeTheme('leaflet')">leaflet</li>
               </div>
             </ul>
         </li>
@@ -88,7 +62,6 @@ import NewVariantWindow from "@/IERT/vue/NewVariantWindow";
 import EditVariantWindow from "@/IERT/vue/EditVariantWindow";
 import AddStation from "@/IERT/vue/AddStation";
 import XmlQuery from "@/IERT/js/xmlQuery";
-
 
 export default {
   name: "MainApp",
@@ -471,7 +444,7 @@ export default {
 
 <!--505 ширина окна миниммум-->
 
-<style>
+<style scoped>
 
 .toolbar-main-button-style {
   border-radius: 20px;
@@ -534,12 +507,3 @@ ul.list-class-style li {
 
 </style>
 
-
-<!-- Указать в лицензии
-
-Icons made by <a href="https://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-
-
--->

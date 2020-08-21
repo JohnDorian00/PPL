@@ -941,7 +941,7 @@ input[type="text"].jqx-input-light:-ms-input-placeholder, input[type="text"].jqx
 
 .jqx-tabs-title-selected-bottom-light, .jqx-tabs-selection-tracker-bottom-light {
     border-color: transparent;
-    border-top: 1px solid #fff;
+    /*border-top: 1px solid #fff;*/
     filter: none;
     background: #fff;
     -webkit-box-shadow: none;
@@ -975,9 +975,10 @@ input[type="text"].jqx-input-light:-ms-input-placeholder, input[type="text"].jqx
 
 .jqx-tabs-content-light {
     box-sizing: border-box;
-    border: 1px solid #E0E0E0;
+    /*border: 1px solid #E0E0E0;*/
+    border: none;
     border-top-color: transparent;
-    padding:5px;
+    padding: 0px;
 }
 
 .jqx-tabs-bar-light {

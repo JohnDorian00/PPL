@@ -638,7 +638,10 @@ License: https://jqwidgets.com/license/
                 this._modalBackground.className = this.toThemeProperty('jqx-window-modal');
                 this._setModalBackgroundStyles();
                 document.body.appendChild(this._modalBackground);
+                
+                let t = this;
                 this.addHandler(this._modalBackground, this._getEvent('click'), function () {
+                    t.closeWindow();
                     return false;
                 });
                 var me = this;

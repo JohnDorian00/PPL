@@ -1,59 +1,40 @@
 <template>
-  <div>
+  <transition appear name="fade">
     <JqxWindow ref="mainWin"
-               :width="600"
-               :height="500"
+               :width="455"
+               :height="431"
                :max-height="190000"
-               :min-height="241"
+               :min-height="173"
                :max-width="190000"
-               :min-width="455"
+               :min-width="242"
                :position="{ x: 40, y: 40 }"
                :title="title"
                :theme="theme"
                :id="modalId"
                :is-modal="true"
-               :auto-open="false">
+               :auto-open="false"
+               :drag-area="dragArea">
       <div>
         Header
       </div>
 
-      <div ref="MainContent" style="width: 100%; height: 100%; position: absolute">
-        <!--        white-space:nowrap;-->
+      <div ref="MainContent">
 
-        <div style="height: calc(100% - 100px);">
-          <div
-              style="display: inline-block; width: calc(100% - 200px - 10px + 210px); height: 100%; position: relative; float: right; ">
-            <JqxGrid style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
-                     :width="'100%'"
-                     :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
-                     :sortable="true" :altrows="true" :columnsresize="true" :showfilterrow="true"
-                     :enabletooltip="true" :columnsautoresize="false" :editable="false"
-                     :selectionmode="'singlerow'" :source="stationsSource"
-                     :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
-                     @rowselect="onRowselect"
-            >
-            </JqxGrid>
-          </div>
-        </div>
-
-
-        <div style="width: 100%; display : block;">
-          <ul class="btn-group" :height="button_height">
-            <li class="last">
-              <JqxButton class="button" ref="closeButton" @click="hideModal" :width="120" :height="button_height+'px'"
-                         :textImageRelation="'imageBeforeText'" :textPosition="'left'"
-                         :theme="theme" style="display: inline-block;"
-              ><span class="nobr">Закрыть&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              </JqxButton>
-            </li>
-            <li class="helper"></li>
-          </ul>
-        </div>
+        <JqxGrid style="position:relative; border: none;" ref="stationGrid" :height="'100%'"
+                 :width="'100%'"
+                 :columnsmenu="false" :columns="stationsColumns" :pageable="false" :autoheight="false"
+                 :sortable="true" :altrows="true" :columnsresize="false" :showfilterrow="true"
+                 :enabletooltip="true" :columnsautoresize="false" :editable="false"
+                 :selectionmode="'singlerow'" :source="stationsSource"
+                 :theme="theme" :filterable="true" :filtermode="'default'" :sortmode="'columns'"
+                 @rowselect="onRowselect" :scrollbarsize="20"
+        >
+        </JqxGrid>
 
       </div>
 
     </JqxWindow>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -80,8 +61,7 @@ export default {
 
   name: "AddStation",
 
-  // props: ["id", "title", "closeWindows", "parentWindow", "stations"],
-  props: ["id", "parentWindow", "title", "locStations", "theme"],
+  props: ["id", "parentWindow", "title", "locStations", "theme", "dragArea"],
 
   data() {
     return {
@@ -105,6 +85,8 @@ export default {
 
       selectedRow: null,
       isOpenModal: true,
+
+      state : true,
 
     }
   },
@@ -192,77 +174,6 @@ export default {
 </script>
 
 <style scoped>
-
-ul {
-  text-align: justify;
-  /* Лекарство для IE6-7*/
-  text-justify: newspaper;
-}
-
-ul li {
-  display: inline-block;
-  text-align: left;
-  /* эмуляция inline-block для IE6-7*/
-/ / display: inline;
-/ / zoom: 1;
-}
-
-ul li.helper {
-  width: 100%;
-  height: 0;
-  visibility: hidden;
-}
-
-.last {
-  margin-right: 100px
-}
-
-.nobr {
-  white-space: nowrap;
-}
-
-.button {
-  display: inline-block;
-  margin-right: 10px;
-  margin-left: 10px;
-
-}
-
-.btn-group {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-}
-
-.collapse-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
-
-.expand-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
-
-.close-button {
-  display: inline;
-  cursor: pointer;
-  width: 12px;
-  height: 12px;
-  margin-right: 1px;
-  margin-left: 1px;
-}
-
 
 </style>
 
