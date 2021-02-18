@@ -709,7 +709,7 @@ export default {
 
       xmlQuery.query('json',
           function (json) {
-            if (json.rowsAffected === 0) {
+            if (json.UCH.length === 0) {
               console.warn("Ошибка получения участков с сервера");
               return
             }
@@ -723,7 +723,7 @@ export default {
               {name: 'uch_id', type: 'string'},
 
             ]
-            t.linesSource.localdata = json.rows;
+            t.linesSource.localdata = json.UCH;
             t.linesSort();
 
             let openRequest = t.$parent.connectDB();
@@ -741,14 +741,14 @@ export default {
 
               let obj;
 
-              for (let i = 0; i < json.rows.length; i++) {
+              for (let i = 0; i < json.UCH.length; i++) {
                 obj = {
-                  uch_id: json.rows[i].uch_id,
-                  start_stan: json.rows[i].start_stan,
-                  start_name: json.rows[i].start_name,
-                  end_stan: json.rows[i].end_stan,
-                  end_name: json.rows[i].end_name,
-                  exist_in_cdl: json.rows[i].exist_in_cdl,
+                  uch_id: json.UCH[i].uch_id,
+                  start_stan: json.UCH[i].start_stan,
+                  start_name: json.UCH[i].start_name,
+                  end_stan: json.UCH[i].end_stan,
+                  end_name: json.UCH[i].end_name,
+                  exist_in_cdl: json.UCH[i].exist_in_cdl,
                 }
                 let addT = lines.add(obj);
 
@@ -814,10 +814,10 @@ export default {
 
               let obj;
 
-              for (let i = 0; i < json.rows.length; i++) {
+              for (let i = 0; i < json.KOD_GR.length; i++) {
                 obj = {
-                  kod_gr: json.rows[i].kod_gr,
-                  name: json.rows[i].name,
+                  kod_gr: json.KOD_GR[i].kod_gr,
+                  name: json.KOD_GR[i].name,
                 }
                 locoCodes.put(obj);
               }
@@ -865,10 +865,10 @@ export default {
 
               let obj;
 
-              for (let i = 0; i < json.rows.length; i++) {
+              for (let i = 0; i < json.VID_URLB.length; i++) {
                 obj = {
-                  vid_uch: json.rows[i].vid_uch,
-                  sname_vid: json.rows[i].sname_vid,
+                  vid_uch: json.VID_URLB[i].vid_uch,
+                  sname_vid: json.VID_URLB[i].sname_vid,
                 }
                 linesCodes.put(obj);
               }
@@ -974,7 +974,6 @@ export default {
 
       xmlQuery.query('json',
           function (json) {
-
             // console.log(json.rows);
 
             let r = t.$parent.connectDB();
@@ -985,7 +984,7 @@ export default {
                   linesCodesTR = db.transaction("linesCodes", "readonly"),
                   linesCodes = linesCodesTR.objectStore("linesCodes");
 
-              if (json.rowsAffected > 0) {
+              if (json.UCH.length > 0) {
 
                 let linesSet = new Set(),
                     locoSet = new Set(),
@@ -997,7 +996,7 @@ export default {
                   linesSet.add(item);
                 })
 
-                json.rows.forEach(function (item, i, arr) {
+                json.UCH.forEach(function (item, i, arr) {
                   lineInfoArr.push({index: i, info: item});
                   linesSet.add(item.uch_id);
                   locoSet.add(item.kod_gr);
@@ -1061,7 +1060,7 @@ export default {
                       //   console.log();
                       // }
 
-                      t.addToSelectedGrid(linesArr, json.rows, locoArr);
+                      t.addToSelectedGrid(linesArr, json.UCH, locoArr);
 
 
 
@@ -1238,13 +1237,13 @@ export default {
       xmlQuery.query('json',
           function (json) {
             t.stationsList = [];
-            if (json.rowsAffected < 1) {
+            if (json.UCH.length < 1) {
               console.log("Отсутствуют участки между данными станциями");
               t.isLoaded = true;
               return
             }
 
-            json.rows.filter(function (item) {
+            json.UCH.filter(function (item) {
               t.stationsList.push(item.uch_id);
             })
             t.calcUchs(t.stationsList);

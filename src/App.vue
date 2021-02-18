@@ -213,7 +213,6 @@ export default {
       xmlQuery.query('json',
           function (json) {
             // t.stations = json.rows;
-
             let openRequest = t.connectDB();
             // Загрузка станций в IndexedDB
             openRequest.onsuccess = function () {
@@ -229,14 +228,14 @@ export default {
 
               let obj;
 
-              for (let i = 0; i < json.rows.length; i++) {
+              for (let i = 0; i < json.STAN.length; i++) {
                 obj = {
-                  dor_kod: json.rows[i].dor_kod,
-                  esr: json.rows[i].esr,
-                  mnem: json.rows[i].mnem,
-                  name: json.rows[i].name,
-                  sname: json.rows[i].sname,
-                  stan_id: json.rows[i].stan_id,
+                  dor_kod: json.STAN[i].dor_kod,
+                  esr: json.STAN[i].esr,
+                  mnem: json.STAN[i].mnem,
+                  name: json.STAN[i].name,
+                  sname: json.STAN[i].sname,
+                  stan_id: json.STAN[i].stan_id,
                 }
                 stations.put(obj);
               }

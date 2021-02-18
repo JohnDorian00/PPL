@@ -216,7 +216,7 @@ export default {
 
           function (json) {
             t.listBoxSourceGenscheme = {};
-            json.rows.filter(function (item) {
+            json.GS_VARIANT.filter(function (item) {
               t.listBoxSourceGenscheme[item.var_id] = item.name;
             })
             xmlQuery.destroy();
@@ -272,19 +272,21 @@ export default {
 
       xmlQuery.query('json',
           function (json) {
+        console.log(json);
             t.idNewVariant = json.rows[0].var_id;
-            xmlQuery.destroy();
+            console.log("Создан вариант с id ", t.idNewVariant);
             t.$root.$children[0].refreshAllMainWindows();
             t.isLoaded = true;
             t.enableButtons();
             t.closeWindows();
+            xmlQuery.destroy();
           },
           function (ER) {
-            xmlQuery.destroy();
             t.isLoaded = true;
             t.enableButtons();
             console.log("Error update data");
             console.log("ERROR = ", ER);
+            xmlQuery.destroy();
           }
       );
     },

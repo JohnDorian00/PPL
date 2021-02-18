@@ -146,6 +146,8 @@ export default {
         variant = this.GridSelector.var_id;
       }
 
+      console.log(variant);
+
       t.isLoaded = false;
       t.disableMenu();
 
@@ -169,8 +171,9 @@ export default {
             xmlQuery.destroy();
             t.isLoaded = true;
             t.enableMenu();
-            console.log("Не удалось удалить вариант, ", this.GridSelector.var_id);
+            console.log("Не удалось удалить вариант, ", variant);
             console.log("ERROR = ", ER);
+            t.$root.$children[0].refreshAllMainWindows();
           }
       );
     },
@@ -194,7 +197,7 @@ export default {
       })
 
       function successQuery(json) {
-        t.sourceOut = json.rows;
+        t.sourceOut = json.VARIANT;
         t.source.datafields = [
           {name: 'var_id', type: 'string'},
           {name: 'var_year', type: 'string'},
@@ -203,10 +206,10 @@ export default {
           {name: 'gs_name', type: 'string'},
           {name: 'var_desc', type: 'string'},
         ]
-        t.source.localdata = json.rows;
+        t.source.localdata = json.VARIANT;
 
         // Передача списка всех записей родителю
-        t.$emit("MainWindowTableChange", json.rows);
+        t.$emit("MainWindowTableChange", json.VARIANT);
         xmlQuery.destroy();
         t.isLoaded = true;
         t.enableMenu();
